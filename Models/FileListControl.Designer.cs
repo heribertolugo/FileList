@@ -53,6 +53,9 @@
             this.panel2.SuspendLayout();
             this.filesTreeViewContextMenu.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // tableLayoutPanel1
+            // 
             this.tableLayoutPanel1.ColumnCount = 2;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100f));
@@ -67,6 +70,10 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100f));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(662, 428);
             this.tableLayoutPanel1.TabIndex = 0;
+            this.tableLayoutPanel1.SetColumnSpan(this.panel1, 2);
+            // 
+            // treeView1
+            // 
             this.treeView1.CheckBoxes = true;
             this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView1.HideSelection = false;
@@ -78,6 +85,9 @@
             this.treeView1.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1_AfterCheck);
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1_AfterSelect);
             this.treeView1.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeView1_NodeMouseClick);
+            // 
+            // fileTypesCheckedListBox
+            // 
             this.fileTypesCheckedListBox.Dock = System.Windows.Forms.DockStyle.Left;
             this.fileTypesCheckedListBox.FormattingEnabled = true;
             this.fileTypesCheckedListBox.Location = new System.Drawing.Point(3, 53);
@@ -86,7 +96,9 @@
             this.fileTypesCheckedListBox.Size = new System.Drawing.Size(120, 372);
             this.fileTypesCheckedListBox.TabIndex = 2;
             this.fileTypesCheckedListBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.FileTypesCheckedListBox_ItemCheck);
-            this.tableLayoutPanel1.SetColumnSpan(this.panel1, 2);
+            // 
+            // panel1
+            // 
             this.panel1.Controls.Add(this.panel2);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.filterButton);
@@ -96,6 +108,9 @@
             this.panel1.Padding = new System.Windows.Forms.Padding(3);
             this.panel1.Size = new System.Drawing.Size(656, 44);
             this.panel1.TabIndex = 0;
+            // 
+            // panel
+            //
             this.panel2.Controls.Add(this.dateModifiedButton);
             this.panel2.Controls.Add(this.dateCreatedButton);
             this.panel2.Controls.Add(this.sizeSortButton);
@@ -104,6 +119,9 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(607, 25);
             this.panel2.TabIndex = 2;
+            // 
+            // label1
+            //
             this.label1.Dock = System.Windows.Forms.DockStyle.Top;
             this.label1.Location = new System.Drawing.Point(46, 3);
             this.label1.Name = "label1";
@@ -112,6 +130,9 @@
             this.label1.TabIndex = 1;
             this.label1.Text = "label1";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // filterButton
+            //
             this.filterButton.Dock = System.Windows.Forms.DockStyle.Left;
             this.filterButton.ForeColor = System.Drawing.SystemColors.WindowFrame;
             this.filterButton.Image = (System.Drawing.Image)Properties.Resources.menu_16;
@@ -124,45 +145,72 @@
             this.filterButton.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.filterButton.UseVisualStyleBackColor = true;
             this.filterButton.Click += new System.EventHandler(this.FilterButton_Click);
+            // 
+            // filesTreeViewContextMenu
+            //
             this.filesTreeViewContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[9]
             {
-        (System.Windows.Forms.ToolStripItem) this.checkUncheckAllToolStripMenuItem,
-        (System.Windows.Forms.ToolStripItem) this.toolStripSeparator3,
-        (System.Windows.Forms.ToolStripItem) this.expandTreeToolStripMenuItem,
-        (System.Windows.Forms.ToolStripItem) this.collapseTreeToolStripMenuItem,
-        (System.Windows.Forms.ToolStripItem) this.toolStripSeparator2,
-        (System.Windows.Forms.ToolStripItem) this.openFileToolStripMenuItem,
-        (System.Windows.Forms.ToolStripItem) this.fileLocationToolStripMenuItem,
-        (System.Windows.Forms.ToolStripItem) this.toolStripSeparator1,
-        (System.Windows.Forms.ToolStripItem) this.deleteFileToolStripMenuItem
+                (System.Windows.Forms.ToolStripItem) this.checkUncheckAllToolStripMenuItem,
+                (System.Windows.Forms.ToolStripItem) this.toolStripSeparator3,
+                (System.Windows.Forms.ToolStripItem) this.expandTreeToolStripMenuItem,
+                (System.Windows.Forms.ToolStripItem) this.collapseTreeToolStripMenuItem,
+                (System.Windows.Forms.ToolStripItem) this.toolStripSeparator2,
+                (System.Windows.Forms.ToolStripItem) this.openFileToolStripMenuItem,
+                (System.Windows.Forms.ToolStripItem) this.fileLocationToolStripMenuItem,
+                (System.Windows.Forms.ToolStripItem) this.toolStripSeparator1,
+                (System.Windows.Forms.ToolStripItem) this.deleteFileToolStripMenuItem
             });
             this.filesTreeViewContextMenu.Name = "filesTreeViewContextMenu";
             this.filesTreeViewContextMenu.ShowImageMargin = false;
             this.filesTreeViewContextMenu.Size = new System.Drawing.Size(156, 176);
+            // 
+            // expandTreeToolStripMenuItem
+            //
             this.expandTreeToolStripMenuItem.Name = "expandTreeToolStripMenuItem";
             this.expandTreeToolStripMenuItem.Size = new System.Drawing.Size((int)sbyte.MaxValue, 22);
             this.expandTreeToolStripMenuItem.Text = "Expand All";
             this.expandTreeToolStripMenuItem.Click += new System.EventHandler(this.ExpandTreeToolStripMenuItem_Click);
+            // 
+            // collapseTreeToolStripMenuItem
+            //
             this.collapseTreeToolStripMenuItem.Name = "collapseTreeToolStripMenuItem";
             this.collapseTreeToolStripMenuItem.Size = new System.Drawing.Size((int)sbyte.MaxValue, 22);
             this.collapseTreeToolStripMenuItem.Text = "Collapse All";
             this.collapseTreeToolStripMenuItem.Click += new System.EventHandler(this.CollapseTreeToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator2
+            //
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(124, 6);
+            // 
+            // openFileToolStripMenuItem
+            //
             this.openFileToolStripMenuItem.Name = "openFileToolStripMenuItem";
             this.openFileToolStripMenuItem.Size = new System.Drawing.Size((int)sbyte.MaxValue, 22);
             this.openFileToolStripMenuItem.Text = "Open File";
             this.openFileToolStripMenuItem.Click += new System.EventHandler(this.OpenFileToolStripMenuItem_Click);
+            // 
+            // fileLocationToolStripMenuItem
+            //
             this.fileLocationToolStripMenuItem.Name = "fileLocationToolStripMenuItem";
             this.fileLocationToolStripMenuItem.Size = new System.Drawing.Size((int)sbyte.MaxValue, 22);
             this.fileLocationToolStripMenuItem.Text = "Open Location";
             this.fileLocationToolStripMenuItem.Click += new System.EventHandler(this.FileLocationToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            //
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(124, 6);
+            // 
+            // deleteFileToolStripMenuItem
+            //
             this.deleteFileToolStripMenuItem.Name = "deleteFileToolStripMenuItem";
             this.deleteFileToolStripMenuItem.Size = new System.Drawing.Size((int)sbyte.MaxValue, 22);
             this.deleteFileToolStripMenuItem.Text = "Delete";
             this.deleteFileToolStripMenuItem.Click += new System.EventHandler(this.DeleteFileToolStripMenuItem_Click);
+            // 
+            // dateModifiedButton
+            //
             this.dateModifiedButton.FlatAppearance.BorderColor = System.Drawing.Color.DarkGray;
             this.dateModifiedButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.dateModifiedButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -175,6 +223,9 @@
             this.dateModifiedButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.dateModifiedButton.UseVisualStyleBackColor = true;
             this.dateModifiedButton.Click += new System.EventHandler(this.DateModifiedButton_Click);
+            // 
+            // dateCreatedButton
+            //
             this.dateCreatedButton.FlatAppearance.BorderColor = System.Drawing.Color.DarkGray;
             this.dateCreatedButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.dateCreatedButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -187,6 +238,9 @@
             this.dateCreatedButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.dateCreatedButton.UseVisualStyleBackColor = true;
             this.dateCreatedButton.Click += new System.EventHandler(this.DateCreatedButton_Click);
+            // 
+            // sizeSortButton
+            //
             this.sizeSortButton.FlatAppearance.BorderColor = System.Drawing.Color.DarkGray;
             this.sizeSortButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.sizeSortButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -199,12 +253,21 @@
             this.sizeSortButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.sizeSortButton.UseVisualStyleBackColor = true;
             this.sizeSortButton.Click += new System.EventHandler(this.SizeSortButton_Click);
+            // 
+            // toolStripSeparator3
+            //
             this.toolStripSeparator3.Name = "toolStripSeparator3";
             this.toolStripSeparator3.Size = new System.Drawing.Size(152, 6);
+            // 
+            // checkUncheckAllToolStripMenuItem
+            //
             this.checkUncheckAllToolStripMenuItem.Name = "checkUncheckAllToolStripMenuItem";
             this.checkUncheckAllToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
             this.checkUncheckAllToolStripMenuItem.Text = "Check/Uncheck All";
             this.checkUncheckAllToolStripMenuItem.Click += new System.EventHandler(this.CheckUncheckAllToolStripMenuItem_Click);
+            // 
+            // FileListControl
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6f, 13f);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.tableLayoutPanel1);

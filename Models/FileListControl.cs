@@ -116,15 +116,15 @@ namespace FileList.Models
             return true;
         }
 
-        public FileDataGroup GetFileDataGroupFromSelected()
-        {
-            TreeNode treeNode = this.treeView1.SelectedNode;
-            if (treeNode == null)
-                return new FileDataGroup((string)null, Enumerable.Empty<FileData>());
-            if ((uint)treeNode.Level > 0U)
-                treeNode = treeNode.Parent;
-            return new FileDataGroup(treeNode.Text, treeNode.Nodes.Cast<TreeNode>().Select<TreeNode, FileData>((Func<TreeNode, FileData>)(n => (FileData)n.Tag)));
-        }
+        //public FileDataGroup GetFileDataGroupFromSelected()
+        //{
+        //    TreeNode treeNode = this.treeView1.SelectedNode;
+        //    if (treeNode == null)
+        //        return new FileDataGroup((string)null, Enumerable.Empty<FileData>());
+        //    if ((uint)treeNode.Level > 0U)
+        //        treeNode = treeNode.Parent;
+        //    return new FileDataGroup(treeNode.Text, treeNode.Nodes.Cast<TreeNode>().Select<TreeNode, FileData>((Func<TreeNode, FileData>)(n => (FileData)n.Tag)));
+        //}
 
         public string[] GetCheckedPaths()
         {
@@ -132,8 +132,8 @@ namespace FileList.Models
             {
                 if ((n.Tag as FileData?).HasValue)
                     return true;
-                if (Path.HasExtension(n.Text))
-                    return Path.GetExtension(n.Text).ToLowerInvariant().Equals(UiHelper.ZipExtension);
+                //if (Path.HasExtension(n.Text))
+                //    return Path.GetExtension(n.Text).ToLowerInvariant().Equals(UiHelper.ZipExtension);
                 return false;
             })).Select<TreeNode, string>((Func<TreeNode, string>)(n =>
             {
@@ -150,7 +150,7 @@ namespace FileList.Models
         public void SortTree()
         {
             this.Enabled = false;
-            FileListControl.SortTree(this.treeView1, this._sortStack);
+            //FileListControl.SortTree(this.treeView1, this._sortStack);
             this.ScrollTreeToTop();
             this.Enabled = true;
         }
@@ -175,7 +175,7 @@ namespace FileList.Models
             this.sizeSortButton.SortOrder = SortOrder.None;
             this.dateCreatedButton.SortOrder = SortOrder.None;
             this.dateModifiedButton.SortOrder = SortOrder.None;
-            this.filterForm.Reset();
+            //this.filterForm.Reset();
         }
 
         public void AddFileData(FileData fileData, string imageKey)
@@ -191,29 +191,29 @@ namespace FileList.Models
             else
                 treeNode = this.TreeDataSource.FirstOrDefault<TreeNode>((Func<TreeNode, bool>)(n => n.Name.Equals(fileData.Directory)));
             TreeNode node = new TreeNode(fileData.Name + fileData.Extension);
-            string str1 = fileData.Extension.Equals(string.Empty) ? UiHelper.NoneFileExtension : fileData.Extension;
-            node.Tag = (object)fileData;
-            node.ToolTipText = string.Join(Environment.NewLine, fileData.ExtendedProperties.Select<KeyValuePair<string, string>, string>((Func<KeyValuePair<string, string>, string>)(p => string.Format("{0}: {1}", (object)p.Key, (object)p.Value))).ToArray<string>());
-            node.ImageKey = str1;
-            node.SelectedImageKey = str1;
-            node.StateImageKey = str1;
-            node.Name = fileData.Name + fileData.Extension;
-            string str2 = fileData.Directory.ToLowerInvariant().Contains(UiHelper.ZipExtension) ? UiHelper.ZipExtension : UiHelper.DirectoryKey;
-            treeNode.ImageKey = str2;
-            treeNode.SelectedImageKey = str2;
-            treeNode.StateImageKey = str2;
-            treeNode.Name = fileData.Directory;
-            if (!this._treeKeys.ContainsKey(fileData.Directory))
-                this._treeKeys.Add(fileData.Directory, treeNode.Clone() as TreeNode);
-            this._treeKeys[fileData.Directory].ImageKey = str2;
-            this._treeKeys[fileData.Directory].SelectedImageKey = str2;
-            this._treeKeys[fileData.Directory].StateImageKey = str2;
-            this._treeKeys[fileData.Directory].Name = fileData.Directory;
-            this._treeKeys[fileData.Directory].Nodes.Add(node.Clone() as TreeNode);
-            treeNode.Nodes.Add(node);
-            if (!this._extensions.Contains(fileData.Extension))
-                this._extensions.Add(fileData.Extension);
-            this.modifyFileTypesListBoxInternal = false;
+            //string str1 = fileData.Extension.Equals(string.Empty) ? UiHelper.NoneFileExtension : fileData.Extension;
+            //node.Tag = (object)fileData;
+            //node.ToolTipText = string.Join(Environment.NewLine, fileData.ExtendedProperties.Select<KeyValuePair<string, string>, string>((Func<KeyValuePair<string, string>, string>)(p => string.Format("{0}: {1}", (object)p.Key, (object)p.Value))).ToArray<string>());
+            //node.ImageKey = str1;
+            //node.SelectedImageKey = str1;
+            //node.StateImageKey = str1;
+            //node.Name = fileData.Name + fileData.Extension;
+            //string str2 = fileData.Directory.ToLowerInvariant().Contains(UiHelper.ZipExtension) ? UiHelper.ZipExtension : UiHelper.DirectoryKey;
+            //treeNode.ImageKey = str2;
+            //treeNode.SelectedImageKey = str2;
+            //treeNode.StateImageKey = str2;
+            //treeNode.Name = fileData.Directory;
+            //if (!this._treeKeys.ContainsKey(fileData.Directory))
+            //    this._treeKeys.Add(fileData.Directory, treeNode.Clone() as TreeNode);
+            //this._treeKeys[fileData.Directory].ImageKey = str2;
+            //this._treeKeys[fileData.Directory].SelectedImageKey = str2;
+            //this._treeKeys[fileData.Directory].StateImageKey = str2;
+            //this._treeKeys[fileData.Directory].Name = fileData.Directory;
+            //this._treeKeys[fileData.Directory].Nodes.Add(node.Clone() as TreeNode);
+            //treeNode.Nodes.Add(node);
+            //if (!this._extensions.Contains(fileData.Extension))
+            //    this._extensions.Add(fileData.Extension);
+            //this.modifyFileTypesListBoxInternal = false;
         }
 
         public void Commit()
@@ -384,107 +384,107 @@ namespace FileList.Models
                 }
                 if (!list.Contains(f.Extension))
                     return false;
-                if ((uint)this.filterForm.SizeFilter.FilterType > 0U)
-                {
-                    KeyValuePair<float, FileFilterForm.StorageSize> fileSize = new KeyValuePair<float, FileFilterForm.StorageSize>(f.SizeInKilobytes.HasValue ? f.SizeInKilobytes.Value : 0.0f, FileFilterForm.StorageSize.Kb);
-                    KeyValuePair<float, FileFilterForm.StorageSize> filter1;
-                    ref KeyValuePair<float, FileFilterForm.StorageSize> local = ref filter1;
-                    double num1 = (double)this.filterForm.SizeFilter.Value1;
-                    SizeFilter sizeFilter1 = this.filterForm.SizeFilter;
-                    int storageSize1 = (int)sizeFilter1.StorageSize1;
-                    local = new KeyValuePair<float, FileFilterForm.StorageSize>((float)num1, (FileFilterForm.StorageSize)storageSize1);
-                    sizeFilter1 = this.filterForm.SizeFilter;
-                    int? nullable1 = sizeFilter1.Value2;
-                    SizeFilter sizeFilter2;
-                    KeyValuePair<float, FileFilterForm.StorageSize>? nullable2;
-                    if (nullable1.HasValue)
-                    {
-                        FileFilterForm.StorageSize? storageSize2 = this.filterForm.SizeFilter.StorageSize2;
-                        if (!storageSize2.HasValue)
-                        {
-                            nullable1 = this.filterForm.SizeFilter.Value2;
-                            double num2 = (double)nullable1.Value;
-                            sizeFilter2 = this.filterForm.SizeFilter;
-                            storageSize2 = sizeFilter2.StorageSize2;
-                            int num3 = (int)storageSize2.Value;
-                            nullable2 = new KeyValuePair<float, FileFilterForm.StorageSize>?(new KeyValuePair<float, FileFilterForm.StorageSize>((float)num2, (FileFilterForm.StorageSize)num3));
-                            goto label_13;
-                        }
-                    }
-                    nullable2 = new KeyValuePair<float, FileFilterForm.StorageSize>?();
-                label_13:
-                    KeyValuePair<float, FileFilterForm.StorageSize>? filter2 = nullable2;
-                    sizeFilter2 = this.filterForm.SizeFilter;
-                    if (!FileListControl.CheckIsFileSizeWithinFilter(sizeFilter2.FilterType, filter1, filter2, fileSize))
-                        return false;
-                }
-                DateTime? nullable;
-                if ((uint)this.filterForm.CreatedDateFilter.FilterType > 0U && f.DateModified.HasValue)
-                {
-                    int filterType = (int)this.filterForm.CreatedDateFilter.FilterType;
-                    nullable = this.filterForm.CreatedDateFilter.DateTime1;
-                    DateTime minValue1;
-                    if (!nullable.HasValue)
-                    {
-                        minValue1 = DateTime.MinValue;
-                    }
-                    else
-                    {
-                        nullable = this.filterForm.CreatedDateFilter.DateTime1;
-                        minValue1 = nullable.Value;
-                    }
-                    nullable = this.filterForm.CreatedDateFilter.DateTime2;
-                    DateTime minValue2;
-                    if (!nullable.HasValue)
-                    {
-                        minValue2 = DateTime.MinValue;
-                    }
-                    else
-                    {
-                        nullable = this.filterForm.CreatedDateFilter.DateTime2;
-                        minValue2 = nullable.Value;
-                    }
-                    DateTime? filter2 = new DateTime?(minValue2);
-                    nullable = f.DateModified;
-                    DateTime fileDate = nullable.Value;
-                    if (!FileListControl.CheckFileDateWithinFilter((FileFilterForm.FilterType)filterType, minValue1, filter2, fileDate))
-                        return false;
-                }
-                if ((uint)this.filterForm.ModifiedDateFilter.FilterType > 0U)
-                {
-                    nullable = f.DateCreated;
-                    if (nullable.HasValue)
-                    {
-                        int filterType = (int)this.filterForm.ModifiedDateFilter.FilterType;
-                        nullable = this.filterForm.ModifiedDateFilter.DateTime1;
-                        DateTime minValue1;
-                        if (!nullable.HasValue)
-                        {
-                            minValue1 = DateTime.MinValue;
-                        }
-                        else
-                        {
-                            nullable = this.filterForm.ModifiedDateFilter.DateTime1;
-                            minValue1 = nullable.Value;
-                        }
-                        nullable = this.filterForm.ModifiedDateFilter.DateTime2;
-                        DateTime minValue2;
-                        if (!nullable.HasValue)
-                        {
-                            minValue2 = DateTime.MinValue;
-                        }
-                        else
-                        {
-                            nullable = this.filterForm.ModifiedDateFilter.DateTime2;
-                            minValue2 = nullable.Value;
-                        }
-                        DateTime? filter2 = new DateTime?(minValue2);
-                        nullable = f.DateCreated;
-                        DateTime fileDate = nullable.Value;
-                        if (!FileListControl.CheckFileDateWithinFilter((FileFilterForm.FilterType)filterType, minValue1, filter2, fileDate))
-                            return false;
-                    }
-                }
+                //if ((uint)this.filterForm.SizeFilter.FilterType > 0U)
+                //{
+                //    KeyValuePair<float, FileFilterForm.StorageSize> fileSize = new KeyValuePair<float, FileFilterForm.StorageSize>(f.SizeInKilobytes.HasValue ? f.SizeInKilobytes.Value : 0.0f, FileFilterForm.StorageSize.Kb);
+                //    KeyValuePair<float, FileFilterForm.StorageSize> filter1;
+                //    ref KeyValuePair<float, FileFilterForm.StorageSize> local = ref filter1;
+                //    double num1 = (double)this.filterForm.SizeFilter.Value1;
+                //    SizeFilter sizeFilter1 = this.filterForm.SizeFilter;
+                //    int storageSize1 = (int)sizeFilter1.StorageSize1;
+                //    local = new KeyValuePair<float, FileFilterForm.StorageSize>((float)num1, (FileFilterForm.StorageSize)storageSize1);
+                //    sizeFilter1 = this.filterForm.SizeFilter;
+                //    int? nullable1 = sizeFilter1.Value2;
+                //    SizeFilter sizeFilter2;
+                //    KeyValuePair<float, FileFilterForm.StorageSize>? nullable2;
+                //    if (nullable1.HasValue)
+                //    {
+                //        FileFilterForm.StorageSize? storageSize2 = this.filterForm.SizeFilter.StorageSize2;
+                //        if (!storageSize2.HasValue)
+                //        {
+                //            nullable1 = this.filterForm.SizeFilter.Value2;
+                //            double num2 = (double)nullable1.Value;
+                //            sizeFilter2 = this.filterForm.SizeFilter;
+                //            storageSize2 = sizeFilter2.StorageSize2;
+                //            int num3 = (int)storageSize2.Value;
+                //            nullable2 = new KeyValuePair<float, FileFilterForm.StorageSize>?(new KeyValuePair<float, FileFilterForm.StorageSize>((float)num2, (FileFilterForm.StorageSize)num3));
+                //            goto label_13;
+                //        }
+                //    }
+                //    nullable2 = new KeyValuePair<float, FileFilterForm.StorageSize>?();
+                //label_13:
+                //    KeyValuePair<float, FileFilterForm.StorageSize>? filter2 = nullable2;
+                //    sizeFilter2 = this.filterForm.SizeFilter;
+                //    if (!FileListControl.CheckIsFileSizeWithinFilter(sizeFilter2.FilterType, filter1, filter2, fileSize))
+                //        return false;
+                //}
+                //DateTime? nullable;
+                //if ((uint)this.filterForm.CreatedDateFilter.FilterType > 0U && f.DateModified.HasValue)
+                //{
+                //    int filterType = (int)this.filterForm.CreatedDateFilter.FilterType;
+                //    nullable = this.filterForm.CreatedDateFilter.DateTime1;
+                //    DateTime minValue1;
+                //    if (!nullable.HasValue)
+                //    {
+                //        minValue1 = DateTime.MinValue;
+                //    }
+                //    else
+                //    {
+                //        nullable = this.filterForm.CreatedDateFilter.DateTime1;
+                //        minValue1 = nullable.Value;
+                //    }
+                //    nullable = this.filterForm.CreatedDateFilter.DateTime2;
+                //    DateTime minValue2;
+                //    if (!nullable.HasValue)
+                //    {
+                //        minValue2 = DateTime.MinValue;
+                //    }
+                //    else
+                //    {
+                //        nullable = this.filterForm.CreatedDateFilter.DateTime2;
+                //        minValue2 = nullable.Value;
+                //    }
+                //    DateTime? filter2 = new DateTime?(minValue2);
+                //    nullable = f.DateModified;
+                //    DateTime fileDate = nullable.Value;
+                //    if (!FileListControl.CheckFileDateWithinFilter((FileFilterForm.FilterType)filterType, minValue1, filter2, fileDate))
+                //        return false;
+                //}
+                //if ((uint)this.filterForm.ModifiedDateFilter.FilterType > 0U)
+                //{
+                //    nullable = f.DateCreated;
+                //    if (nullable.HasValue)
+                //    {
+                //        int filterType = (int)this.filterForm.ModifiedDateFilter.FilterType;
+                //        nullable = this.filterForm.ModifiedDateFilter.DateTime1;
+                //        DateTime minValue1;
+                //        if (!nullable.HasValue)
+                //        {
+                //            minValue1 = DateTime.MinValue;
+                //        }
+                //        else
+                //        {
+                //            nullable = this.filterForm.ModifiedDateFilter.DateTime1;
+                //            minValue1 = nullable.Value;
+                //        }
+                //        nullable = this.filterForm.ModifiedDateFilter.DateTime2;
+                //        DateTime minValue2;
+                //        if (!nullable.HasValue)
+                //        {
+                //            minValue2 = DateTime.MinValue;
+                //        }
+                //        else
+                //        {
+                //            nullable = this.filterForm.ModifiedDateFilter.DateTime2;
+                //            minValue2 = nullable.Value;
+                //        }
+                //        DateTime? filter2 = new DateTime?(minValue2);
+                //        nullable = f.DateCreated;
+                //        DateTime fileDate = nullable.Value;
+                //        if (!FileListControl.CheckFileDateWithinFilter((FileFilterForm.FilterType)filterType, minValue1, filter2, fileDate))
+                //            return false;
+                //    }
+                //}
                 return true;
             });
         }
@@ -493,7 +493,7 @@ namespace FileList.Models
         {
             this.Enabled = false;
             Func<FileData, bool> filterPredicate = this.GetFilterPredicate((ItemCheckEventArgs)null);
-            FileListControl.SortTree(this.treeView1, this._sortStack);
+            //FileListControl.SortTree(this.treeView1, this._sortStack);
             FileListControl.SetNodeVisibility(this.treeView1, filterPredicate, this.TreeDataSource);
             this.treeView1.ExpandAll();
             this.treeView1.Refresh();
@@ -527,125 +527,125 @@ namespace FileList.Models
                 yield return node;
         }
 
-        private FileDataSelectedEventArgs GetEventArgs(
-          EventHandler<FileDataSelectedEventArgs> handler)
-        {
-            TreeNode selectedNode = this.treeView1.SelectedNode;
-            List<FileData> fileDataList = new List<FileData>();
-            string selectedPath;
-            if (selectedNode.Level == 0)
-            {
-                foreach (TreeNode node in selectedNode.Nodes)
-                    fileDataList.Add((FileData)node.Tag);
-                selectedPath = selectedNode.Text;
-            }
-            else
-            {
-                fileDataList.Add((FileData)selectedNode.Tag);
-                selectedPath = ((FileData)selectedNode.Tag).Path;
-            }
-            return new FileDataSelectedEventArgs(fileDataList.ToArray(), selectedPath, selectedNode.Level == 0);
-        }
+        //private FileDataSelectedEventArgs GetEventArgs(
+        //  EventHandler<FileDataSelectedEventArgs> handler)
+        //{
+        //    TreeNode selectedNode = this.treeView1.SelectedNode;
+        //    List<FileData> fileDataList = new List<FileData>();
+        //    string selectedPath;
+        //    if (selectedNode.Level == 0)
+        //    {
+        //        foreach (TreeNode node in selectedNode.Nodes)
+        //            fileDataList.Add((FileData)node.Tag);
+        //        selectedPath = selectedNode.Text;
+        //    }
+        //    else
+        //    {
+        //        fileDataList.Add((FileData)selectedNode.Tag);
+        //        selectedPath = ((FileData)selectedNode.Tag).Path;
+        //    }
+        //    return new FileDataSelectedEventArgs(fileDataList.ToArray(), selectedPath, selectedNode.Level == 0);
+        //}
 
-        private static void SortTree(TreeView treeView, FileDataSortStack sortStack)
-        {
-            List<IComparer<TreeNode>> comparerList = new List<IComparer<TreeNode>>();
-            while (sortStack.MoveNext())
-                comparerList.Add(sortStack.CurrentComparer);
-            IMultiComparer<TreeNode> multiComparer = (IMultiComparer<TreeNode>)new MultiCompareFileData((IEnumerable<IComparer<TreeNode>>)comparerList);
-            treeView.TreeViewNodeSorter = (IComparer)multiComparer;
-            treeView.Sort();
-        }
+        //private static void SortTree(TreeView treeView, FileDataSortStack sortStack)
+        //{
+        //    List<IComparer<TreeNode>> comparerList = new List<IComparer<TreeNode>>();
+        //    while (sortStack.MoveNext())
+        //        comparerList.Add(sortStack.CurrentComparer);
+        //    IMultiComparer<TreeNode> multiComparer = (IMultiComparer<TreeNode>)new MultiCompareFileData((IEnumerable<IComparer<TreeNode>>)comparerList);
+        //    treeView.TreeViewNodeSorter = (IComparer)multiComparer;
+        //    treeView.Sort();
+        //}
 
-        private static void SortTreeSource(List<TreeNode> treeNodes, FileDataSortStack sortStack)
-        {
-            List<IComparer<TreeNode>> comparerList = new List<IComparer<TreeNode>>();
-            while (sortStack.MoveNext())
-                comparerList.Add(sortStack.CurrentComparer);
-            IMultiComparer<TreeNode> multi = (IMultiComparer<TreeNode>)new MultiCompareFileData((IEnumerable<IComparer<TreeNode>>)comparerList);
-            IEnumerable<TreeNode> array1 = (IEnumerable<TreeNode>)treeNodes.OrderBy<TreeNode, TreeNode>((Func<TreeNode, TreeNode>)(n =>
-            {
-                TreeNode[] array2 = n.Nodes.Cast<TreeNode>().OrderBy<TreeNode, TreeNode>((Func<TreeNode, TreeNode>)(m => m), (IComparer<TreeNode>)multi).ToArray<TreeNode>();
-                n.Nodes.Clear();
-                n.Nodes.AddRange(array2);
-                return n;
-            }), (IComparer<TreeNode>)multi).ToArray<TreeNode>();
-            treeNodes.Clear();
-            treeNodes.AddRange(array1);
-        }
+        //private static void SortTreeSource(List<TreeNode> treeNodes, FileDataSortStack sortStack)
+        //{
+        //    List<IComparer<TreeNode>> comparerList = new List<IComparer<TreeNode>>();
+        //    while (sortStack.MoveNext())
+        //        comparerList.Add(sortStack.CurrentComparer);
+        //    IMultiComparer<TreeNode> multi = (IMultiComparer<TreeNode>)new MultiCompareFileData((IEnumerable<IComparer<TreeNode>>)comparerList);
+        //    IEnumerable<TreeNode> array1 = (IEnumerable<TreeNode>)treeNodes.OrderBy<TreeNode, TreeNode>((Func<TreeNode, TreeNode>)(n =>
+        //    {
+        //        TreeNode[] array2 = n.Nodes.Cast<TreeNode>().OrderBy<TreeNode, TreeNode>((Func<TreeNode, TreeNode>)(m => m), (IComparer<TreeNode>)multi).ToArray<TreeNode>();
+        //        n.Nodes.Clear();
+        //        n.Nodes.AddRange(array2);
+        //        return n;
+        //    }), (IComparer<TreeNode>)multi).ToArray<TreeNode>();
+        //    treeNodes.Clear();
+        //    treeNodes.AddRange(array1);
+        //}
 
-        private static void SortChildNodes(TreeNode node, FileDataSortStack sortStack)
-        {
-            foreach (TreeNode node1 in node.Nodes.Cast<TreeNode>().ToList<TreeNode>().OrderBy<TreeNode, TreeNode>((Func<TreeNode, TreeNode>)(n => n), sortStack[0].Value).ThenBy<TreeNode, TreeNode>((Func<TreeNode, TreeNode>)(n => n), sortStack[1].Value).ThenBy<TreeNode, TreeNode>((Func<TreeNode, TreeNode>)(n => n), sortStack[2].Value).ThenBy<TreeNode, TreeNode>((Func<TreeNode, TreeNode>)(n => n), sortStack[3].Value).ToList<TreeNode>())
-            {
-                node1.Remove();
-                node.Nodes.Add(node1);
-            }
-        }
+        //private static void SortChildNodes(TreeNode node, FileDataSortStack sortStack)
+        //{
+        //    foreach (TreeNode node1 in node.Nodes.Cast<TreeNode>().ToList<TreeNode>().OrderBy<TreeNode, TreeNode>((Func<TreeNode, TreeNode>)(n => n), sortStack[0].Value).ThenBy<TreeNode, TreeNode>((Func<TreeNode, TreeNode>)(n => n), sortStack[1].Value).ThenBy<TreeNode, TreeNode>((Func<TreeNode, TreeNode>)(n => n), sortStack[2].Value).ThenBy<TreeNode, TreeNode>((Func<TreeNode, TreeNode>)(n => n), sortStack[3].Value).ToList<TreeNode>())
+        //    {
+        //        node1.Remove();
+        //        node.Nodes.Add(node1);
+        //    }
+        //}
 
-        private static bool CheckIsFileSizeWithinFilter(
-          FileFilterForm.FilterType filterType,
-          KeyValuePair<float, FileFilterForm.StorageSize> filter1,
-          KeyValuePair<float, FileFilterForm.StorageSize>? filter2,
-          KeyValuePair<float, FileFilterForm.StorageSize> fileSize)
-        {
-            float kb1 = Misc.ConvertStorageValueToKb(filter1.Key, filter1.Value);
-            float num = filter2.HasValue ? Misc.ConvertStorageValueToKb(filter2.Value.Key, filter2.Value.Value) : 0.0f;
-            float kb2 = Misc.ConvertStorageValueToKb(fileSize.Key, fileSize.Value);
-            switch (filterType)
-            {
-                case FileFilterForm.FilterType.Between:
-                    if ((double)kb2 < (double)kb1 || (double)kb2 > (double)num)
-                        return false;
-                    break;
-                case FileFilterForm.FilterType.LessThan:
-                    if ((double)kb2 >= (double)kb1)
-                        return false;
-                    break;
-                case FileFilterForm.FilterType.GreaterThan:
-                    if ((double)kb2 <= (double)kb1)
-                        return false;
-                    break;
-                case FileFilterForm.FilterType.Equals:
-                    if ((double)kb2 != (double)kb1)
-                        return false;
-                    break;
-                default:
-                    return false;
-            }
-            return true;
-        }
+        //private static bool CheckIsFileSizeWithinFilter(
+        //  FileFilterForm.FilterType filterType,
+        //  KeyValuePair<float, FileFilterForm.StorageSize> filter1,
+        //  KeyValuePair<float, FileFilterForm.StorageSize>? filter2,
+        //  KeyValuePair<float, FileFilterForm.StorageSize> fileSize)
+        //{
+        //    float kb1 = Misc.ConvertStorageValueToKb(filter1.Key, filter1.Value);
+        //    float num = filter2.HasValue ? Misc.ConvertStorageValueToKb(filter2.Value.Key, filter2.Value.Value) : 0.0f;
+        //    float kb2 = Misc.ConvertStorageValueToKb(fileSize.Key, fileSize.Value);
+        //    switch (filterType)
+        //    {
+        //        case FileFilterForm.FilterType.Between:
+        //            if ((double)kb2 < (double)kb1 || (double)kb2 > (double)num)
+        //                return false;
+        //            break;
+        //        case FileFilterForm.FilterType.LessThan:
+        //            if ((double)kb2 >= (double)kb1)
+        //                return false;
+        //            break;
+        //        case FileFilterForm.FilterType.GreaterThan:
+        //            if ((double)kb2 <= (double)kb1)
+        //                return false;
+        //            break;
+        //        case FileFilterForm.FilterType.Equals:
+        //            if ((double)kb2 != (double)kb1)
+        //                return false;
+        //            break;
+        //        default:
+        //            return false;
+        //    }
+        //    return true;
+        //}
 
-        private static bool CheckFileDateWithinFilter(
-          FileFilterForm.FilterType filterType,
-          DateTime filter1,
-          DateTime? filter2,
-          DateTime fileDate)
-        {
-            DateTime dateTime = filter2.HasValue ? filter2.Value : DateTime.MinValue;
-            switch (filterType)
-            {
-                case FileFilterForm.FilterType.Between:
-                    if (fileDate < filter1 || fileDate > dateTime)
-                        return false;
-                    break;
-                case FileFilterForm.FilterType.LessThan:
-                    if (fileDate >= filter1)
-                        return false;
-                    break;
-                case FileFilterForm.FilterType.GreaterThan:
-                    if (fileDate <= filter1)
-                        return false;
-                    break;
-                case FileFilterForm.FilterType.Equals:
-                    if (fileDate != filter1)
-                        return false;
-                    break;
-                default:
-                    return false;
-            }
-            return true;
-        }
+        //private static bool CheckFileDateWithinFilter(
+        //  FileFilterForm.FilterType filterType,
+        //  DateTime filter1,
+        //  DateTime? filter2,
+        //  DateTime fileDate)
+        //{
+        //    DateTime dateTime = filter2.HasValue ? filter2.Value : DateTime.MinValue;
+        //    switch (filterType)
+        //    {
+        //        case FileFilterForm.FilterType.Between:
+        //            if (fileDate < filter1 || fileDate > dateTime)
+        //                return false;
+        //            break;
+        //        case FileFilterForm.FilterType.LessThan:
+        //            if (fileDate >= filter1)
+        //                return false;
+        //            break;
+        //        case FileFilterForm.FilterType.GreaterThan:
+        //            if (fileDate <= filter1)
+        //                return false;
+        //            break;
+        //        case FileFilterForm.FilterType.Equals:
+        //            if (fileDate != filter1)
+        //                return false;
+        //            break;
+        //        default:
+        //            return false;
+        //    }
+        //    return true;
+        //}
 
         private static void SetTreeSource(TreeView treeView, List<TreeNode> treeNodes)
         {

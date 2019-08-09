@@ -1,25 +1,33 @@
 ﻿
+using FileList.Models;
 using FileList.Views;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace FileList.Logic
 {
     public static class Misc
     {
-        public static float ConvertStorageValueToKb(float value, FileFilterForm.StorageSize storageSize)
+        private static ICollection<string> ByteVariants = new string[] { "byte", "bytes", "bt", "bts" };
+        private static ICollection<string> KilobyteVariants = new string[] { "kilobyte", "kilobytes", "kb", "kbs" };
+        private static ICollection<string> MegabyteVariants = new string[] { "megabyte", "megabytes", "mb", "mbs" };
+        private static ICollection<string> GigabyteVariants = new string[] { "gigabyte", "gigabytes", "gb", "gbs" };
+        private static ICollection<string> TerabyteVariants = new string[] { "terabyte", "terabytes", "tb", "tbs" };
+
+        public static float ConvertStorageValueToKb(float value, StorageSize storageSize)
         {
             int num1 = 1024;
             int num2;
             switch (storageSize)
             {
-                case FileFilterForm.StorageSize.Kb:
+                case StorageSize.Kb:
                     num2 = 0;
                     break;
-                case FileFilterForm.StorageSize.Mb:
+                case StorageSize.Mb:
                     num2 = 1;
                     break;
-                case FileFilterForm.StorageSize.Gb:
+                case StorageSize.Gb:
                     num2 = 2;
                     break;
                 default:
@@ -30,62 +38,91 @@ namespace FileList.Logic
 
         public static float ConvertStorageValueToKb(string value)
         {
-            int num = 1024;
-            string[] strArray = value.Split();
-            if (strArray.Length < 2)
+            int multiplier = 1024;
+            // split on spaces.. we are expecting a value similar to 20.3 mb
+            // we take into account possibility of decimals or not.
+            // but we will also handle values without spaces, such as 20.3mb, with or without decimals
+            // storage type may or may not be abbreviated
+            string[] values = value.Split();
+
+            // handle values that did not include a space // this area has not been tested
+            if (values.Length < 2)
             {
-                StringBuilder stringBuilder1 = new StringBuilder();
-                StringBuilder stringBuilder2 = new StringBuilder();
-                foreach (char c in value)
+                bool hasDecimal = false;
+                StringBuilder storageSizeBuilder = new StringBuilder();
+                StringBuilder storageTypeBuilder = new StringBuilder();
+
+                foreach (char karacter in value)
                 {
-                    if (stringBuilder2.Length == 0 && (char.IsDigit(c) || c.Equals('.') || c.Equals(',')))
+                    // if we havent started building our storage type, we must be working on the size value itself
+                    // just make sure we have acceptable values for the value of size, compatible with a float - excluding "e" and such scientific notations
+                    if (storageTypeBuilder.Length == 0 && (char.IsDigit(karacter) || karacter.Equals('.') || karacter.Equals(',')))
                     {
-                        if (!c.Equals(','))
-                            stringBuilder2.Append(c);
+                        if (hasDecimal && karacter.Equals('.'))
+                            return 0.0f;
+
+                        // grab 
+                        if (!karacter.Equals(','))
+                            storageSizeBuilder.Append(karacter);
+
+                        if (karacter.Equals('.'))
+                            hasDecimal = true;
                     }
                     else
                     {
-                        if (stringBuilder2.Length != 0 && char.IsNumber(c))
+                        // we started building our storage type, but we encountered a invalid character or unknown storage type
+                        if (storageTypeBuilder.Length != 0 && char.IsNumber(karacter))
                             return 0.0f;
-                        if (stringBuilder1.Length != 0 && char.IsLetter(c))
-                            stringBuilder2.Append(c);
-                        else if (stringBuilder1.Length == 0 && char.IsLetter(c))
+                        // continue building our storage type
+                        if (storageSizeBuilder.Length != 0 && char.IsLetter(karacter))
+                            storageTypeBuilder.Append(karacter);
+                        // invalid data, or format does not meet our expectations
+                        else if (storageSizeBuilder.Length == 0 && char.IsLetter(karacter))
                             return 0.0f;
                     }
                 }
-                strArray = new string[2]
+
+                // now that we have a friendly format, we can parse it
+                values = new string[2]
                 {
-          stringBuilder1.ToString(),
-          stringBuilder2.ToString()
+                    storageSizeBuilder.ToString(),
+                    storageTypeBuilder.ToString()
                 };
             }
-            float result1;
-            if (!float.TryParse(strArray[0], out result1))
+
+            float storageSize;
+            if (!float.TryParse(values[0], out storageSize))
                 return 0.0f;
-            FileFilterForm.StorageSize result2;
-            if (Misc.TryParseEnum<FileFilterForm.StorageSize>(strArray[1], true, out result2) || strArray[1].Length == 3 && strArray[1].ToLowerInvariant().Equals("s") && Misc.TryParseEnum<FileFilterForm.StorageSize>(strArray[1].Substring(0, 2), true, out result2))
-                return Misc.ConvertStorageValueToKb(result1, result2);
-            if (strArray[1].ToLowerInvariant().Equals("kilobyte") || strArray[1].ToLowerInvariant().Equals("kilobytes"))
-                result2 = FileFilterForm.StorageSize.Kb;
-            else if (strArray[1].ToLowerInvariant().Equals("megabyte") || strArray[1].ToLowerInvariant().Equals("megabytes"))
-                result2 = FileFilterForm.StorageSize.Mb;
-            else if (strArray[1].ToLowerInvariant().Equals("gigabyte") || strArray[1].ToLowerInvariant().Equals("gigabytes"))
-                result2 = FileFilterForm.StorageSize.Gb;
-            else if (strArray[1].ToLowerInvariant().Equals("terabyte") || strArray[1].ToLowerInvariant().Equals("terabytes") || strArray[1].ToLowerInvariant().Equals("tb") || strArray[1].ToLowerInvariant().Equals("tbs"))
+
+            StorageSize storageType;
+
+            // we ran into plural.. make singular and try to parse
+            if (values[1].Length == 3)
+                values[1] = values[1].Substring(0, 2);
+            if (Misc.TryParseEnum<StorageSize>(values[1], true, out storageType))
+                return Misc.ConvertStorageValueToKb(storageSize, storageType);
+            // if our parse was not successful, try other means
+            if (Misc.KilobyteVariants.Contains(values[1].ToLowerInvariant()))
+                storageType = StorageSize.Kb;
+            else if (Misc.MegabyteVariants.Contains(values[1].ToLowerInvariant()))
+                storageType = StorageSize.Mb;
+            else if (Misc.GigabyteVariants.Contains(values[1].ToLowerInvariant()))
+                storageType = StorageSize.Gb;
+            else if (Misc.TerabyteVariants.Contains(values[1].ToLowerInvariant()))
             {
-                result1 /= (float)num;
-                result2 = FileFilterForm.StorageSize.Gb;
+                storageSize /= (float)multiplier;
+                storageType = StorageSize.Gb;
             }
             else
             {
-                if (!strArray[1].ToLowerInvariant().Equals("byte") && !strArray[1].ToLowerInvariant().Equals("bytes") && !strArray[1].ToLowerInvariant().Equals("bt") && !strArray[1].ToLowerInvariant().Equals("bts"))
+                if (!Misc.TerabyteVariants.Contains(values[1].ToLowerInvariant()))
                     return 0.0f;
-                result1 /= (float)num;
-                result2 = FileFilterForm.StorageSize.Kb;
+                storageSize *= (float)multiplier;
+                storageType = StorageSize.Kb;
             }
             try
             {
-                return Misc.ConvertStorageValueToKb(result1, result2);
+                return Misc.ConvertStorageValueToKb(storageSize, storageType);
             }
             catch (Exception ex)
             {
