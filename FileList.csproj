@@ -31,6 +31,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>folder_search.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
@@ -50,6 +53,7 @@
     <Compile Include="Logic\FileToIconConverter.cs" />
     <Compile Include="Logic\Misc.cs" />
     <Compile Include="Logic\Mover.cs" />
+    <Compile Include="Logic\NotepadHelper.cs" />
     <Compile Include="Logic\UiHelper.cs" />
     <Compile Include="Models\DateFilter.cs" />
     <Compile Include="Models\Enums.cs" />
@@ -93,6 +97,12 @@
     <Compile Include="Views\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Views\MoveFilesForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\MoveFilesForm.Designer.cs">
+      <DependentUpon>MoveFilesForm.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Models\FileListControl.resx">
       <DependentUpon>FileListControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -115,6 +125,9 @@
     <EmbeddedResource Include="Views\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Views\MoveFilesForm.resx">
+      <DependentUpon>MoveFilesForm.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -125,7 +138,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="folder_search.ico" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="Resources\closeX_16.png" />
   </ItemGroup>
