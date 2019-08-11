@@ -49,6 +49,7 @@
     <Compile Include="Logic\FileSearch.cs" />
     <Compile Include="Logic\FileToIconConverter.cs" />
     <Compile Include="Logic\Misc.cs" />
+    <Compile Include="Logic\Mover.cs" />
     <Compile Include="Logic\UiHelper.cs" />
     <Compile Include="Models\DateFilter.cs" />
     <Compile Include="Models\Enums.cs" />
@@ -67,6 +68,12 @@
     <Compile Include="Models\IMultiComparer.cs" />
     <Compile Include="Models\IMultiValueConverter.cs" />
     <Compile Include="Models\NodeComparers.cs" />
+    <Compile Include="Models\ProgressInfoControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Models\ProgressInfoControl.Designer.cs">
+      <DependentUpon>ProgressInfoControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Win32MARGINS.cs" />
     <Compile Include="Models\SizeFilter.cs" />
     <Compile Include="Models\SortButton.cs">
@@ -88,6 +95,9 @@
     </Compile>
     <EmbeddedResource Include="Models\FileListControl.resx">
       <DependentUpon>FileListControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Models\ProgressInfoControl.resx">
+      <DependentUpon>ProgressInfoControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
