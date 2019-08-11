@@ -17,23 +17,23 @@ namespace FileList.Logic
 
         public static float ConvertStorageValueToKb(float value, StorageSize storageSize)
         {
-            int num1 = 1024;
-            int num2;
+            int multiplier = 1024;
+            int sizeFactor;
             switch (storageSize)
             {
                 case StorageSize.Kb:
-                    num2 = 0;
+                    sizeFactor = 0;
                     break;
                 case StorageSize.Mb:
-                    num2 = 1;
+                    sizeFactor = 1;
                     break;
                 case StorageSize.Gb:
-                    num2 = 2;
+                    sizeFactor = 2;
                     break;
                 default:
                     return 0.0f;
             }
-            return value * (float)Math.Pow((double)num1, (double)num2);
+            return value * (float)Math.Pow((double)multiplier, (double)sizeFactor);
         }
 
         public static float ConvertStorageValueToKb(string value)

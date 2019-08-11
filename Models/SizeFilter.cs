@@ -9,16 +9,16 @@ namespace FileList.Models
     public struct SizeFilter
     {
         private FilterType _filterType;
-        private int _value1;
-        private int? _value2;
+        private float _value1;
+        private float? _value2;
         private StorageSize _storageSize1;
         private StorageSize? _storageSize2;
 
         public SizeFilter(
           FilterType filterType,
-          int value1,
+          float value1,
           StorageSize storageSize1,
-          int? value2,
+          float? value2,
           StorageSize? storageSize2)
         {
             this._filterType = filterType;
@@ -39,7 +39,7 @@ namespace FileList.Models
             }
         }
 
-        public int Value1
+        public float Value1
         {
             get
             {
@@ -61,7 +61,7 @@ namespace FileList.Models
             }
         }
 
-        public int? Value2
+        public float? Value2
         {
             get
             {

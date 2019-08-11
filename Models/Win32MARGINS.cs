@@ -5,6 +5,9 @@ using System.Text;
 
 namespace FileList.Models
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public struct Win32MARGINS
     {
         public int leftWidth;

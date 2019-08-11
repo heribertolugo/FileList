@@ -26,18 +26,18 @@ namespace FileList
 
         public FileData(string path)
         {
-            this._name = (string)null;
-            this._extension = (string)null;
-            this._diectory = (string)null;
+            this._name = null;
+            this._extension = null;
+            this._diectory = null;
             this._extendedProperties = new List<KeyValuePair<string, string>>();
             this._path = path;
             this._isZip = false;
             this._zipContents = new List<FileData>();
-            this._sizeInKilobytes = new float?();
+            this._sizeInKilobytes = null;
             this._isSizeSet = false;
-            this._dateCreated = new DateTime?();
+            this._dateCreated = null;
             this._isDateCreatedSet = false;
-            this._dateModified = new DateTime?();
+            this._dateModified = null;
             this._isDateModifiedSet = false;
             if (FileData.FilePropertyNames == null || FileData.FilePropertyNames.Count < 1)
             {
@@ -119,7 +119,7 @@ namespace FileList
         {
             get
             {
-                return (IEnumerable<KeyValuePair<string, string>>)this._extendedProperties;
+                return this._extendedProperties;
             }
             private set
             {
@@ -130,7 +130,7 @@ namespace FileList
         {
             get
             {
-                return (IList<FileData>)this._zipContents;
+                return this._zipContents;
             }
             private set
             {
@@ -158,7 +158,7 @@ namespace FileList
             get
             {
                 if (!this._isDateCreatedSet)
-                    this._dateCreated = this.GetDateFromExtendedProperties("date created");
+                    this._dateCreated = this.GetDateFromExtendedProperties("date created") ?? this.GetDateFromExtendedProperties("Creation Time");   
                 return this._dateCreated;
             }
             private set
@@ -171,7 +171,7 @@ namespace FileList
             get
             {
                 if (!this._isDateModifiedSet)
-                    this._dateModified = this.GetDateFromExtendedProperties("date modified");
+                    this._dateModified = this.GetDateFromExtendedProperties("date modified") ?? this.GetDateFromExtendedProperties("Last Write Time"); 
                 return this._dateModified;
             }
             private set
@@ -181,28 +181,35 @@ namespace FileList
 
         private float? GetSizeInKiloBytes()
         {
-            KeyValuePair<string, string> keyValuePair = this.ExtendedProperties.FirstOrDefault<KeyValuePair<string, string>>((Func<KeyValuePair<string, string>, bool>)(p => p.Key.ToLowerInvariant().Equals("size")));
-            if (keyValuePair.Equals((object)new KeyValuePair<string, string>()))
-                return new float?();
-            return new float?(Misc.ConvertStorageValueToKb(keyValuePair.Value));
+            string fileSIze = this.ExtendedProperties.FirstOrDefault(p => p.Key.ToLowerInvariant().Equals("size")).Value; 
+            if (string.IsNullOrEmpty(fileSIze))
+            {
+                fileSIze = this.ExtendedProperties.Where(p => p.Key.ToLowerInvariant().Equals("Length")).Select(p => p.Value).FirstOrDefault();
+                if (!string.IsNullOrEmpty(fileSIze))
+                    return (float?)(Misc.ConvertStorageValueToKb(fileSIze));
+            }
+
+            if (string.IsNullOrEmpty(fileSIze))
+                return null;
+            return (float?)(Misc.ConvertStorageValueToKb(fileSIze));
         }
 
         private DateTime? GetDateFromExtendedProperties(string propertyName)
         {
             DateTime result;
-            if (!DateTime.TryParse(this.ExtendedProperties.FirstOrDefault<KeyValuePair<string, string>>((Func<KeyValuePair<string, string>, bool>)(p => p.Key.ToLowerInvariant().Equals(propertyName.ToLowerInvariant()))).Value, out result))
-                return new DateTime?();
-            return new DateTime?(result);
+            if (!DateTime.TryParse(this.ExtendedProperties.FirstOrDefault(p => p.Key.ToLowerInvariant().Equals(propertyName.ToLowerInvariant())).Value, out result))
+                return null;
+            return (DateTime)(result);
         }
 
         private void LoadExtendedProperties()
         {
             try
             {
-                Folder folder = ((IShellDispatch6)new ShellClass()).NameSpace((object)System.IO.Path.GetDirectoryName(this.Path));
+                Folder folder = new ShellClass().NameSpace(System.IO.Path.GetDirectoryName(this.Path));
                 FolderItem name = folder.ParseName(System.IO.Path.GetFileName(this.Path));
                 for (int iColumn = 0; iColumn < FileData.FilePropertyNames.Count; ++iColumn)
-                    this._extendedProperties.Add(new KeyValuePair<string, string>(FileData.FilePropertyNames[iColumn], folder.GetDetailsOf((object)name, iColumn)));
+                    this._extendedProperties.Add(new KeyValuePair<string, string>(FileData.FilePropertyNames[iColumn], folder.GetDetailsOf(name, iColumn)));
             }
             catch (Exception ex)
             {
@@ -220,7 +227,7 @@ namespace FileList
                 FileInfo fileInfo = new FileInfo(this.Path);
                 this._extendedProperties.Add(new KeyValuePair<string, string>("Creation Time", fileInfo.CreationTime.ToString()));
                 this._extendedProperties.Add(new KeyValuePair<string, string>("Last Write Time", fileInfo.LastWriteTime.ToString()));
-                this._extendedProperties.Add(new KeyValuePair<string, string>("Length", string.Format("{0} bytes", (object)fileInfo.Length.ToString())));
+                this._extendedProperties.Add(new KeyValuePair<string, string>("Length", string.Format("{0} bytes", fileInfo.Length.ToString())));
                 this._extendedProperties.Add(new KeyValuePair<string, string>("Last Accessed Time", fileInfo.LastAccessTime.ToString()));
             }
             catch (Exception ex)
@@ -230,7 +237,7 @@ namespace FileList
 
         private static void LoadFilePropertyNames(string nspace)
         {
-            Folder folder = ((IShellDispatch6)new ShellClass()).NameSpace((object)nspace);
+            Folder folder = new ShellClass().NameSpace(nspace);
             for (int iColumn = 0; iColumn < (int)short.MaxValue; ++iColumn)
             {
                 string detailsOf = folder.GetDetailsOf((object)null, iColumn);

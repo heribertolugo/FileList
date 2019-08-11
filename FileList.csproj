@@ -32,6 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -41,19 +42,31 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Logic\Extensions.cs" />
+    <Compile Include="Logic\FileSearch.cs" />
+    <Compile Include="Logic\FileToIconConverter.cs" />
     <Compile Include="Logic\Misc.cs" />
+    <Compile Include="Logic\UiHelper.cs" />
     <Compile Include="Models\DateFilter.cs" />
     <Compile Include="Models\Enums.cs" />
     <Compile Include="Models\EnumToUi.cs" />
     <Compile Include="Models\FileData.cs" />
+    <Compile Include="Models\FileDataGroup.cs" />
+    <Compile Include="Models\FileDataSortStack.cs" />
     <Compile Include="Models\FileListControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Models\FileListControl.Designer.cs">
       <DependentUpon>FileListControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\FileType.cs" />
+    <Compile Include="Models\ImageList.cs" />
+    <Compile Include="Models\IMultiComparer.cs" />
+    <Compile Include="Models\IMultiValueConverter.cs" />
+    <Compile Include="Models\NodeComparers.cs" />
     <Compile Include="Models\Win32MARGINS.cs" />
     <Compile Include="Models\SizeFilter.cs" />
     <Compile Include="Models\SortButton.cs">

@@ -15,19 +15,20 @@ namespace FileList.Views
     {
         public event EventHandler<FilterSelectedEventArgs> OnFilterSelectedHandler;
 
-        private static EnumToUi<FilterType>[] UiFilterTypes = (EnumToUi<FilterType>[])null;
-        private static EnumToUi<StorageSize>[] UiStorageSizes = (EnumToUi<StorageSize>[])null;
-        private bool _dataSourcesSet = false;
-        private static readonly FilterType DefaultUiFilterType = FilterType.None;
-        private static readonly StorageSize DefaultUiStorageSize = StorageSize.None;
-        private Control _ownerControl;
-        private bool m_aeroEnabled;
         private const int CS_DROPSHADOW = 131072;
         private const int WM_NCPAINT = 133;
-        private const int WM_ACTIVATEAPP = 28;
         private const int WM_NCHITTEST = 132;
-        private const int HTCLIENT = 1;
+        private const int WM_ACTIVATEAPP = 28;
         private const int HTCAPTION = 2;
+        private const int HTCLIENT = 1;
+
+        private static readonly FilterType DefaultUiFilterType = FilterType.None;
+        private static readonly StorageSize DefaultUiStorageSize = StorageSize.None;
+        private static EnumToUi<FilterType>[] UiFilterTypes = null;
+        private static EnumToUi<StorageSize>[] UiStorageSizes = null;
+        private bool isAeroEnabled;
+        private bool _dataSourcesSet = false;
+        private Control _ownerControl;
 
         public FileFilterForm()
         {
@@ -35,12 +36,7 @@ namespace FileList.Views
         }
 
 
-        private void FileFilterForm_Load(object sender, EventArgs e)
-        {
-            this.SetDataSources();
-            this.ShowInTaskbar = false;
-        }
-
+        #region Public Properties / Methods
         public void Show(Control target)
         {
             Rectangle screen = target.RectangleToScreen(target.ClientRectangle);
@@ -68,6 +64,30 @@ namespace FileList.Views
             this.dateCreated2Picker.Value = DateTimePicker.MinimumDateTime;
             this.dateModified1Picker.Value = DateTimePicker.MinimumDateTime;
             this.dateModified2Picker.Value = DateTimePicker.MinimumDateTime;
+        }
+
+        public SizeFilter SizeFilter { get; private set; }
+
+        public DateFilter ModifiedDateFilter { get; set; }
+
+        public DateFilter CreatedDateFilter { get; set; }
+
+        protected void OnFilterSelected(FilterSelectedEventArgs args)
+        {
+            EventHandler<FilterSelectedEventArgs> filterSelectedHandler = this.OnFilterSelectedHandler;
+            if (filterSelectedHandler == null)
+                return;
+            filterSelectedHandler((object)this, args);
+        }
+
+        #endregion
+
+        #region Event Handlers
+
+        private void FileFilterForm_Load(object sender, EventArgs e)
+        {
+            this.SetDataSources();
+            this.ShowInTaskbar = false;
         }
 
         private void TargetForm_Resize(object sender, EventArgs e)
@@ -99,51 +119,6 @@ namespace FileList.Views
             this.TopMost = true;
         }
 
-        public SizeFilter SizeFilter { get; private set; }
-
-        public DateFilter ModifiedDateFilter { get; set; }
-
-        public DateFilter CreatedDateFilter { get; set; }
-
-        protected void OnFilterSelected(FilterSelectedEventArgs args)
-        {
-            EventHandler<FilterSelectedEventArgs> filterSelectedHandler = this.OnFilterSelectedHandler;
-            if (filterSelectedHandler == null)
-                return;
-            filterSelectedHandler((object)this, args);
-        }
-
-        private void SetDataSources()
-        {
-            if (FileFilterForm.UiFilterTypes == null)
-            {
-                FileFilterForm.UiFilterTypes = Enum.GetValues(typeof(FilterType)).Cast<FilterType>().Select(f => new EnumToUi<FilterType>(f)).ToArray();
-                //FileFilterForm.DefaultUiFilterType = FilterType.None;
-            }
-            if (FileFilterForm.UiStorageSizes == null)
-            {
-                FileFilterForm.UiStorageSizes = Enum.GetValues(typeof(StorageSize)).Cast<StorageSize>().Select(s => new EnumToUi<StorageSize>(s)).ToArray();
-                //FileFilterForm.DefaultUiStorageSize = StorageSize.None;
-            }
-            this.sizeFilterComboBox.DataSource = FileFilterForm.UiFilterTypes.Select(n => new EnumToUi<FilterType>(n.Value)).ToArray();
-            this.dateModifiedComboBox.DataSource = FileFilterForm.UiFilterTypes.Select(n => new EnumToUi<FilterType>(n.Value)).ToArray();
-            this.dateCreatedcomboBox.DataSource = FileFilterForm.UiFilterTypes.Select(n => new EnumToUi<FilterType>(n.Value)).ToArray();
-            this.sizeType1ComboBox.DataSource = FileFilterForm.UiStorageSizes.Select(n => new EnumToUi<StorageSize>(n.Value)).ToArray();
-            this.sizeType2ComboBox.DataSource = FileFilterForm.UiStorageSizes.Select(n => new EnumToUi<StorageSize>(n.Value)).ToArray();
-            this.sizeFilterComboBox.ValueMember = "Value";
-            this.sizeFilterComboBox.DisplayMember = "Friendly";
-            this.dateModifiedComboBox.ValueMember = "Value";
-            this.dateModifiedComboBox.DisplayMember = "Friendly";
-            this.dateCreatedcomboBox.ValueMember = "Value";
-            this.dateCreatedcomboBox.DisplayMember = "Friendly";
-            this.sizeType1ComboBox.ValueMember = "Value";
-            this.sizeType1ComboBox.DisplayMember = "Friendly";
-            this.sizeType2ComboBox.ValueMember = "Value";
-            this.sizeType2ComboBox.DisplayMember = "Friendly";
-            this.Reset();
-            this._dataSourcesSet = true;
-        }
-
         private void SizeFilterComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             this.HandleSizeFilterValueChanged();
@@ -167,44 +142,6 @@ namespace FileList.Views
         private void SizeType2ComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             this.HandleSizeFilterValueChanged();
-        }
-
-        private void HandleSizeFilterValueChanged()
-        {
-            if (!this._dataSourcesSet)
-                return;
-
-            FilterType selectedFilterType = (FilterType)this.sizeFilterComboBox.SelectedValue;
-            StorageSize storageType1 = (StorageSize)this.sizeType1ComboBox.SelectedValue;
-            StorageSize? storageType2 = null;
-            int sizeValue1 = (int)this.sizeAmount1NumericUpDown.Value;
-            int? sizeValue2 = null;
-
-            if (selectedFilterType == FilterType.None || storageType1 == StorageSize.None)
-            {
-                selectedFilterType = FilterType.None;
-                sizeValue1 = 0;
-                sizeValue2 = null;
-                storageType1 = StorageSize.None;
-                storageType2 = null;
-            }
-
-            if (selectedFilterType == FilterType.Between)
-            {
-                this.sizeValue2Panel.Visible = true;
-                sizeValue2 = (int?)this.sizeAmount2NumericUpDown.Value;
-                storageType2 = (StorageSize?)this.sizeType2ComboBox.SelectedValue;
-            }
-            else
-            {
-                this.sizeValue2Panel.Visible = false;
-            }
-
-            this.SizeFilter = new SizeFilter(selectedFilterType, sizeValue1, storageType1, sizeValue2, storageType2);
-            this.OnFilterSelected(new FilterSelectedEventArgs(Filter.Size, selectedFilterType, 
-                                    Misc.ConvertStorageValueToKb((float)sizeValue1, storageType1)
-                                    , Misc.ConvertStorageValueToKb(sizeValue2.HasValue ? (float)sizeValue2.Value : 0.0f
-                                    , storageType2.HasValue ? storageType2.Value : StorageSize.None)));
         }
 
         private void DateModifiedComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -249,18 +186,96 @@ namespace FileList.Views
             this.HandleDateFilterValueChanged(Filter.DateCreated, (FilterType)this.dateCreatedcomboBox.SelectedValue, this.dateCreated1Picker, this.dateCreatedValue2Panel);
         }
 
-        private void HandleDateFilterValueChanged(
-          Filter filter,
-          FilterType filterType,
-          DateTimePicker dateTime1,
-          Panel dateTime2Panel)
+        private void ClearFiltersButton_Click(object sender, EventArgs e)
+        {
+            this.Reset();
+        }
+
+        private void CloseButton_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+        }
+        #endregion
+
+        #region Helpers
+
+        private void SetDataSources()
+        {
+            if (FileFilterForm.UiFilterTypes == null)
+            {
+                FileFilterForm.UiFilterTypes = Enum.GetValues(typeof(FilterType)).Cast<FilterType>().Select(f => new EnumToUi<FilterType>(f)).ToArray();
+                //FileFilterForm.DefaultUiFilterType = FilterType.None;
+            }
+            if (FileFilterForm.UiStorageSizes == null)
+            {
+                FileFilterForm.UiStorageSizes = Enum.GetValues(typeof(StorageSize)).Cast<StorageSize>().Select(s => new EnumToUi<StorageSize>(s)).ToArray();
+                //FileFilterForm.DefaultUiStorageSize = StorageSize.None;
+            }
+            this.sizeFilterComboBox.DataSource = FileFilterForm.UiFilterTypes.Select(n => new EnumToUi<FilterType>(n.Value)).ToArray();
+            this.dateModifiedComboBox.DataSource = FileFilterForm.UiFilterTypes.Select(n => new EnumToUi<FilterType>(n.Value)).ToArray();
+            this.dateCreatedcomboBox.DataSource = FileFilterForm.UiFilterTypes.Select(n => new EnumToUi<FilterType>(n.Value)).ToArray();
+            this.sizeType1ComboBox.DataSource = FileFilterForm.UiStorageSizes.Select(n => new EnumToUi<StorageSize>(n.Value)).ToArray();
+            this.sizeType2ComboBox.DataSource = FileFilterForm.UiStorageSizes.Select(n => new EnumToUi<StorageSize>(n.Value)).ToArray();
+            this.sizeFilterComboBox.ValueMember = "Value";
+            this.sizeFilterComboBox.DisplayMember = "Friendly";
+            this.dateModifiedComboBox.ValueMember = "Value";
+            this.dateModifiedComboBox.DisplayMember = "Friendly";
+            this.dateCreatedcomboBox.ValueMember = "Value";
+            this.dateCreatedcomboBox.DisplayMember = "Friendly";
+            this.sizeType1ComboBox.ValueMember = "Value";
+            this.sizeType1ComboBox.DisplayMember = "Friendly";
+            this.sizeType2ComboBox.ValueMember = "Value";
+            this.sizeType2ComboBox.DisplayMember = "Friendly";
+            this.Reset();
+            this._dataSourcesSet = true;
+        }
+        private void HandleSizeFilterValueChanged()
+        {
+            if (!this._dataSourcesSet)
+                return;
+
+            FilterType selectedFilterType = (FilterType)this.sizeFilterComboBox.SelectedValue;
+            StorageSize storageType1 = (StorageSize)this.sizeType1ComboBox.SelectedValue;
+            StorageSize? storageType2 = null;
+            int sizeValue1 = (int)this.sizeAmount1NumericUpDown.Value;
+            int? sizeValue2 = null;
+
+            if (selectedFilterType == FilterType.None || storageType1 == StorageSize.None)
+            {
+                selectedFilterType = FilterType.None;
+                sizeValue1 = 0;
+                sizeValue2 = null;
+                storageType1 = StorageSize.None;
+                storageType2 = null;
+            }
+
+            if (selectedFilterType == FilterType.Between)
+            {
+                this.sizeValue2Panel.Visible = true;
+                sizeValue2 = (int?)this.sizeAmount2NumericUpDown.Value;
+                storageType2 = (StorageSize?)this.sizeType2ComboBox.SelectedValue;
+            }
+            else
+            {
+                this.sizeValue2Panel.Visible = false;
+            }
+
+            this.SizeFilter = new SizeFilter(selectedFilterType, sizeValue1, storageType1, sizeValue2, storageType2);
+            this.OnFilterSelected(new FilterSelectedEventArgs(Filter.Size, selectedFilterType, 
+                                    Misc.ConvertStorageValueToKb((float)sizeValue1, storageType1)
+                                    , Misc.ConvertStorageValueToKb(sizeValue2.HasValue ? (float)sizeValue2.Value : 0.0f
+                                    , storageType2.HasValue ? storageType2.Value : StorageSize.None)));
+        }
+
+        private void HandleDateFilterValueChanged(Filter filter, FilterType filterType, DateTimePicker dateTime1, Panel dateTime2Panel)
         {
             DateTime? dateTime1_1 = new DateTime?(dateTime1.Value);
-            DateTime? dateTime2 = new DateTime?((dateTime2Panel.Controls.Cast<Control>().FirstOrDefault<Control>((Func<Control, bool>)(c => c.GetType().Equals(typeof(DateTimePicker)))) as DateTimePicker).Value);
+            DateTime? dateTime2 = new DateTime?((dateTime2Panel.Controls.Cast<Control>().FirstOrDefault(c => c.GetType().Equals(typeof(DateTimePicker))) as DateTimePicker).Value);
             dateTime2Panel.Visible = filterType == FilterType.Between;
-            dateTime2 = dateTime2Panel.Visible ? dateTime2 : new DateTime?();
+            dateTime2 = dateTime2Panel.Visible ? dateTime2 : null;
             DateFilter dateFilter = new DateFilter(filterType, dateTime1_1, dateTime2);
-            FilterSelectedEventArgs args = new FilterSelectedEventArgs(filter, dateFilter.FilterType, (object)dateFilter.DateTime1, (object)dateFilter.DateTime2);
+            FilterSelectedEventArgs args = new FilterSelectedEventArgs(filter, dateFilter.FilterType, dateFilter.DateTime1, dateFilter.DateTime2);
+
             if (filter == Filter.DateCreated)
             {
                 this.CreatedDateFilter = dateFilter;
@@ -273,17 +288,9 @@ namespace FileList.Views
             }
             this.OnFilterSelected(args);
         }
+        #endregion
 
-        private void ClearFiltersButton_Click(object sender, EventArgs e)
-        {
-            this.Reset();
-        }
-
-        private void CloseButton_Click(object sender, EventArgs e)
-        {
-            this.Hide();
-        }
-
+        #region Win32 - drop shadow
         [DllImport("Gdi32.dll")]
         private static extern IntPtr CreateRoundRectRgn(
           int nLeftRect,
@@ -312,10 +319,10 @@ namespace FileList.Views
         {
             get
             {
-                this.m_aeroEnabled = this.CheckAeroEnabled();
+                this.isAeroEnabled = this.CheckAeroEnabled();
                 CreateParams createParams = base.CreateParams;
-                if (!this.m_aeroEnabled)
-                    createParams.ClassStyle |= 131072;
+                if (!this.isAeroEnabled)
+                    createParams.ClassStyle |= CS_DROPSHADOW;
                 return createParams;
             }
         }
@@ -326,15 +333,14 @@ namespace FileList.Views
                 return false;
             int pfEnabled = 0;
             FileFilterForm.DwmIsCompositionEnabled(ref pfEnabled);
-            return pfEnabled == 1;
+            return pfEnabled == HTCLIENT;
         }
-
         protected override void WndProc(ref Message m)
         {
-            if (m.Msg == 133 && this.m_aeroEnabled)
+            if (m.Msg == WM_NCPAINT && this.isAeroEnabled)
             {
-                int attrValue = 2;
-                FileFilterForm.DwmSetWindowAttribute(this.Handle, 2, ref attrValue, 4);
+                int attrValue = HTCAPTION;
+                FileFilterForm.DwmSetWindowAttribute(this.Handle, HTCAPTION, ref attrValue, 4);
                 Win32MARGINS pMarInset = new Win32MARGINS()
                 {
                     bottomHeight = 1,
@@ -345,22 +351,18 @@ namespace FileList.Views
                 FileFilterForm.DwmExtendFrameIntoClientArea(this.Handle, ref pMarInset);
             }
             base.WndProc(ref m);
-            if (m.Msg != 132 || (int)m.Result != 1)
+            if (m.Msg != WM_NCHITTEST || (int)m.Result != HTCLIENT)
                 return;
-            m.Result = (IntPtr)2;
+            m.Result = (IntPtr)HTCAPTION;
         }
+        #endregion
 
 
-        
     }
 
     public class FilterSelectedEventArgs : EventArgs
     {
-        public FilterSelectedEventArgs(
-          Filter filter,
-          FilterType filterType,
-          object value1,
-          object value2)
+        public FilterSelectedEventArgs(Filter filter, FilterType filterType, object value1, object value2)
         {
             this.Filter = filter;
             this.FilterType = filterType;

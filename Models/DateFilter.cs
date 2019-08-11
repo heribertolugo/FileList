@@ -11,10 +11,7 @@ namespace FileList.Models
         private DateTime? _dateTime1;
         private DateTime? _dateTime2;
 
-        public DateFilter(
-          FilterType filterType,
-          DateTime? dateTime1,
-          DateTime? dateTime2)
+        public DateFilter(FilterType filterType, DateTime? dateTime1, DateTime? dateTime2)
         {
             this._FilterType = filterType;
             this._dateTime1 = dateTime1;

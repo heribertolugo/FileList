@@ -56,6 +56,8 @@ namespace FileList.Models
             }
         }
 
+        // @TODO - get click hit test. if within image, drop down a menu select for selecting next sort order
+        // if other area is clicked, default behavior
         protected override void OnClick(EventArgs e)
         {
             int num = (int)(this.SortOrder + 1);
