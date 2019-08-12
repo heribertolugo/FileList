@@ -30,7 +30,7 @@ namespace FileList.Views
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = (System.ComponentModel.IContainer)new System.ComponentModel.Container();
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.rootPathTextBox = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -38,7 +38,7 @@ namespace FileList.Views
             this.browseButton = new System.Windows.Forms.Button();
             this.searchButton = new System.Windows.Forms.Button();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.fileListControl1 = new FileListControl();
+            this.fileListControl1 = new FileList.Models.FileListControl();
             this.viewerTabControl = new System.Windows.Forms.TabControl();
             this.imageTabPage = new System.Windows.Forms.TabPage();
             this.imageViewerPanel = new System.Windows.Forms.Panel();
@@ -70,7 +70,8 @@ namespace FileList.Views
             // 
             // rootPathTextBox
             // 
-            this.rootPathTextBox.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            this.rootPathTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.rootPathTextBox.Location = new System.Drawing.Point(12, 33);
             this.rootPathTextBox.Name = "rootPathTextBox";
             this.rootPathTextBox.Size = new System.Drawing.Size(1222, 20);
@@ -96,11 +97,12 @@ namespace FileList.Views
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(685, 13);
             this.label2.TabIndex = 3;
-            this.label2.Text = "Select a folder from which to copy or move files. Then click search to enumerate the files within. Select desired files then click \"Move Selected\".";
+            this.label2.Text = "Select a folder from which to copy or move files. Then click search to enumerate " +
+    "the files within. Select desired files then click \"Move Selected\".";
             // 
             // browseButton
             // 
-            this.browseButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
+            this.browseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.browseButton.Location = new System.Drawing.Point(1240, 30);
             this.browseButton.Name = "browseButton";
             this.browseButton.Size = new System.Drawing.Size(75, 23);
@@ -112,7 +114,7 @@ namespace FileList.Views
             // 
             // searchButton
             // 
-            this.searchButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
+            this.searchButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.searchButton.Enabled = false;
             this.searchButton.Location = new System.Drawing.Point(1321, 30);
             this.searchButton.Name = "searchButton";
@@ -128,7 +130,13 @@ namespace FileList.Views
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer1.Location = new System.Drawing.Point(0, 56);
             this.splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
             this.splitContainer1.Panel1.Controls.Add(this.fileListControl1);
+            // 
+            // splitContainer1.Panel2
+            // 
             this.splitContainer1.Panel2.Controls.Add(this.viewerTabControl);
             this.splitContainer1.Panel2.Controls.Add(this.panel2);
             this.splitContainer1.Size = new System.Drawing.Size(1410, 734);
@@ -145,7 +153,7 @@ namespace FileList.Views
             this.fileListControl1.Size = new System.Drawing.Size(783, 734);
             this.fileListControl1.TabIndex = 0;
             this.fileListControl1.TreeImageList = null;
-            this.fileListControl1.OnFileDataSelected += new System.EventHandler<FileDataSelectedEventArgs>(this.FileListControl1_OnFileDataSelected);
+            this.fileListControl1.OnFileDataSelected += new System.EventHandler<FileList.Models.FileDataSelectedEventArgs>(this.FileListControl1_OnFileDataSelected);
             // 
             // viewerTabControl
             // 
@@ -249,7 +257,7 @@ namespace FileList.Views
             // 
             // moveSelectedButton
             // 
-            this.moveSelectedButton.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            this.moveSelectedButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.moveSelectedButton.BackColor = System.Drawing.Color.PaleTurquoise;
             this.moveSelectedButton.Location = new System.Drawing.Point(507, 35);
             this.moveSelectedButton.Name = "moveSelectedButton";
@@ -286,7 +294,8 @@ namespace FileList.Views
             // 
             // filePropertiesTextBox
             // 
-            this.filePropertiesTextBox.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            this.filePropertiesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.filePropertiesTextBox.Location = new System.Drawing.Point(88, 6);
             this.filePropertiesTextBox.Multiline = true;
             this.filePropertiesTextBox.Name = "filePropertiesTextBox";
@@ -312,6 +321,7 @@ namespace FileList.Views
             this.saveFileDialog1.AddExtension = false;
             this.saveFileDialog1.FileName = "Folder.";
             this.saveFileDialog1.OverwritePrompt = false;
+            this.saveFileDialog1.Title = "Select Folder";
             // 
             // treeIconsImageList
             // 
@@ -321,7 +331,7 @@ namespace FileList.Views
             // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6f, 13f);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1410, 790);
             this.Controls.Add(this.splitContainer1);
@@ -342,6 +352,7 @@ namespace FileList.Views
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             this.ResumeLayout(false);
+
         }
 
         #endregion

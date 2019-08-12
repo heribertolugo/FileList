@@ -6,7 +6,7 @@ namespace FileList.Models
     public struct FileDataGroup
     {
         private string _parentPath;
-        private List<FileList.FileData> _fileDatas;
+        private List<FileData> _fileDatas;
 
         public FileDataGroup(string parent, IEnumerable<FileData> children)
         {

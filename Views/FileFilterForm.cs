@@ -11,24 +11,15 @@ using System.Windows.Forms;
 
 namespace FileList.Views
 {
-    public partial class FileFilterForm : Form
+    public partial class FileFilterForm : DropForm
     {
         public event EventHandler<FilterSelectedEventArgs> OnFilterSelectedHandler;
-
-        private const int CS_DROPSHADOW = 131072;
-        private const int WM_NCPAINT = 133;
-        private const int WM_NCHITTEST = 132;
-        private const int WM_ACTIVATEAPP = 28;
-        private const int HTCAPTION = 2;
-        private const int HTCLIENT = 1;
 
         private static readonly FilterType DefaultUiFilterType = FilterType.None;
         private static readonly StorageSize DefaultUiStorageSize = StorageSize.None;
         private static EnumToUi<FilterType>[] UiFilterTypes = null;
         private static EnumToUi<StorageSize>[] UiStorageSizes = null;
-        private bool isAeroEnabled;
         private bool _dataSourcesSet = false;
-        private Control _ownerControl;
 
         public FileFilterForm()
         {
@@ -37,20 +28,6 @@ namespace FileList.Views
 
 
         #region Public Properties / Methods
-        public void Show(Control target)
-        {
-            Rectangle screen = target.RectangleToScreen(target.ClientRectangle);
-            Form form = target.FindForm();
-            this._ownerControl = target;
-            form.Move -= new EventHandler(this.Owner_Move);
-            form.Move += new EventHandler(this.Owner_Move);
-            form.Resize -= new EventHandler(this.TargetForm_Resize);
-            form.Resize += new EventHandler(this.TargetForm_Resize);
-            this.Location = new Point(screen.X, screen.Bottom);
-            this.TopMost = true;
-            this.Show();
-        }
-
         public void Reset()
         {
             this.sizeFilterComboBox.SelectedValue = FileFilterForm.DefaultUiFilterType;
@@ -77,7 +54,7 @@ namespace FileList.Views
             EventHandler<FilterSelectedEventArgs> filterSelectedHandler = this.OnFilterSelectedHandler;
             if (filterSelectedHandler == null)
                 return;
-            filterSelectedHandler((object)this, args);
+            filterSelectedHandler(this, args);
         }
 
         #endregion
@@ -87,36 +64,6 @@ namespace FileList.Views
         private void FileFilterForm_Load(object sender, EventArgs e)
         {
             this.SetDataSources();
-            this.ShowInTaskbar = false;
-        }
-
-        private void TargetForm_Resize(object sender, EventArgs e)
-        {
-            Form form = sender as Form;
-            switch (form.WindowState)
-            {
-                case FormWindowState.Normal:
-                    this.WindowState = form.WindowState;
-                    this.Show(this._ownerControl);
-                    break;
-                case FormWindowState.Minimized:
-                    this.WindowState = form.WindowState;
-                    break;
-                case FormWindowState.Maximized:
-                    this.WindowState = FormWindowState.Normal;
-                    this.Show(this._ownerControl);
-                    break;
-                default:
-                    this.WindowState = form.WindowState;
-                    break;
-            }
-        }
-
-        private void Owner_Move(object sender, EventArgs e)
-        {
-            Rectangle screen = this._ownerControl.RectangleToScreen(this._ownerControl.ClientRectangle);
-            this.Location = new Point(screen.X, screen.Bottom);
-            this.TopMost = true;
         }
 
         private void SizeFilterComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -289,75 +236,6 @@ namespace FileList.Views
             this.OnFilterSelected(args);
         }
         #endregion
-
-        #region Win32 - drop shadow
-        [DllImport("Gdi32.dll")]
-        private static extern IntPtr CreateRoundRectRgn(
-          int nLeftRect,
-          int nTopRect,
-          int nRightRect,
-          int nBottomRect,
-          int nWidthEllipse,
-          int nHeightEllipse);
-
-        [DllImport("dwmapi.dll")]
-        public static extern int DwmExtendFrameIntoClientArea(
-          IntPtr hWnd,
-          ref Win32MARGINS pMarInset);
-
-        [DllImport("dwmapi.dll")]
-        public static extern int DwmSetWindowAttribute(
-          IntPtr hwnd,
-          int attr,
-          ref int attrValue,
-          int attrSize);
-
-        [DllImport("dwmapi.dll")]
-        public static extern int DwmIsCompositionEnabled(ref int pfEnabled);
-
-        protected override CreateParams CreateParams
-        {
-            get
-            {
-                this.isAeroEnabled = this.CheckAeroEnabled();
-                CreateParams createParams = base.CreateParams;
-                if (!this.isAeroEnabled)
-                    createParams.ClassStyle |= CS_DROPSHADOW;
-                return createParams;
-            }
-        }
-
-        private bool CheckAeroEnabled()
-        {
-            if (Environment.OSVersion.Version.Major < 6)
-                return false;
-            int pfEnabled = 0;
-            FileFilterForm.DwmIsCompositionEnabled(ref pfEnabled);
-            return pfEnabled == HTCLIENT;
-        }
-        protected override void WndProc(ref Message m)
-        {
-            if (m.Msg == WM_NCPAINT && this.isAeroEnabled)
-            {
-                int attrValue = HTCAPTION;
-                FileFilterForm.DwmSetWindowAttribute(this.Handle, HTCAPTION, ref attrValue, 4);
-                Win32MARGINS pMarInset = new Win32MARGINS()
-                {
-                    bottomHeight = 1,
-                    leftWidth = 1,
-                    rightWidth = 1,
-                    topHeight = 1
-                };
-                FileFilterForm.DwmExtendFrameIntoClientArea(this.Handle, ref pMarInset);
-            }
-            base.WndProc(ref m);
-            if (m.Msg != WM_NCHITTEST || (int)m.Result != HTCLIENT)
-                return;
-            m.Result = (IntPtr)HTCAPTION;
-        }
-        #endregion
-
-
     }
 
     public class FilterSelectedEventArgs : EventArgs

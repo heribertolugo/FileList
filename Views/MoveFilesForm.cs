@@ -34,7 +34,7 @@ namespace FileList.Views
         {
             IEnumerable<Exception> result = e.Result as IEnumerable<Exception>;
             if (result.Count() > 0)
-                NotepadHelper.ShowMessage(string.Join(string.Format("{0}{0}", Environment.NewLine), result.Select(x => string.Format("{0}{1}{2}", x.Message, Environment.NewLine, x.InnerException == null ? string.Empty : x.InnerException.Message)).ToArray()), "Exceptions");
+                Notepad.ShowMessage(string.Join(string.Format("{0}{0}", Environment.NewLine), result.Select(x => string.Format("{0}{1}{2}", x.Message, Environment.NewLine, x.InnerException == null ? string.Empty : x.InnerException.Message)).ToArray()), "Exceptions");
             this.ToggleUiEnabled();
         }
 

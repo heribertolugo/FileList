@@ -21,15 +21,9 @@ namespace FileList.Logic
         private static string imageFilter = ".jpg,.jpeg,.png,.gif";
         private static string exeFilter = ".exe,.lnk";
         private static Dictionary<string, BitmapSource> iconDic = new Dictionary<string, BitmapSource>();
-        private static SysImageList _imgList = new SysImageList(SysImageListSize.jumbo);
+        private static SysImageList _imgList = new SysImageList(Models.Win32.SysImageListSize.jumbo);
         private static Dictionary<string, BitmapSource> thumbDic = new Dictionary<string, BitmapSource>();
         private int defaultsize;
-        internal const uint SHGFI_ICON = 256;
-        internal const uint SHGFI_TYPENAME = 1024;
-        internal const uint SHGFI_LARGEICON = 0;
-        internal const uint SHGFI_SMALLICON = 1;
-        internal const uint SHGFI_SYSICONINDEX = 16384;
-        internal const uint SHGFI_USEFILEATTRIBUTES = 16;
 
         public int DefaultSize
         {
@@ -43,25 +37,14 @@ namespace FileList.Logic
             }
         }
 
-        [DllImport("gdi32.dll")]
-        public static extern bool DeleteObject(IntPtr hObject);
-
-        [DllImport("shell32.dll")]
-        internal static extern IntPtr SHGetFileInfo(
-          string pszPath,
-          uint dwFileAttributes,
-          ref FileToIconConverter.SHFILEINFO psfi,
-          uint cbSizeFileInfo,
-          uint uFlags);
-
         internal static Icon GetFileIcon(string fileName, FileToIconConverter.IconSize size)
         {
-            FileToIconConverter.SHFILEINFO psfi = new FileToIconConverter.SHFILEINFO();
-            uint num = 16384;
+            Models.Win32.SHFILEINFO psfi = new Models.Win32.SHFILEINFO();
+            uint num = Models.Win32.Win32Enums.SHGFI_SYSICONINDEX; 
             if (fileName.IndexOf(":") == -1)
-                num |= 16U;
-            uint uFlags = size != FileToIconConverter.IconSize.Small ? num | 256U : (uint)((int)num | 256 | 1);
-            FileToIconConverter.SHGetFileInfo(fileName, 0U, ref psfi, (uint)Marshal.SizeOf((object)psfi), uFlags);
+                num |= Models.Win32.Win32Enums.SHGFI_USEFILEATTRIBUTES; 
+            uint uFlags = size != FileToIconConverter.IconSize.Small ? num | Models.Win32.Win32Enums.SHGFI_ICON : (uint)((int)num | Models.Win32.Win32Enums.SHGFI_ICON | Models.Win32.Win32Enums.SHGFI_SMALLICON);
+            Models.Win32.Win32Methods.SHGetFileInfo(fileName, Models.Win32.Win32Enums.SHGFI_LARGEICON, ref psfi, (uint)Marshal.SizeOf(psfi), uFlags);
             return Icon.FromHandle(psfi.hIcon);
         }
 
@@ -198,7 +181,7 @@ namespace FileList.Logic
             }
             finally
             {
-                FileToIconConverter.DeleteObject(hbitmap);
+                Models.Win32.Win32Methods.DeleteObject(hbitmap);
             }
         }
 
@@ -255,7 +238,7 @@ namespace FileList.Logic
 
         private Bitmap loadJumbo(string lookup)
         {
-            FileToIconConverter._imgList.ImageListSize = FileToIconConverter.isVistaUp() ? SysImageListSize.jumbo : SysImageListSize.extraLargeIcons;
+            FileToIconConverter._imgList.ImageListSize = FileToIconConverter.isVistaUp() ? Models.Win32.SysImageListSize.jumbo : Models.Win32.SysImageListSize.extraLargeIcons;
             Icon icon = FileToIconConverter._imgList.Icon(FileToIconConverter._imgList.IconIndex(lookup, FileToIconConverter.isFolder(lookup)));
             Bitmap imgToResize = icon.ToBitmap();
             icon.Dispose();
@@ -264,7 +247,7 @@ namespace FileList.Logic
                 imgToResize = FileToIconConverter.resizeImage(imgToResize, new System.Drawing.Size(256, 256), 0);
             else if (imgToResize.GetPixel(100, 100) == color && imgToResize.GetPixel(200, 200) == color && imgToResize.GetPixel(200, 200) == color)
             {
-                FileToIconConverter._imgList.ImageListSize = SysImageListSize.largeIcons;
+                FileToIconConverter._imgList.ImageListSize = Models.Win32.SysImageListSize.largeIcons;
                 imgToResize = FileToIconConverter.resizeJumbo(FileToIconConverter._imgList.Icon(FileToIconConverter._imgList.IconIndex(lookup)).ToBitmap(), new System.Drawing.Size(200, 200), 5);
             }
             return imgToResize;
@@ -369,7 +352,7 @@ namespace FileList.Logic
             switch (size)
             {
                 case FileToIconConverter.IconSize.ExtraLarge:
-                    FileToIconConverter._imgList.ImageListSize = SysImageListSize.extraLargeIcons;
+                    FileToIconConverter._imgList.ImageListSize = Models.Win32.SysImageListSize.extraLargeIcons;
                     return FileToIconConverter.loadBitmap(FileToIconConverter._imgList.Icon(FileToIconConverter._imgList.IconIndex(str2, FileToIconConverter.isFolder(fileName))).ToBitmap());
                 case FileToIconConverter.IconSize.Jumbo:
                     return FileToIconConverter.loadBitmap(this.loadJumbo(str2));
@@ -429,17 +412,6 @@ namespace FileList.Logic
                 this.fullPath = path;
                 this.iconsize = size;
             }
-        }
-
-        internal struct SHFILEINFO
-        {
-            public IntPtr hIcon;
-            public IntPtr iIcon;
-            public uint dwAttributes;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
-            public string szDisplayName;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
-            public string szTypeName;
         }
     }
 }

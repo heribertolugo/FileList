@@ -1,23 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using FileList.Models;
 
 namespace FileList.Logic
 {
-    public static class NotepadHelper
+    public static class Notepad
     {
-        [DllImport("user32.dll")]
-        private static extern int SetWindowText(IntPtr hWnd, string text);
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr FindWindowEx(
-          IntPtr hwndParent,
-          IntPtr hwndChildAfter,
-          string lpszClass,
-          string lpszWindow);
-
-        [DllImport("User32.dll")]
-        private static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, string lParam);
 
         public static void ShowMessage(string message = null, string title = null)
         {
@@ -26,9 +15,9 @@ namespace FileList.Logic
                 return;
             process.WaitForInputIdle();
             if (!string.IsNullOrEmpty(title))
-                NotepadHelper.SetWindowText(process.MainWindowHandle, title);
+                Models.Win32.Win32Methods.SetWindowText(process.MainWindowHandle, title);
             if (!string.IsNullOrEmpty(message))
-                NotepadHelper.SendMessage(NotepadHelper.FindWindowEx(process.MainWindowHandle, new IntPtr(0), "Edit", (string)null), 12, 0, message);
+                 Models.Win32.Win32Methods.SendMessage(Models.Win32.Win32Methods.FindWindowEx(process.MainWindowHandle, new IntPtr(0), "Edit", null), 12, 0, message);
         }
     }
 }

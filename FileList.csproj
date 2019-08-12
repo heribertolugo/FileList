@@ -55,7 +55,18 @@
     <Compile Include="Logic\Mover.cs" />
     <Compile Include="Logic\NotepadHelper.cs" />
     <Compile Include="Logic\UiHelper.cs" />
+    <Compile Include="Models\Win32\Win32Enums.cs" />
+    <Compile Include="Models\Win32\Win32IImageList.cs" />
+    <Compile Include="Models\Win32\Win32IMAGEINFO.cs" />
+    <Compile Include="Models\Win32\Win32IMAGELISTDRAWPARAMS.cs" />
+    <Compile Include="Models\Win32\Win32Methods.cs" />
     <Compile Include="Models\DateFilter.cs" />
+    <Compile Include="Models\DropForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Models\DropForm.Designer.cs">
+      <DependentUpon>DropForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Enums.cs" />
     <Compile Include="Models\EnumToUi.cs" />
     <Compile Include="Models\FileData.cs" />
@@ -78,11 +89,20 @@
     <Compile Include="Models\ProgressInfoControl.Designer.cs">
       <DependentUpon>ProgressInfoControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Models\Win32MARGINS.cs" />
+    <Compile Include="Models\SortDropDown.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Models\SortDropDown.Designer.cs">
+      <DependentUpon>SortDropDown.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Win32\Win32MARGINS.cs" />
     <Compile Include="Models\SizeFilter.cs" />
     <Compile Include="Models\SortButton.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Models\Win32\Win32POINT.cs" />
+    <Compile Include="Models\Win32\Win32RECT.cs" />
+    <Compile Include="Models\Win32\Win32SHFILEINFO.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Views\FileFilterForm.cs">
@@ -108,6 +128,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Models\ProgressInfoControl.resx">
       <DependentUpon>ProgressInfoControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Models\SortDropDown.resx">
+      <DependentUpon>SortDropDown.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

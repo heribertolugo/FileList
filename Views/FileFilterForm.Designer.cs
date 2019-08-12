@@ -306,9 +306,7 @@
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.bannerPanel);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "FileFilterForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "FileFilterForm";
             this.Load += new System.EventHandler(this.FileFilterForm_Load);
             this.groupBox1.ResumeLayout(false);
