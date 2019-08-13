@@ -81,7 +81,7 @@ namespace FileList
                     return string.Empty;
                 if (this._extension == null)
                     this._extension = System.IO.Path.GetExtension(this.Path);
-                return this._extension;
+                return this._extension.ToLowerInvariant();
             }
             private set
             {

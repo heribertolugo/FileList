@@ -130,11 +130,21 @@ namespace FileList.Views
                     this.Height = 829;
                     this.Width = 1350;
                 }
+                ConcurrentFileSearch search = new ConcurrentFileSearch(this.rootPathTextBox.Text);
+                search.OnFinishedHandler += Search_OnFinishedHandler;
+                search.Start();
+                return;
+
                 this.ToggleEnabled((Control)this);
                 this.Reset();
                 this.Search();
                 this.ToggleEnabled((Control)this);
             }
+        }
+
+        private void Search_OnFinishedHandler(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         public void ToggleEnabled(Control control)

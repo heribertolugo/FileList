@@ -69,7 +69,7 @@ namespace FileList.Logic
                     fileData1 = current.Value;
                     string path1 = fileData1.Path;
                     Bitmap bitmap = fileToIconConverter2.GetImage(path1, FileToIconConverter.IconSize.Small).ToBitmap();
-                    images2.Add(extension2, (Image)bitmap);
+                    images2.Add(extension2, bitmap);
                 }
                 FileListControl fileListControl1 = fileListControl;
                 FileData fileData2 = current.Value;
@@ -119,13 +119,13 @@ namespace FileList.Logic
         {
             if (Thread.CurrentThread.GetApartmentState() == ApartmentState.STA)
             {
-                UiHelper.MoveNextFileData((object)search);
+                UiHelper.MoveNextFileData(search);
             }
             else
             {
                 Thread thread = new Thread(new ParameterizedThreadStart(UiHelper.MoveNextFileData));
                 thread.SetApartmentState(ApartmentState.STA);
-                thread.Start((object)search);
+                thread.Start(search);
                 thread.Join();
             }
         }
@@ -153,7 +153,7 @@ namespace FileList.Logic
                     UiHelper.DisplayBrowsablePreview(new FileData?(), contentsListView);
                     UiHelper.DisplayImagePreview((string)null, imageViewerPanel, ImageLayout.None);
                     UiHelper.DisplayTextPreview((string)null, textViewerTextBox);
-                    UiHelper.DisplayApplicationPreview(path, (TextBoxBase)textViewerTextBox);
+                    UiHelper.DisplayApplicationPreview(path, textViewerTextBox);
                     tabControl.SelectedTab = documentTabPage;
                     break;
                 case FileType.Text:

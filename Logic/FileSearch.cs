@@ -13,7 +13,7 @@ namespace FileList.Logic
         public FileSearch(string root)
         {
             this._root = root;
-            this._fileEnumerator = (IEnumerator)this.Search(this._root).GetEnumerator();
+            this._fileEnumerator = this.Search(this._root).GetEnumerator();
         }
 
         public FileData? GetNext()
@@ -30,7 +30,7 @@ namespace FileList.Logic
             }
         }
 
-        private IEnumerable<FileData> Search(string path)
+        private IEnumerable<FileData> Search(string path, bool searchSubdirectories = true)
         {
             Shell shell = new ShellClass();
             Folder objFolder = shell.NameSpace(path);
@@ -47,7 +47,7 @@ namespace FileList.Logic
                     this.AddZipContentsToFileData(item.Path, fileData);
                     yield return fileData;
                 }
-                else
+                else if (searchSubdirectories)
                 {
                     foreach (FileData fileData in this.Search(item.Path))
                     {
