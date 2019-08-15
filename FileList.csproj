@@ -57,6 +57,7 @@
     <Compile Include="Logic\NotepadHelper.cs" />
     <Compile Include="Logic\UiHelper.cs" />
     <Compile Include="Models\ConcurrentCollection.cs" />
+    <Compile Include="Models\FileSearchWorkerArgs.cs" />
     <Compile Include="Models\Win32\Win32Enums.cs" />
     <Compile Include="Models\Win32\Win32IImageList.cs" />
     <Compile Include="Models\Win32\Win32IMAGEINFO.cs" />

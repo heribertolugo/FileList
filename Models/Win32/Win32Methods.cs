@@ -19,8 +19,11 @@ namespace FileList.Models.Win32
           string lpszClass,
           string lpszWindow);
 
-        [DllImport("User32.dll")]
-        internal static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, string lParam);
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        internal static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, int wParam, object lParam);
+
+        //[DllImport("User32.dll")]
+        //internal static extern int SendMessage(IntPtr hWnd, int uMsg, int wParam, string lParam);
 
         [DllImport("user32.dll")]
         internal static extern int DestroyIcon(IntPtr hIcon);

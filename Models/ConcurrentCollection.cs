@@ -19,6 +19,22 @@ namespace FileList.Models
             ConcurrentCollection<T> that = this;
             this._enumerator = new ConcurrentCollectionEnumerator<T>(ref that);
         }
+
+        public T this[int index]
+        {
+            get
+            {
+                return this._items[index];
+            }
+            set
+            {
+                lock (this._itemLock)
+                {
+                    this._items[index] = value;
+                }
+            }
+        }
+
         public int Count
         {
             get

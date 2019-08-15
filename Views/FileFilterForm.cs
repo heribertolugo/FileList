@@ -181,36 +181,32 @@ namespace FileList.Views
             if (!this._dataSourcesSet)
                 return;
 
-            FilterType selectedFilterType = (FilterType)this.sizeFilterComboBox.SelectedValue;
+            FilterType filterType = (FilterType)this.sizeFilterComboBox.SelectedValue;
             StorageSize storageType1 = (StorageSize)this.sizeType1ComboBox.SelectedValue;
-            StorageSize? storageType2 = null;
-            int sizeValue1 = (int)this.sizeAmount1NumericUpDown.Value;
-            int? sizeValue2 = null;
+            StorageSize? storageType2 = (StorageSize)this.sizeType2ComboBox.SelectedValue;
+            float sizeValue1 = (float)this.sizeAmount1NumericUpDown.Value;
+            float? sizeValue2 = (float)this.sizeAmount2NumericUpDown.Value;
+            Panel value2Panel = this.sizeValue2Panel;
 
-            if (selectedFilterType == FilterType.None || storageType1 == StorageSize.None)
+            value2Panel.Visible = (filterType == FilterType.Between);
+
+            if (filterType == FilterType.None || storageType1 == StorageSize.None)
             {
-                selectedFilterType = FilterType.None;
+                filterType = FilterType.None;
                 sizeValue1 = 0;
                 sizeValue2 = null;
                 storageType1 = StorageSize.None;
                 storageType2 = null;
+            }else if (filterType != FilterType.Between)
+            {
+                sizeValue2 = null;
+                storageType2 = null;
             }
 
-            if (selectedFilterType == FilterType.Between)
-            {
-                this.sizeValue2Panel.Visible = true;
-                sizeValue2 = (int?)this.sizeAmount2NumericUpDown.Value;
-                storageType2 = (StorageSize?)this.sizeType2ComboBox.SelectedValue;
-            }
-            else
-            {
-                this.sizeValue2Panel.Visible = false;
-            }
-
-            this.SizeFilter = new SizeFilter(selectedFilterType, sizeValue1, storageType1, sizeValue2, storageType2);
-            this.OnFilterSelected(new FilterSelectedEventArgs(Filter.Size, selectedFilterType, 
-                                    Misc.ConvertStorageValueToKb((float)sizeValue1, storageType1)
-                                    , Misc.ConvertStorageValueToKb(sizeValue2.HasValue ? (float)sizeValue2.Value : 0.0f
+            this.SizeFilter = new SizeFilter(filterType, sizeValue1, storageType1, sizeValue2, storageType2);
+            this.OnFilterSelected(new FilterSelectedEventArgs(Filter.Size, filterType, 
+                                    Misc.ConvertStorageValueToKb(sizeValue1, storageType1)
+                                    , Misc.ConvertStorageValueToKb(sizeValue2.HasValue ? sizeValue2.Value : 0.0f
                                     , storageType2.HasValue ? storageType2.Value : StorageSize.None)));
         }
 

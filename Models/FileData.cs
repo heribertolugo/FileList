@@ -9,7 +9,7 @@ namespace FileList
 {
     public struct FileData
     {
-        private static List<string> FilePropertyNames;
+        private static Models.ConcurrentCollection<string> FilePropertyNames;
         private string _path;
         private string _name;
         private string _extension;
@@ -23,6 +23,22 @@ namespace FileList
         private bool _isDateCreatedSet;
         private DateTime? _dateModified;
         private bool _isDateModifiedSet;
+
+        private static object _filePropertyNamesLock;
+
+        static FileData()
+        {
+            if (FileData._filePropertyNamesLock == null)
+                FileData._filePropertyNamesLock = new object();
+
+            lock (FileData._filePropertyNamesLock)
+            {
+                if (FileData.FilePropertyNames == null)
+                {
+                    FileData.FilePropertyNames = new Models.ConcurrentCollection<string>();
+                }
+            }
+        }
 
         public FileData(string path)
         {
@@ -39,10 +55,15 @@ namespace FileList
             this._isDateCreatedSet = false;
             this._dateModified = null;
             this._isDateModifiedSet = false;
-            if (FileData.FilePropertyNames == null || FileData.FilePropertyNames.Count < 1)
+
+            lock (FileData._filePropertyNamesLock)
             {
-                FileData.FilePropertyNames = new List<string>();
-                FileData.LoadFilePropertyNames(System.IO.Path.GetDirectoryName(path));
+                if (FileData.FilePropertyNames == null || FileData.FilePropertyNames.Count < 1)
+                {
+                    if (FileData.FilePropertyNames == null)
+                        FileData.FilePropertyNames = new Models.ConcurrentCollection<string>();
+                    FileData.LoadFilePropertyNames(System.IO.Path.GetDirectoryName(path));
+                }
             }
             this.LoadExtendedProperties();
         }

@@ -179,6 +179,7 @@ namespace FileList.Models
             this.dateCreatedButton.SortOrder = SortOrder.None;
             this.dateModifiedButton.SortOrder = SortOrder.None;
             this.filterForm.Reset();
+            this._treeKeys.Clear();
         }
 
         /// <summary>
@@ -187,7 +188,7 @@ namespace FileList.Models
         /// </summary>
         /// <param name="fileData"></param>
         /// <param name="imageKey"></param>
-        public void AddFileData(FileData fileData, string imageKey)
+        public void AddFileData(FileData fileData, bool commitRequired)
         {
             this.modifyFileTypesListBoxInternal = true;
             TreeNode treeNode;
@@ -202,36 +203,53 @@ namespace FileList.Models
                 treeNode = this.TreeDataSource.FirstOrDefault(n => n.Name.Equals(fileData.Directory));
 
             TreeNode node = new TreeNode(fileData.Name + fileData.Extension);
-            string str1 = fileData.Extension.Equals(string.Empty) ? UiHelper.NoneFileExtension : fileData.Extension;
+            string fileImageKey = fileData.Extension.Equals(string.Empty) ? UiHelper.NoneFileExtension : fileData.Extension;
+            string directoryImageKey = fileData.Directory.ToLowerInvariant().Contains(UiHelper.ZipExtension) ? UiHelper.ZipExtension : UiHelper.DirectoryKey;
+
             node.Tag = fileData;
             node.ToolTipText = string.Join(Environment.NewLine, fileData.ExtendedProperties.Select(p => string.Format("{0}: {1}", p.Key, p.Value)).ToArray());
-            node.ImageKey = str1;
-            node.SelectedImageKey = str1;
-            node.StateImageKey = str1;
+            node.ImageKey = fileImageKey;
+            node.SelectedImageKey = fileImageKey;
+            node.StateImageKey = fileImageKey;
             node.Name = fileData.Name + fileData.Extension;
-            string str2 = fileData.Directory.ToLowerInvariant().Contains(UiHelper.ZipExtension) ? UiHelper.ZipExtension : UiHelper.DirectoryKey;
-            treeNode.ImageKey = str2;
-            treeNode.SelectedImageKey = str2;
-            treeNode.StateImageKey = str2;
+            treeNode.ImageKey = directoryImageKey;
+            treeNode.SelectedImageKey = directoryImageKey;
+            treeNode.StateImageKey = directoryImageKey;
             treeNode.Name = fileData.Directory;
+
             if (!this._treeKeys.ContainsKey(fileData.Directory))
+            {
                 this._treeKeys.Add(fileData.Directory, treeNode.Clone() as TreeNode);
-            this._treeKeys[fileData.Directory].ImageKey = str2;
-            this._treeKeys[fileData.Directory].SelectedImageKey = str2;
-            this._treeKeys[fileData.Directory].StateImageKey = str2;
+
+                if (!commitRequired)
+                {
+                    this.treeView1.Nodes.Add(this._treeKeys[fileData.Directory]);
+                    if (!this._extensions.Contains(fileData.Extension))
+                        this.fileTypesCheckedListBox.Items.Add(fileData.Extension, true);
+                }
+            }
+            this._treeKeys[fileData.Directory].ImageKey = directoryImageKey;
+            this._treeKeys[fileData.Directory].SelectedImageKey = directoryImageKey;
+            this._treeKeys[fileData.Directory].StateImageKey = directoryImageKey;
             this._treeKeys[fileData.Directory].Name = fileData.Directory;
             this._treeKeys[fileData.Directory].Nodes.Add(node.Clone() as TreeNode);
             treeNode.Nodes.Add(node);
+
             if (!this._extensions.Contains(fileData.Extension))
                 this._extensions.Add(fileData.Extension);
+
             this.modifyFileTypesListBoxInternal = false;
         }
 
         public void Commit()
         {
             this.modifyFileTypesListBoxInternal = true;
-            this.treeView1.Nodes.AddRange(this._treeKeys.Values.ToArray<TreeNode>());
-            foreach (object extension in this._extensions)
+            this.fileTypesCheckedListBox.Items.Clear();
+            this.treeView1.Nodes.Clear();
+            if (this._treeKeys.Count < 1)
+                return;
+            this.treeView1.Nodes.AddRange(this._treeKeys.Values.Where(t => !this.treeView1.Nodes.Contains(t)).ToArray<TreeNode>());
+            foreach (object extension in this._extensions.Where(x => !this.fileTypesCheckedListBox.Items.Contains(x)).ToArray())
                 this.fileTypesCheckedListBox.Items.Add(extension, true);
             this._treeKeys.Clear();
             this._extensions.Clear();
@@ -252,7 +270,7 @@ namespace FileList.Models
             EventHandler<FileDataSelectedEventArgs> fileDataSelected = this.OnFileDataSelected;
             if (fileDataSelected == null)
                 return;
-            this.OnFileDataSelected((object)this, this.GetEventArgs(fileDataSelected));
+            this.OnFileDataSelected(this, this.GetEventArgs(fileDataSelected));
         }
 
         private void FileTypesCheckedListBox_ItemCheck(object sender, ItemCheckEventArgs e)
@@ -334,7 +352,10 @@ namespace FileList.Models
 
         private void FilterButton_Click(object sender, EventArgs e)
         {
-            this.filterForm.Show(sender as Control);
+            if (this.filterForm.Visible)
+                this.filterForm.Hide();
+            else
+                this.filterForm.Show(sender as Control);
         }
 
         private void SizeSortButton_Click(object sender, EventArgs e)
@@ -375,7 +396,7 @@ namespace FileList.Models
 
         private static void ScrollTreeLeft(TreeView tree)
         {
-            FileListControl.SendMessage(tree.Handle, WM_HSCROLL, SB_LEFT, 0);
+            Win32.Win32Methods.SendMessage(tree.Handle, WM_HSCROLL, SB_LEFT, 0);
         }
 
         /// <summary>
@@ -475,7 +496,7 @@ namespace FileList.Models
         private void SetVisibleNodes()
         {
             this.Enabled = false;
-            Func<FileData, bool> filterPredicate = this.GetFilterPredicate((ItemCheckEventArgs)null);
+            Func<FileData, bool> filterPredicate = this.GetFilterPredicate(null);
             FileListControl.SortTree(this.treeView1, this._sortStack);
             FileListControl.SetNodeVisibility(this.treeView1, filterPredicate, this.TreeDataSource);
             this.treeView1.ExpandAll();
@@ -706,11 +727,6 @@ namespace FileList.Models
         }
         #endregion
 
-        #region System32
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, int wParam, int lParam);
-        #endregion
     }
 
     public class FileDataSelectedEventArgs : EventArgs

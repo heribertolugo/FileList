@@ -1,25 +1,32 @@
 ﻿using FileList.Models;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace FileList.Logic
 {
     internal sealed class ConcurrentFileSearch
     {
-        public event EventHandler OnFinishedHandler;
+        public event EventHandler<ConcurrentFileSearchEventArgs> OnFinishedHandler;
+        public event EventHandler<ConcurrentFileSearchEventArgs> OnUpdateHandler;
 
         private static ConcurrentCollection<FileData> _fileData;
         private string _root;
+        private FileListControl _fileListControl;
+        private bool _commitRequired;
 
-        public ConcurrentFileSearch(string rootPath)
+        public ConcurrentFileSearch(string rootPath, FileSearchWorkerArgs args)
         {
             this._root = rootPath;
             if (ConcurrentFileSearch._fileData == null)
                 ConcurrentFileSearch._fileData = new ConcurrentCollection<FileData>();
+            this._fileListControl = args.FileListControl;
+            this._commitRequired = !args.LiveUpdate;
         }
 
         public void Start()
@@ -35,12 +42,67 @@ namespace FileList.Logic
             thread.Start();
         }
 
-        private void ConcurrentFileSearch_OnFinishedHandler(object sender, EventArgs e)
+        private void AttachFileData(IEnumerable<FileData> files, FileListControl fileListControl, bool commitRequired)
+        {
+            fileListControl.InvokeIfRequired(c =>
+            {
+                c.Enabled = false;
+                c.Clear();
+
+                FileToIconConverter iconConverter = new FileToIconConverter();
+                if (c.TreeImageList == null)
+                    c.TreeImageList = new ImageList();
+                ImageList treeImageList = c.TreeImageList;
+                if (!treeImageList.Images.ContainsKey(UiHelper.DirectoryKey))
+                    treeImageList.Images.Add(UiHelper.DirectoryKey, iconConverter.GetImage(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), FileToIconConverter.IconSize.Small).ToBitmap());
+                if (!treeImageList.Images.ContainsKey(UiHelper.ZipExtension))
+                    treeImageList.Images.Add(UiHelper.ZipExtension, iconConverter.GetImage(UiHelper.ZipExtension, FileToIconConverter.IconSize.Small).ToBitmap());
+                if (!treeImageList.Images.ContainsKey(UiHelper.NoneFileExtension))
+                    treeImageList.Images.Add(UiHelper.NoneFileExtension, iconConverter.GetImage(UiHelper.NoneFileExtension, FileToIconConverter.IconSize.Small).ToBitmap());
+
+                foreach (FileData file in files)
+                {
+                    ImageList.ImageCollection images = treeImageList.Images;
+                    if (!images.ContainsKey(file.Extension))
+                    {
+                        Bitmap icon = iconConverter.GetImage(file.Path, FileToIconConverter.IconSize.Small).ToBitmap();
+                        images.Add(file.Extension, icon);
+                    }
+
+                    c.AddFileData(file, commitRequired);
+                }
+            });
+        }
+
+        private void FinalizeFileListControl(FileListControl fileListControl, bool commitRequired)
+        {
+            fileListControl.InvokeIfRequired(c =>
+            {
+                if (commitRequired)
+                    c.Commit();
+
+                c.ExpandTree();
+                c.ScrollTreeToTop();
+                c.FileTypeListSorted = true;
+                c.Enabled = true;
+            });
+        }
+
+        private void ConcurrentFileSearch_OnFinishedHandler(object sender, ConcurrentFileSearchEventArgs e)
         {
             int bucketCount = ConcurrentFileSearchSta.ThreadBucketCount();
-            Console.WriteLine(bucketCount);
+            //Console.WriteLine(bucketCount);
             if (bucketCount == 0)
-                this.OnFinished(EventArgs.Empty);
+            {
+                this.AttachFileData(e.Files, this._fileListControl, this._commitRequired);
+                this.FinalizeFileListControl(this._fileListControl, this._commitRequired); ;
+                this.OnFinished(e);
+            }
+            else if (e.Files.Count() > 0)
+            {
+                this.AttachFileData(e.Files, this._fileListControl, this._commitRequired);
+                this.OnUpdate(e);
+            }
         }
 
         public void Cancel()
@@ -48,29 +110,36 @@ namespace FileList.Logic
             ConcurrentFileSearchSta.Cancel();
         }
 
-        private void OnFinished(EventArgs args)
+        private void OnFinished(ConcurrentFileSearchEventArgs args)
         {
-            EventHandler handler = this.OnFinishedHandler;
+            EventHandler<ConcurrentFileSearchEventArgs> handler = this.OnFinishedHandler;
             if (handler == null)
                 return;
-            OnFinishedHandler(this, args);
+            this.OnFinishedHandler(this, args);
+        }
+
+        private void OnUpdate(ConcurrentFileSearchEventArgs args)
+        {
+            EventHandler<ConcurrentFileSearchEventArgs> handler = this.OnUpdateHandler;
+            if (handler == null)
+                return;
+            this.OnUpdateHandler(this, args);
         }
 
 
         private sealed class ConcurrentFileSearchSta
         {
-            private event EventHandler OnFinishedHandler;
+            private event EventHandler<ConcurrentFileSearchEventArgs> OnFinishedHandler;
 
             private static ConcurrentCollection<int> ThreadBucket;
             public static ConcurrentCollection<FileData> Files;
-
-            private static ConcurrentCollection<string> Directories;
             private FileSearch _fileSearch;
             private static int IdTracker;
             private static object IdLock;
             private readonly int ID;
             private string _root;
-            private EventHandler _handler;
+            private EventHandler<ConcurrentFileSearchEventArgs> _handler;
+            private List<FileData> _files;
 
             static ConcurrentFileSearchSta()
             {
@@ -85,21 +154,22 @@ namespace FileList.Logic
             {
                 this.ID = this.GetNextId();
                 this._root = root;
+                this._files = new List<FileData>();
             }
 
-            public void Start(EventHandler onFinishedHandler)
+            public void Start(EventHandler<ConcurrentFileSearchEventArgs> onFinishedHandler)
             {
                 if (ConcurrentFileSearchSta.IsCancelled())
                     return;
                 this._handler = onFinishedHandler;
                 if (onFinishedHandler != null)
-                    this.OnFinishedHandler += (EventHandler)onFinishedHandler;
+                    this.OnFinishedHandler += (EventHandler<ConcurrentFileSearchEventArgs>)onFinishedHandler;
                 ConcurrentFileSearchSta.ThreadBucket.Add(this.ID);
                 //this.CopyHandler();
                 this.SummonMinions(this._root);
-                this.GetFiles(this._root);
+                this.GetFiles(this._root, this._files);
                 this.RmoveFromThreadBucket();
-                this.OnFinished(EventArgs.Empty);
+                this.OnFinished(new ConcurrentFileSearchEventArgs(this._files));
             }
 
             private void RmoveFromThreadBucket()
@@ -156,14 +226,15 @@ namespace FileList.Logic
                 }
             }
 
-            private void GetFiles(string root)
+            private void GetFiles(string root, IList<FileData> files)
             {
                 this._fileSearch = new FileSearch(root);
 
                 while (this._fileSearch.GetNext() != null)
                 {
-                    ConcurrentFileSearchSta.Files.Add(this._fileSearch.Current.Value);
-                    Console.WriteLine(this._fileSearch.Current.Value.Path);
+                    //ConcurrentFileSearchSta.Files.Add(this._fileSearch.Current.Value);
+                    files.Add(this._fileSearch.Current.Value);
+                    //Console.WriteLine(this._fileSearch.Current.Value.Path);
                 }
             }
 
@@ -174,16 +245,16 @@ namespace FileList.Logic
                     Delegate[] delegates = this.OnFinishedHandler.GetInvocationList();
                     for (int index = 0; index < delegates.Length; index++)
                     {
-                        EventHandler subscriber = (EventHandler)delegates[index];
+                        EventHandler<ConcurrentFileSearchEventArgs> subscriber = (EventHandler<ConcurrentFileSearchEventArgs>)delegates[index];
                         if (subscriber != null)
                             this.OnFinishedHandler += subscriber;
                     }
                 }
             }
 
-            private void OnFinished(EventArgs args)
+            private void OnFinished(ConcurrentFileSearchEventArgs args)
             {
-                EventHandler handler = this.OnFinishedHandler;
+                EventHandler<ConcurrentFileSearchEventArgs> handler = this.OnFinishedHandler;
                 if (handler == null)
                     return;
                 OnFinishedHandler(this, args);
@@ -191,5 +262,15 @@ namespace FileList.Logic
         }
     }
 
-    
+    public class ConcurrentFileSearchEventArgs : EventArgs
+    {
+        private IEnumerable<FileData> _files;
+
+        public ConcurrentFileSearchEventArgs(IEnumerable<FileData> files)
+        {
+            this._files = files;
+        }
+
+        public IEnumerable<FileData> Files { get { return this._files; } private set { } }
+    }
 }
