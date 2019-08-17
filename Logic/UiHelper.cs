@@ -52,53 +52,6 @@ namespace FileList.Logic
             FileSearchWorkerArgs args = new FileSearchWorkerArgs(path, fileListControl, true);
 
             UiHelper.worker.RunWorkerAsync(args);
-
-            //fileListControl.Enabled = false;
-            //FileSearch search = new FileSearch(path);
-            //if (search == null)
-            //    return;
-            //fileListControl.Clear();
-            ////FileData? nullable = new FileData?();
-            //FileToIconConverter fileToIconConverter1 = new FileToIconConverter();
-            //if (fileListControl.TreeImageList == null)
-            //    fileListControl.TreeImageList = new ImageList();
-            //ImageList treeImageList = fileListControl.TreeImageList;
-            //if (!treeImageList.Images.ContainsKey(UiHelper.DirectoryKey))
-            //    treeImageList.Images.Add(UiHelper.DirectoryKey, (Image)fileToIconConverter1.GetImage(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), FileToIconConverter.IconSize.Small).ToBitmap());
-            //if (!treeImageList.Images.ContainsKey(UiHelper.ZipExtension))
-            //    treeImageList.Images.Add(UiHelper.ZipExtension, (Image)fileToIconConverter1.GetImage(UiHelper.ZipExtension, FileToIconConverter.IconSize.Small).ToBitmap());
-            //if (!treeImageList.Images.ContainsKey(UiHelper.NoneFileExtension))
-            //    treeImageList.Images.Add(UiHelper.NoneFileExtension, (Image)fileToIconConverter1.GetImage(UiHelper.NoneFileExtension, FileToIconConverter.IconSize.Small).ToBitmap());
-            //UiHelper.MoveNextFileDataFromMta(search);
-            //FileData? current;
-            //while ((current = search.Current).HasValue)
-            //{
-            //    ImageList.ImageCollection images1 = treeImageList.Images;
-            //    FileData fileData1 = current.Value;
-            //    string extension1 = fileData1.Extension;
-            //    if (!images1.ContainsKey(extension1))
-            //    {
-            //        ImageList.ImageCollection images2 = treeImageList.Images;
-            //        fileData1 = current.Value;
-            //        string extension2 = fileData1.Extension;
-            //        FileToIconConverter fileToIconConverter2 = fileToIconConverter1;
-            //        fileData1 = current.Value;
-            //        string path1 = fileData1.Path;
-            //        Bitmap bitmap = fileToIconConverter2.GetImage(path1, FileToIconConverter.IconSize.Small).ToBitmap();
-            //        images2.Add(extension2, bitmap);
-            //    }
-            //    FileListControl fileListControl1 = fileListControl;
-            //    FileData fileData2 = current.Value;
-            //    fileData1 = current.Value;
-            //    string extension3 = fileData1.Extension;
-            //    fileListControl1.AddFileData(fileData2, extension3);
-            //    UiHelper.MoveNextFileDataFromMta(search);
-            //}
-            //fileListControl.Commit();
-            //fileListControl.ExpandTree();
-            //fileListControl.ScrollTreeToTop();
-            //fileListControl.FileTypeListSorted = true;
-            //fileListControl.Enabled = true;
         }
 
         private static void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

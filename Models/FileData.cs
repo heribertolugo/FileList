@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace FileList
 {
@@ -227,10 +228,31 @@ namespace FileList
         {
             try
             {
-                Folder folder = new ShellClass().NameSpace(System.IO.Path.GetDirectoryName(this.Path));
+
+                
+                //Folder objFolder = null;
+
+                //try
+                //{
+                //    objFolder = (Folder)shell.NameSpace(path);
+                //}
+                //catch (Exception ex)
+                //{
+
+                //}
+
+                //if (objFolder == null)
+                //{
+                //    //Marshal.ReleaseComObject(objFolder);
+                //    fileData.ZipContents.Add(new FileData(path));
+                //    return;
+                //}
+Shell shell = new ShellClass();
+                Folder folder = shell.NameSpace(System.IO.Path.GetDirectoryName(this.Path));
                 FolderItem name = folder.ParseName(System.IO.Path.GetFileName(this.Path));
                 for (int iColumn = 0; iColumn < FileData.FilePropertyNames.Count; ++iColumn)
                     this._extendedProperties.Add(new KeyValuePair<string, string>(FileData.FilePropertyNames[iColumn], folder.GetDetailsOf(name, iColumn)));
+                    Marshal.ReleaseComObject(shell);
             }
             catch (Exception ex)
             {
@@ -258,13 +280,23 @@ namespace FileList
 
         private static void LoadFilePropertyNames(string nspace)
         {
-            Folder folder = new ShellClass().NameSpace(nspace);
-            for (int iColumn = 0; iColumn < (int)short.MaxValue; ++iColumn)
+            try
             {
-                string detailsOf = folder.GetDetailsOf((object)null, iColumn);
-                if (string.IsNullOrEmpty(detailsOf))
-                    break;
-                FileData.FilePropertyNames.Add(detailsOf);
+                Shell shell = new ShellClass();
+                Folder folder = shell.NameSpace(nspace);
+                for (int iColumn = 0; iColumn < (int)short.MaxValue; ++iColumn)
+                {
+                    string detailsOf = folder.GetDetailsOf((object)null, iColumn);
+                    if (string.IsNullOrEmpty(detailsOf))
+                        break;
+                    FileData.FilePropertyNames.Add(detailsOf);
+                }
+                Marshal.ReleaseComObject(folder);
+                Marshal.ReleaseComObject(shell);
+            }
+            catch(Exception ex)
+            {
+
             }
         }
     }

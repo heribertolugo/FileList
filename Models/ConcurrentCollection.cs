@@ -9,7 +9,7 @@ namespace FileList.Models
 {
     public class ConcurrentCollection<T> : ICollection<T>
     {
-        private List<T> _items;
+        private volatile List<T> _items;
         private readonly object _itemLock;
         private ConcurrentCollectionEnumerator<T> _enumerator;
         public ConcurrentCollection()

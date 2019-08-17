@@ -32,7 +32,7 @@ namespace FileList.Logic
         public void Start()
         {
             ConcurrentFileSearchSta searcher = new ConcurrentFileSearchSta(this._root);
-            ConcurrentFileSearchSta.Files = ConcurrentFileSearch._fileData;
+            //ConcurrentFileSearchSta.Files = ConcurrentFileSearch._fileData;
 
             Thread thread = new Thread(() =>
             {
@@ -91,7 +91,7 @@ namespace FileList.Logic
         private void ConcurrentFileSearch_OnFinishedHandler(object sender, ConcurrentFileSearchEventArgs e)
         {
             int bucketCount = ConcurrentFileSearchSta.ThreadBucketCount();
-            //Console.WriteLine(bucketCount);
+            Console.WriteLine(bucketCount);
             if (bucketCount == 0)
             {
                 this.AttachFileData(e.Files, this._fileListControl, this._commitRequired);
@@ -132,7 +132,7 @@ namespace FileList.Logic
             private event EventHandler<ConcurrentFileSearchEventArgs> OnFinishedHandler;
 
             private static ConcurrentCollection<int> ThreadBucket;
-            public static ConcurrentCollection<FileData> Files;
+            //public static ConcurrentCollection<FileData> Files;
             private FileSearch _fileSearch;
             private static int IdTracker;
             private static object IdLock;
@@ -166,10 +166,11 @@ namespace FileList.Logic
                     this.OnFinishedHandler += (EventHandler<ConcurrentFileSearchEventArgs>)onFinishedHandler;
                 ConcurrentFileSearchSta.ThreadBucket.Add(this.ID);
                 //this.CopyHandler();
-                this.SummonMinions(this._root);
                 this.GetFiles(this._root, this._files);
                 this.RmoveFromThreadBucket();
                 this.OnFinished(new ConcurrentFileSearchEventArgs(this._files));
+                this.SummonMinions(this._root);
+                Thread.CurrentThread.Abort();
             }
 
             private void RmoveFromThreadBucket()
@@ -215,14 +216,25 @@ namespace FileList.Logic
                 return id;
             }
 
+            private static object minionLock = new object();
             private void SummonMinions(string root)
             {
-                foreach (string directory in Directory.GetDirectories(root))
+                try
                 {
-                    ConcurrentFileSearchSta search = new ConcurrentFileSearchSta(directory);
-                    Thread thread = new Thread(() => search.Start(this._handler));
-                    thread.SetApartmentState(ApartmentState.STA);
-                    thread.Start();
+                    //lock (minionLock)
+                    //{
+                        foreach (string directory in Directory.GetDirectories(root))
+                        {
+                            ConcurrentFileSearchSta search = new ConcurrentFileSearchSta(directory);
+                            Thread thread = new Thread(() => search.Start(this._handler));
+                            thread.SetApartmentState(ApartmentState.STA);
+                            thread.Start();
+                        }
+                    //}
+                }
+                catch(Exception ex)
+                {
+
                 }
             }
 

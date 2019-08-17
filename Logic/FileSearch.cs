@@ -1,6 +1,8 @@
 ﻿using Shell32;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace FileList.Logic
 {
@@ -10,10 +12,10 @@ namespace FileList.Logic
         private IEnumerator _fileEnumerator;
         private FileData? _current;
 
-        public FileSearch(string root)
+        public FileSearch(string root, bool searchSubdirectories = false)
         {
             this._root = root;
-            this._fileEnumerator = this.Search(this._root).GetEnumerator();
+            this._fileEnumerator = this.Search(this._root, searchSubdirectories).GetEnumerator();
         }
 
         public FileData? GetNext()
@@ -33,7 +35,24 @@ namespace FileList.Logic
         private IEnumerable<FileData> Search(string path, bool searchSubdirectories = true)
         {
             Shell shell = new ShellClass();
-            Folder objFolder = shell.NameSpace(path);
+            Folder objFolder = null;
+
+            try
+            {
+                objFolder = shell.NameSpace(path);
+            }
+            catch(Exception ex)
+            {
+                
+            }
+
+            if (objFolder == null)
+            {
+                //Marshal.ReleaseComObject(objFolder);
+                Marshal.ReleaseComObject(shell);
+                //yield return new FileData(path);
+                yield break;
+            }
 
             foreach (FolderItem2 folderItem2 in objFolder.Items())
             {
@@ -58,15 +77,41 @@ namespace FileList.Logic
                     item = null;
                 }
             }
+            Marshal.ReleaseComObject(objFolder);
+            Marshal.ReleaseComObject(shell);
+            GC.Collect(0, GCCollectionMode.Forced);
         }
 
         private void AddZipContentsToFileData(string path, FileData fileData)
         {
-            foreach (FolderItem2 folderItem2 in new ShellClass().NameSpace(path).Items())
+            Shell shell = new ShellClass();
+            Folder objFolder = null;
+
+            try
+            {
+                objFolder = (Folder)shell.NameSpace(path);
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            if (objFolder == null)
+            {
+                //Marshal.ReleaseComObject(objFolder);
+                Marshal.ReleaseComObject(shell);
+                //fileData.ZipContents.Add(new FileData(path));
+                return;
+            }
+
+            foreach (FolderItem2 folderItem2 in objFolder.Items())
             {
                 string str = folderItem2.IsFolder ? "\\" : string.Empty;
                 fileData.ZipContents.Add(new FileData(folderItem2.Path + str));
             }
+
+            Marshal.ReleaseComObject(objFolder);
+            Marshal.ReleaseComObject(shell);
         }
     }
 }

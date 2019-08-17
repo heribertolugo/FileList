@@ -237,7 +237,7 @@ namespace FileList.Models
 
             if (!this._extensions.Contains(fileData.Extension))
                 this._extensions.Add(fileData.Extension);
-
+            this.countLabel.InvokeIfRequired(c => c.Text = this._treeKeys.Sum(k => k.Value.Nodes.Count).ToString());
             this.modifyFileTypesListBoxInternal = false;
         }
 
