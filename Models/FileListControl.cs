@@ -180,7 +180,11 @@ namespace FileList.Models
             this.dateModifiedButton.SortOrder = SortOrder.None;
             this.filterForm.Reset();
             this._treeKeys.Clear();
+            this._fileCount = 0;
         }
+
+
+        private int _fileCount = 0;
 
         /// <summary>
         /// Adds FileData to TreeView source, and to FileExtensionsList source with the provided imageKey.
@@ -237,13 +241,14 @@ namespace FileList.Models
 
             if (!this._extensions.Contains(fileData.Extension))
                 this._extensions.Add(fileData.Extension);
-            this.countLabel.InvokeIfRequired(c => c.Text = this._treeKeys.Sum(k => k.Value.Nodes.Count).ToString());
+            ++this._fileCount;
+            this.countLabel.Text = this._fileCount.ToString(); // (c => c.Text = this._treeKeys.Sum(k => k.Value.Nodes.Count).ToString());
             this.modifyFileTypesListBoxInternal = false;
         }
 
         public void Commit()
         {
-            this.modifyFileTypesListBoxInternal = true;
+            //this.modifyFileTypesListBoxInternal = true;
             this.fileTypesCheckedListBox.Items.Clear();
             this.treeView1.Nodes.Clear();
             if (this._treeKeys.Count < 1)

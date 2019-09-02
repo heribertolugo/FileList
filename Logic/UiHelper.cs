@@ -68,6 +68,14 @@ namespace FileList.Logic
         {
             FileSearchWorkerArgs args = (FileSearchWorkerArgs)e.Argument;
 
+            //Thread thread = new Thread(() =>
+            //{
+            //    ConcurrentFileSearch searcher = new ConcurrentFileSearch(args.Path, args);
+            //    searcher.Start();
+            //});
+            //thread.SetApartmentState(ApartmentState.STA);
+            //thread.Start();
+
             ConcurrentFileSearch search = new ConcurrentFileSearch(args.Path, args);
             search.Start();
         }

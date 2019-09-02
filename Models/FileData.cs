@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 
 namespace FileList
 {
-    public struct FileData
+    public struct FileData : ICloneable
     {
-        private static Models.ConcurrentCollection<string> FilePropertyNames;
+        private static List<string> FilePropertyNames;
         private string _path;
         private string _name;
         private string _extension;
@@ -24,6 +24,7 @@ namespace FileList
         private bool _isDateCreatedSet;
         private DateTime? _dateModified;
         private bool _isDateModifiedSet;
+        private IShellDispatch5 _shell;
 
         private static object _filePropertyNamesLock;
 
@@ -32,16 +33,17 @@ namespace FileList
             if (FileData._filePropertyNamesLock == null)
                 FileData._filePropertyNamesLock = new object();
 
+            Console.WriteLine("requesting filePropertyNames lock @ 36");
             lock (FileData._filePropertyNamesLock)
             {
                 if (FileData.FilePropertyNames == null)
                 {
-                    FileData.FilePropertyNames = new Models.ConcurrentCollection<string>();
+                    FileData.FilePropertyNames = new List<string>(); //  Models.ConcurrentCollection<string>("FileData FilePropertyNames");
                 }
             }
         }
 
-        public FileData(string path)
+        public FileData(string path, IShellDispatch5 shell = null)
         {
             this._name = null;
             this._extension = null;
@@ -56,17 +58,22 @@ namespace FileList
             this._isDateCreatedSet = false;
             this._dateModified = null;
             this._isDateModifiedSet = false;
+            this._shell = shell; // ?? new ShellClass();
 
-            lock (FileData._filePropertyNamesLock)
+            if (FileData.FilePropertyNames == null || FileData.FilePropertyNames.Count < 1)
             {
-                if (FileData.FilePropertyNames == null || FileData.FilePropertyNames.Count < 1)
+                Console.WriteLine("requesting filePropertyNames lock @ 63");
+                lock (FileData._filePropertyNamesLock)
                 {
                     if (FileData.FilePropertyNames == null)
-                        FileData.FilePropertyNames = new Models.ConcurrentCollection<string>();
-                    FileData.LoadFilePropertyNames(System.IO.Path.GetDirectoryName(path));
+                        FileData.FilePropertyNames = new List<string>(); //  Models.ConcurrentCollection<string>("FileData FilePropertyNames 2");
+                    if (FileData.FilePropertyNames.Count < 1)
+                        FileData.LoadFilePropertyNames(System.IO.Path.GetDirectoryName(path));
                 }
             }
+
             this.LoadExtendedProperties();
+            //GC.Collect();
         }
 
         public string Path
@@ -180,7 +187,7 @@ namespace FileList
             get
             {
                 if (!this._isDateCreatedSet)
-                    this._dateCreated = this.GetDateFromExtendedProperties("date created") ?? this.GetDateFromExtendedProperties("Creation Time");   
+                    this._dateCreated = this.GetDateFromExtendedProperties("date created") ?? this.GetDateFromExtendedProperties("Creation Time");
                 return this._dateCreated;
             }
             private set
@@ -193,7 +200,7 @@ namespace FileList
             get
             {
                 if (!this._isDateModifiedSet)
-                    this._dateModified = this.GetDateFromExtendedProperties("date modified") ?? this.GetDateFromExtendedProperties("Last Write Time"); 
+                    this._dateModified = this.GetDateFromExtendedProperties("date modified") ?? this.GetDateFromExtendedProperties("Last Write Time");
                 return this._dateModified;
             }
             private set
@@ -203,17 +210,17 @@ namespace FileList
 
         private float? GetSizeInKiloBytes()
         {
-            string fileSIze = this.ExtendedProperties.FirstOrDefault(p => p.Key.ToLowerInvariant().Equals("size")).Value; 
+            string fileSIze = this.ExtendedProperties.FirstOrDefault(p => p.Key.ToLowerInvariant().Equals("size")).Value;
             if (string.IsNullOrEmpty(fileSIze))
             {
                 fileSIze = this.ExtendedProperties.Where(p => p.Key.ToLowerInvariant().Equals("Length")).Select(p => p.Value).FirstOrDefault();
                 if (!string.IsNullOrEmpty(fileSIze))
-                    return (float?)(Misc.ConvertStorageValueToKb(fileSIze));
+                    return Misc.ConvertStorageValueToKb(fileSIze);
             }
 
             if (string.IsNullOrEmpty(fileSIze))
                 return null;
-            return (float?)(Misc.ConvertStorageValueToKb(fileSIze));
+            return Misc.ConvertStorageValueToKb(fileSIze);
         }
 
         private DateTime? GetDateFromExtendedProperties(string propertyName)
@@ -221,7 +228,7 @@ namespace FileList
             DateTime result;
             if (!DateTime.TryParse(this.ExtendedProperties.FirstOrDefault(p => p.Key.ToLowerInvariant().Equals(propertyName.ToLowerInvariant())).Value, out result))
                 return null;
-            return (DateTime)(result);
+            return result;
         }
 
         private void LoadExtendedProperties()
@@ -229,7 +236,7 @@ namespace FileList
             try
             {
 
-                
+
                 //Folder objFolder = null;
 
                 //try
@@ -247,12 +254,14 @@ namespace FileList
                 //    fileData.ZipContents.Add(new FileData(path));
                 //    return;
                 //}
-Shell shell = new ShellClass();
-                Folder folder = shell.NameSpace(System.IO.Path.GetDirectoryName(this.Path));
-                FolderItem name = folder.ParseName(System.IO.Path.GetFileName(this.Path));
-                for (int iColumn = 0; iColumn < FileData.FilePropertyNames.Count; ++iColumn)
-                    this._extendedProperties.Add(new KeyValuePair<string, string>(FileData.FilePropertyNames[iColumn], folder.GetDetailsOf(name, iColumn)));
-                    Marshal.ReleaseComObject(shell);
+                //Shell shell = new ShellClass();
+                if (this._shell != null)
+                {
+                    Folder folder = this._shell.NameSpace(System.IO.Path.GetDirectoryName(this.Path));
+                    FolderItem name = folder.ParseName(System.IO.Path.GetFileName(this.Path));
+                    for (int iColumn = 0; iColumn < FileData.FilePropertyNames.Count; ++iColumn)
+                        this._extendedProperties.Add(new KeyValuePair<string, string>(FileData.FilePropertyNames[iColumn], folder.GetDetailsOf(name, iColumn)));
+                }
             }
             catch (Exception ex)
             {
@@ -282,22 +291,31 @@ Shell shell = new ShellClass();
         {
             try
             {
-                Shell shell = new ShellClass();
-                Folder folder = shell.NameSpace(nspace);
+                Shell shell1 = new ShellClass();
+                Folder folder = shell1.NameSpace(nspace);
                 for (int iColumn = 0; iColumn < (int)short.MaxValue; ++iColumn)
                 {
-                    string detailsOf = folder.GetDetailsOf((object)null, iColumn);
+                    string detailsOf = folder.GetDetailsOf(null, iColumn);
                     if (string.IsNullOrEmpty(detailsOf))
                         break;
                     FileData.FilePropertyNames.Add(detailsOf);
                 }
                 Marshal.ReleaseComObject(folder);
-                Marshal.ReleaseComObject(shell);
+                Marshal.ReleaseComObject(shell1);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
             }
+        }
+
+        public object Clone()
+        {
+            FileData f = new FileData(this.Path);
+
+
+
+            return new FileData(this.Path);
         }
     }
 }

@@ -34,9 +34,11 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.dateModifiedButton = new FileList.Models.SortButton();
+            this.countLabel = new System.Windows.Forms.Label();
             this.dateCreatedButton = new FileList.Models.SortButton();
             this.sizeSortButton = new FileList.Models.SortButton();
             this.infoPanel = new System.Windows.Forms.Panel();
+            this.label2 = new System.Windows.Forms.Label();
             this.filterButton = new System.Windows.Forms.Button();
             this.filesTreeViewContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.checkUncheckAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -48,8 +50,7 @@
             this.fileLocationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.deleteFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.countLabel = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
+            this.scoutCountLabel = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -114,6 +115,7 @@
             // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.scoutCountLabel);
             this.panel2.Controls.Add(this.dateModifiedButton);
             this.panel2.Controls.Add(this.countLabel);
             this.panel2.Controls.Add(this.dateCreatedButton);
@@ -139,6 +141,16 @@
             this.dateModifiedButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.dateModifiedButton.UseVisualStyleBackColor = true;
             this.dateModifiedButton.Click += new System.EventHandler(this.DateModifiedButton_Click);
+            // 
+            // countLabel
+            // 
+            this.countLabel.Dock = System.Windows.Forms.DockStyle.Right;
+            this.countLabel.Location = new System.Drawing.Point(501, 0);
+            this.countLabel.Name = "countLabel";
+            this.countLabel.Size = new System.Drawing.Size(106, 25);
+            this.countLabel.TabIndex = 0;
+            this.countLabel.Text = "0";
+            this.countLabel.TextAlign = System.Drawing.ContentAlignment.BottomRight;
             // 
             // dateCreatedButton
             // 
@@ -181,6 +193,16 @@
             this.infoPanel.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
             this.infoPanel.Size = new System.Drawing.Size(607, 13);
             this.infoPanel.TabIndex = 1;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Dock = System.Windows.Forms.DockStyle.Left;
+            this.label2.Location = new System.Drawing.Point(10, 0);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(35, 13);
+            this.label2.TabIndex = 1;
+            this.label2.Text = "label2";
             // 
             // filterButton
             // 
@@ -270,25 +292,15 @@
             this.deleteFileToolStripMenuItem.Text = "Delete";
             this.deleteFileToolStripMenuItem.Click += new System.EventHandler(this.DeleteFileToolStripMenuItem_Click);
             // 
-            // countLabel
+            // scoutCountLabel
             // 
-            this.countLabel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.countLabel.Location = new System.Drawing.Point(501, 0);
-            this.countLabel.Name = "countLabel";
-            this.countLabel.Size = new System.Drawing.Size(106, 25);
-            this.countLabel.TabIndex = 0;
-            this.countLabel.Text = "0";
-            this.countLabel.TextAlign = System.Drawing.ContentAlignment.BottomRight;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Dock = System.Windows.Forms.DockStyle.Left;
-            this.label2.Location = new System.Drawing.Point(10, 0);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(35, 13);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "label2";
+            this.scoutCountLabel.Dock = System.Windows.Forms.DockStyle.Right;
+            this.scoutCountLabel.Location = new System.Drawing.Point(426, 0);
+            this.scoutCountLabel.Name = "scoutCountLabel";
+            this.scoutCountLabel.Size = new System.Drawing.Size(75, 25);
+            this.scoutCountLabel.TabIndex = 3;
+            this.scoutCountLabel.Text = "0";
+            this.scoutCountLabel.TextAlign = System.Drawing.ContentAlignment.BottomRight;
             // 
             // FileListControl
             // 
@@ -332,5 +344,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.Label countLabel;
         private System.Windows.Forms.Label label2;
+        internal System.Windows.Forms.Label scoutCountLabel;
     }
 }
