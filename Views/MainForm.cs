@@ -117,6 +117,7 @@ namespace FileList.Views
         {
             if (string.IsNullOrEmpty(this.rootPathTextBox.Text) || this.rootPathTextBox.Text.Equals(""))
                 return;
+
             if (!Directory.Exists(this.rootPathTextBox.Text) && !File.Exists(this.rootPathTextBox.Text))
             {
                 MessageBox.Show("Wouldnt it be nice to go to places that dont exist?", UiHelper.ErrorHeader, MessageBoxButtons.OK, MessageBoxIcon.Question);
@@ -137,7 +138,12 @@ namespace FileList.Views
 
                 this.ToggleEnabled((Control)this);
                 this.Reset();
+                //#if DEBUG
+                //                this.GetFileCount(this.rootPathTextBox.Text);
+                //                Console.WriteLine(fc);
+                //#else
                 this.Search();
+                //#endif
                 this.ToggleEnabled((Control)this);
             }
         }
@@ -254,5 +260,29 @@ namespace FileList.Views
             UiHelper.DeleteItem(this.fileListControl1.SelectedPath, this.fileListControl1);
         }
 
+        private int fc = 0;
+        private void GetFileCount(string path)
+        {
+            Console.WriteLine("current file count: {0}", fc);
+            Console.WriteLine("gettting files count in:");
+            Console.WriteLine(path);
+            Console.WriteLine();
+            try
+            {
+                fc += Extensions.AccessableFiles(path).Count();
+            }catch(Exception ex)
+            {
+
+            }
+
+            try
+            {
+                foreach (string dir in Extensions.AccessableDirectories(path))
+                    GetFileCount(dir);
+            }catch (Exception ex2)
+            {
+
+            }
+        }
     }
 }

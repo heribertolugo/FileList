@@ -52,43 +52,49 @@ namespace FileList
 
         public static IEnumerable<string> AccessableDirectories(string path)
         {
-            List<string> accessable = new List<string>();
+            //List<string> accessable = new List<string>();
+            string[] directories = new string[0];
+
             try
             {
-                string[] directories = System.IO.Directory.GetDirectories(path);
-
-                foreach (string directory in directories)
-                {
-                    if (Extensions.IsSystemObjectAccessable(directory))
-                        accessable.Add(directory);
-                }
+                directories = System.IO.Directory.GetDirectories(path);
             }
             catch (Exception ex)
             {
 
             }
 
-            return accessable;
+            foreach (string directory in directories)
+            {
+                if (Extensions.IsSystemObjectAccessable(directory))
+                    yield return directory;
+                //accessable.Add(directory);
+            }
+
+            //return accessable;
         }
         public static IEnumerable<string> AccessableFiles(string path)
         {
-            List<string> accessable = new List<string>();
+            //List<string> accessable = new List<string>();
+            string[] files = new string[0];
+
             try
             {
-                string[] files = System.IO.Directory.GetFiles(path);
-
-                foreach (string file in files)
-                {
-                    if (Extensions.IsSystemObjectAccessable(file))
-                        accessable.Add(file);
-                }
+                files = System.IO.Directory.GetFiles(path);
             }
             catch (Exception ex)
             {
 
             }
 
-            return accessable;
+            foreach (string file in files)
+            {
+                if (Extensions.IsSystemObjectAccessable(file))
+                    yield return file;
+                //accessable.Add(file);
+            }
+
+            //return accessable;
         }
 
         public static bool IsSystemObjectAccessable(string path)
@@ -97,13 +103,18 @@ namespace FileList
             {
                 if (System.IO.Directory.Exists(path))
                 {
+                    //System.IO.DirectoryInfo dirInfo = new System.IO.DirectoryInfo(path);
+                    //System.Security.AccessControl.DirectorySecurity dirAC = dirInfo.GetAccessControl(System.Security.AccessControl.AccessControlSections.All);
                     System.IO.Directory.GetDirectories(path);
                     System.IO.Directory.GetFiles(path);
                 }
                 else if (System.IO.File.Exists(path))
                 {
+                    //System.IO.FileInfo fileInfo = new System.IO.FileInfo(path);
+                    //System.Security.AccessControl.FileSecurity fileAC = fileInfo.GetAccessControl(System.Security.AccessControl.AccessControlSections.All);
+
                     System.IO.FileStream stream = System.IO.File.Open(path, System.IO.FileMode.Open,
-                                                System.IO.FileAccess.Read, System.IO.FileShare.None);
+                                                    System.IO.FileAccess.Read, System.IO.FileShare.None);
                     stream.Close();
                     //using (System.IO.FileStream reader = new System.IO.FileStream(path, System.IO.FileMode.Open))
                     //{
@@ -113,7 +124,8 @@ namespace FileList
                 }
                 else
                 {
-                    throw new Exception();
+                    return false;
+                    //throw new Exception();
                 }
                 return true;
             }
@@ -141,16 +153,24 @@ namespace FileList
 
         public static T ToObject<T>(IntPtr ptr)
         {
-            try {
+            try
+            {
                 GCHandle gch = GCHandle.FromIntPtr(ptr);
                 T t = (T)(gch.Target);
                 gch.Free();
                 return t;
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
 
             }
             return default(T);
+        }
+
+        public static bool IsAdministrator()
+        {
+            return (new System.Security.Principal.WindowsPrincipal(System.Security.Principal.WindowsIdentity.GetCurrent()))
+                      .IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
         }
     }
 }

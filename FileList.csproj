@@ -57,6 +57,7 @@
     <Compile Include="Logic\NotepadHelper.cs" />
     <Compile Include="Logic\UiHelper.cs" />
     <Compile Include="Models\ConcurrentCollection.cs" />
+    <Compile Include="Models\ConcurrentQueue.cs" />
     <Compile Include="Models\FileSearchWorkerArgs.cs" />
     <Compile Include="Models\Win32\Win32Enums.cs" />
     <Compile Include="Models\Win32\Win32IImageList.cs" />
@@ -165,6 +166,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\createHresult.html" />
     <Content Include="folder_search.ico" />
   </ItemGroup>
   <ItemGroup>

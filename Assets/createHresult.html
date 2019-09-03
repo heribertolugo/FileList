@@ -1,0 +1,45 @@
+﻿<html>
+<head>
+    <script>
+
+function doInput(){
+var input = document.getElementById("input").value;
+var output = document.getElementById("output");
+var lines = input.split(/\r?\n/);
+
+output.value = '';
+
+var offset = 0;
+var nam,hex,desc,summ;
+	for (i = 0; i < lines.length; i++){
+
+		if (lines[i].trim() === '')
+			continue;
+		offset+=1;
+
+		if ((offset% 3) == 0){
+			summ = "/// <summary>\n/// " + lines[i].replace(/"/g, '&quot;') + "\n/// </summary>\n";
+			desc = lines[i].replace(/"/g, '\\"');
+			offset = 0;
+		}else if ((offset% 2) == 0){
+			hex = lines[i];
+		}else {
+			if (i > 0){
+				output.value += summ;
+				output.value += "public static HRESULT " + nam + " = new HRESULT(\"" + hex + "\", \"" + nam + "\", \"" + desc + "\");\n\n";
+			}
+
+			nam = lines[i];
+		}
+	}
+}
+
+    </script>
+</head>
+
+<body>
+    <button onclick="doInput()">DO It</button>
+<textarea rows="50" cols="50" id="input"></textarea>
+<textarea rows="50" cols="50" id="output"></textarea>
+</body>
+</html>
