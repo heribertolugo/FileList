@@ -146,19 +146,34 @@ namespace FileList.Views
                 //#else
                 this.Search();
                 //#endif
-                this.ToggleEnabled((Control)this);
+                //this.ToggleEnabled((Control)this);
             }
         }
 
-        private void Search_OnFinishedHandler(object sender, EventArgs e)
+        private void CancelButton_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            UiHelper.CancelSearch();
+            this.ToggleEnabled((Control)this);
         }
 
         public void ToggleEnabled(Control control)
         {
             foreach (Control control1 in (ArrangedElementCollection)control.Controls)
                 control1.Enabled = !control1.Enabled;
+
+            this.searchButton.Parent.Enabled = true;
+            if (this.searchButton.Text.ToUpper().Equals("SEARCH"))
+            {
+                this.searchButton.Text = "Cancel";
+                this.searchButton.Click -= SearchButton_Click;
+                this.searchButton.Click += CancelButton_Click;
+            }
+            else
+            {
+                this.searchButton.Text = "Search";
+                this.searchButton.Click -= CancelButton_Click;
+                this.searchButton.Click += SearchButton_Click;
+            }
         }
 
         private void BackgroundWorker1_DoWork(object sender, DoWorkEventArgs e)

@@ -12,8 +12,8 @@ namespace FileList.Logic
 {
     internal sealed class ConcurrentFileSearch
     {
-        public event EventHandler<ConcurrentFileSearchEventArgs> OnFinishedHandler;
-        public event EventHandler<ConcurrentFileSearchEventArgs> OnUpdateHandler;
+        public event EventHandler<ConcurrentFileSearchEventArgs> Finished;
+        public event EventHandler<ConcurrentFileSearchEventArgs> Update;
 
         private static volatile ConcurrentCollection<FileData> _fileData;
         //private static volatile ConcurrentCollection<string> _directories;
@@ -21,6 +21,7 @@ namespace FileList.Logic
         private FileListControl _fileListControl;
         private bool _commitRequired;
         private DateTime startTime;
+        private CancellationToken _cancelToken;
 
         public static ConcurrentQueue<FileData> TestPool = new ConcurrentQueue<FileData>();
 
@@ -31,7 +32,7 @@ namespace FileList.Logic
                 ConcurrentFileSearch._fileData = new ConcurrentCollection<FileData>("ConcurrentFileSearch fileData");
             this._fileListControl = args.FileListControl;
             this._commitRequired = true;// !args.LiveUpdate;
-
+            this._cancelToken = args.CancellationToken;
         }
 
         public void Start()
@@ -103,7 +104,7 @@ namespace FileList.Logic
                 if (commitRequired)
                     c.Commit();
 
-                c.ExpandTree();
+                //c.ExpandTree();
                 c.ScrollTreeToTop();
                 c.FileTypeListSorted = true;
                 c.Enabled = true;
@@ -138,7 +139,10 @@ namespace FileList.Logic
             searchSta.OnFinishedHandler -= this.ConcurrentFileSearch_OnFinishedHandler;
             int maxThreads = 0;
 
-            this.SummonMinions(maxThreads);
+            if (!this._cancelToken.IsCancellationRequested)
+                this.SummonMinions(maxThreads);
+            else
+                ConcurrentFileSearchMinion.Cancel();
 
             //lock (locker)
             //{
@@ -152,7 +156,7 @@ namespace FileList.Logic
             //    //this.OnUpdate(e);
             //}
 
-            if (ConcurrentFileSearch.Directories.Count == 0 && ConcurrentFileSearchMinion.ThreadBucketCount() == 0)
+            if ((ConcurrentFileSearch.Directories.Count == 0 && ConcurrentFileSearchMinion.ThreadBucketCount() == 0) || this._cancelToken.IsCancellationRequested)
             {
                 DateTime endTime = DateTime.Now;
                 TimeSpan timeSpan = endTime.Subtract(startTime);
@@ -291,28 +295,23 @@ namespace FileList.Logic
             }
         }
 
-        public void Cancel()
-        {
-            ConcurrentFileSearchMinion.Cancel();
-        }
-
         private void OnFinished(ConcurrentFileSearchEventArgs args)
         {
-            EventHandler<ConcurrentFileSearchEventArgs> handler = this.OnFinishedHandler;
+            EventHandler<ConcurrentFileSearchEventArgs> handler = this.Finished;
             if (handler == null)
             {
                 Console.WriteLine("handler null");
                 return;
             }
-            this.OnFinishedHandler(this, args);
+            this.Finished(this, args);
         }
 
         private void OnUpdate(ConcurrentFileSearchEventArgs args)
         {
-            EventHandler<ConcurrentFileSearchEventArgs> handler = this.OnUpdateHandler;
+            EventHandler<ConcurrentFileSearchEventArgs> handler = this.Update;
             if (handler == null)
                 return;
-            this.OnUpdateHandler(this, args);
+            this.Update(this, args);
         }
 
 

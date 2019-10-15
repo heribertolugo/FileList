@@ -20,6 +20,7 @@ namespace FileList.Logic
         public static readonly string DirectoryKey = "\\";
         public static readonly string NoneFileExtension = ".none";
         private static BackgroundWorker worker;
+        private static CancellationTokenSource cancellationToken;
 
         public static void OpenFileSelectedNode(TreeView treeView)
         {
@@ -45,13 +46,24 @@ namespace FileList.Logic
                 UiHelper.worker.DoWork += Worker_DoWork;
                 UiHelper.worker.ProgressChanged += Worker_ProgressChanged;
                 UiHelper.worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
+                UiHelper.worker.WorkerSupportsCancellation = true;
             }
 
             fileListControl.Clear();
 
-            FileSearchWorkerArgs args = new FileSearchWorkerArgs(path, fileListControl, true);
+            UiHelper.cancellationToken = new CancellationTokenSource();
+
+            FileSearchWorkerArgs args = new FileSearchWorkerArgs(path, fileListControl, true, UiHelper.cancellationToken.Token);
 
             UiHelper.worker.RunWorkerAsync(args);
+        }
+
+        public static void CancelSearch()
+        {
+            if (UiHelper.worker != null && !UiHelper.cancellationToken.IsCancellationRequested)
+            {
+                UiHelper.cancellationToken.Cancel();
+            }
         }
 
         private static void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -63,7 +75,6 @@ namespace FileList.Logic
         {
             throw new NotImplementedException();
         }
-
         private static void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
             FileSearchWorkerArgs args = (FileSearchWorkerArgs)e.Argument;
@@ -75,9 +86,15 @@ namespace FileList.Logic
             //});
             //thread.SetApartmentState(ApartmentState.STA);
             //thread.Start();
-
+            
             ConcurrentFileSearch search = new ConcurrentFileSearch(args.Path, args);
+            search.Finished += Search_Finished;
             search.Start();
+        }
+
+        private static void Search_Finished(object sender, ConcurrentFileSearchEventArgs e)
+        {
+            UiHelper.cancellationToken.Dispose();
         }
 
         public static void DeleteItem(string path, FileListControl fileListControl)
