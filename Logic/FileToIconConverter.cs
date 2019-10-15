@@ -40,11 +40,11 @@ namespace FileList.Logic
         internal static Icon GetFileIcon(string fileName, FileToIconConverter.IconSize size)
         {
             Models.Win32.SHFILEINFO psfi = new Models.Win32.SHFILEINFO();
-            uint num = Models.Win32.Win32Enums.SHGFI_SYSICONINDEX; 
+            uint num = Models.Win32.Win32ShellIconFlags.SHGFI_SYSICONINDEX; 
             if (fileName.IndexOf(":") == -1)
-                num |= Models.Win32.Win32Enums.SHGFI_USEFILEATTRIBUTES; 
-            uint uFlags = size != FileToIconConverter.IconSize.Small ? num | Models.Win32.Win32Enums.SHGFI_ICON : (uint)((int)num | Models.Win32.Win32Enums.SHGFI_ICON | Models.Win32.Win32Enums.SHGFI_SMALLICON);
-            Models.Win32.Win32Methods.SHGetFileInfo(fileName, Models.Win32.Win32Enums.SHGFI_LARGEICON, ref psfi, (uint)Marshal.SizeOf(psfi), uFlags);
+                num |= Models.Win32.Win32ShellIconFlags.SHGFI_USEFILEATTRIBUTES; 
+            uint uFlags = size != FileToIconConverter.IconSize.Small ? num | Models.Win32.Win32ShellIconFlags.SHGFI_ICON : (uint)((int)num | Models.Win32.Win32ShellIconFlags.SHGFI_ICON | Models.Win32.Win32ShellIconFlags.SHGFI_SMALLICON);
+            Models.Win32.Win32Methods.SHGetFileInfo(fileName, Models.Win32.Win32ShellIconFlags.SHGFI_LARGEICON, ref psfi, (uint)Marshal.SizeOf(psfi), uFlags);
             return Icon.FromHandle(psfi.hIcon);
         }
 

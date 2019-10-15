@@ -29,10 +29,11 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FileListControl));
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.treeView1 = new System.Windows.Forms.TreeView();
+            this.treeView1 = new FileList.Models.ScrollNotifyTreeView();
             this.fileTypesCheckedListBox = new System.Windows.Forms.CheckedListBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.scoutCountLabel = new System.Windows.Forms.Label();
             this.dateModifiedButton = new FileList.Models.SortButton();
             this.countLabel = new System.Windows.Forms.Label();
             this.dateCreatedButton = new FileList.Models.SortButton();
@@ -50,7 +51,6 @@
             this.fileLocationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.deleteFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.scoutCountLabel = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -80,11 +80,15 @@
             this.treeView1.CheckBoxes = true;
             this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView1.HideSelection = false;
+            this.treeView1.HorizontalScroll = false;
             this.treeView1.Location = new System.Drawing.Point(129, 53);
             this.treeView1.Name = "treeView1";
+            this.treeView1.Scrollable = false;
             this.treeView1.ShowNodeToolTips = true;
             this.treeView1.Size = new System.Drawing.Size(530, 372);
             this.treeView1.TabIndex = 3;
+            this.treeView1.VerticalScroll = false;
+            this.treeView1.Scrolled += new System.EventHandler<FileList.Models.ScrollNotifyTreeViewEventArgs>(this.treeView1_Scrolled);
             this.treeView1.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1_AfterCheck);
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1_AfterSelect);
             this.treeView1.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeView1_NodeMouseClick);
@@ -125,6 +129,16 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(607, 25);
             this.panel2.TabIndex = 2;
+            // 
+            // scoutCountLabel
+            // 
+            this.scoutCountLabel.Dock = System.Windows.Forms.DockStyle.Right;
+            this.scoutCountLabel.Location = new System.Drawing.Point(426, 0);
+            this.scoutCountLabel.Name = "scoutCountLabel";
+            this.scoutCountLabel.Size = new System.Drawing.Size(75, 25);
+            this.scoutCountLabel.TabIndex = 3;
+            this.scoutCountLabel.Text = "0";
+            this.scoutCountLabel.TextAlign = System.Drawing.ContentAlignment.BottomRight;
             // 
             // dateModifiedButton
             // 
@@ -292,16 +306,6 @@
             this.deleteFileToolStripMenuItem.Text = "Delete";
             this.deleteFileToolStripMenuItem.Click += new System.EventHandler(this.DeleteFileToolStripMenuItem_Click);
             // 
-            // scoutCountLabel
-            // 
-            this.scoutCountLabel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.scoutCountLabel.Location = new System.Drawing.Point(426, 0);
-            this.scoutCountLabel.Name = "scoutCountLabel";
-            this.scoutCountLabel.Size = new System.Drawing.Size(75, 25);
-            this.scoutCountLabel.TabIndex = 3;
-            this.scoutCountLabel.Text = "0";
-            this.scoutCountLabel.TextAlign = System.Drawing.ContentAlignment.BottomRight;
-            // 
             // FileListControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -327,7 +331,7 @@
         private System.Windows.Forms.Button filterButton;
         private System.Windows.Forms.Panel infoPanel;
         private System.Windows.Forms.CheckedListBox fileTypesCheckedListBox;
-        private System.Windows.Forms.TreeView treeView1;
+        private ScrollNotifyTreeView treeView1;
         private System.Windows.Forms.Panel panel2;
         private SortButton sizeSortButton;
         private SortButton dateModifiedButton;

@@ -13,7 +13,7 @@ namespace FileList
         [STAThread]
         static void Main()
         {
-            Models.Win32.Win32Methods.AttachConsole(Models.Win32.Win32Enums.ATTACH_PARENT_PROCESS);
+            Models.Win32.Win32Methods.AttachConsole(Models.Win32.MiscConstants.ATTACH_PARENT_PROCESS);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Views.MainForm());

@@ -13502,7 +13502,7 @@ namespace FileList.Models.Win32
             if (!string.IsNullOrEmpty(hex) && !hex.Trim().Equals(string.Empty))
             {
                 this._value = Convert.ToInt64(hex, 16); // int.Parse(hex, System.Globalization.NumberStyles.HexNumber);
-                this._hex = string.Concat(0, "x", this._value.ToString("X8")); 
+                this._hex = string.Concat(0, "x", this._value.ToString("X8"));
             }
             else
             {
@@ -13624,36 +13624,214 @@ namespace FileList.Models.Win32
         }
     }
 
-
-
-
-    internal static class Win32Enums
+    internal static class Win32ClassStyles
     {
-        internal const int CS_DROPSHADOW = 131072;
-        internal const int WM_NCPAINT = 133;
-        internal const int WM_NCHITTEST = 132;
-        internal const int WM_ACTIVATEAPP = 28;
-        internal const int HTCAPTION = 2;
-        internal const int HTCLIENT = 1;
+        public const int CS_VREDRAW = 0x0001;
+        public const int CS_HREDRAW = 0x0002;
+        public const int CS_DBLCLKS = 0x0008;
+        public const int CS_OWNDC = 0x0020;
+        public const int CS_CLASSDC = 0x0040;
+        public const int CS_PARENTDC = 0x0080;
+        public const int CS_NOCLOSE = 0x0200;
+        public const int CS_SAVEBITS = 0x0800;
+        public const int CS_BYTEALIGNCLIENT = 0x1000;
+        public const int CS_BYTEALIGNWINDOW = 0x2000;
+        public const int CS_GLOBALCLASS = 0x4000;
+        public const int CS_IME = 0x00010000;
+        public const int CS_DROPSHADOW = 0x00020000;
+    }
 
-        internal const uint SHGFI_SYSICONINDEX = 16384;
-        internal const uint SHGFI_TYPENAME = 1024;
-        internal const uint SHGFI_ICON = 256;
-        internal const uint SHGFI_USEFILEATTRIBUTES = 16;
-        internal const uint SHGFI_SMALLICON = 1;
-        internal const uint SHGFI_LARGEICON = 0;
+    /// <summary>
+    /// WM_NCHITTEST and MOUSEHOOKSTRUCT Mouse Position Codes
+    /// </summary>
+    internal static class Win32MousePositionCodes
+    {
+        public const int HTERROR = (-2);
+        public const int HTTRANSPARENT = (-1);
+        public const int HTNOWHERE = 0;
+        public const int HTCLIENT = 1;
+        public const int HTCAPTION = 2;
+        public const int HTSYSMENU = 3;
+        public const int HTGROWBOX = 4;
+        public const int HTSIZE = HTGROWBOX;
+        public const int HTMENU = 5;
+        public const int HTHSCROLL = 6;
+        public const int HTVSCROLL = 7;
+        public const int HTMINBUTTON = 8;
+        public const int HTMAXBUTTON = 9;
+        public const int HTLEFT = 10;
+        public const int HTRIGHT = 11;
+        public const int HTTOP = 12;
+        public const int HTTOPLEFT = 13;
+        public const int HTTOPRIGHT = 14;
+        public const int HTBOTTOM = 15;
+        public const int HTBOTTOMLEFT = 16;
+        public const int HTBOTTOMRIGHT = 17;
+        public const int HTBORDER = 18;
+        public const int HTREDUCE = HTMINBUTTON;
+        public const int HTZOOM = HTMAXBUTTON;
+        public const int HTSIZEFIRST = HTLEFT;
+        public const int HTSIZELAST = HTBOTTOMRIGHT;
+        public const int HTOBJECT = 19;
+        public const int HTCLOSE = 20;
+        public const int HTHELP = 21;
+    }
 
-        internal const int MAX_PATH = 260;
+    internal static class Win32Messages
+    {
+        public const int WM_NOTIFY = 0x004E;
+        public const int WM_INPUTLANGCHANGEREQUEST = 0x0050;
+        public const int WM_INPUTLANGCHANGE = 0x0051;
+        public const int WM_TCARD = 0x0052;
+        public const int WM_HELP = 0x0053;
+        public const int WM_USERCHANGED = 0x0054;
+        public const int WM_NOTIFYFORMAT = 0x0055;
+        public const int WM_CONTEXTMENU = 0x007B;
+        public const int WM_STYLECHANGING = 0x007C;
+        public const int WM_STYLECHANGED = 0x007D;
+        public const int WM_DISPLAYCHANGE = 0x007E;
+        public const int WM_GETICON = 0x007F;
+        public const int WM_SETICON = 0x0080;
+        public const int WM_NCCREATE = 0x0081;
+        public const int WM_NCDESTROY = 0x0082;
+        public const int WM_NCCALCSIZE = 0x0083;
+        public const int WM_NCHITTEST = 0x0084;
+        public const int WM_NCPAINT = 0x0085;
+        public const int WM_NCACTIVATE = 0x0086;
+        public const int WM_GETDLGCODE = 0x0087;
+        public const int WM_NCMOUSEMOVE = 0x00A0;
+        public const int WM_NCLBUTTONDOWN = 0x00A1;
+        public const int WM_NCLBUTTONUP = 0x00A2;
+        public const int WM_NCLBUTTONDBLCLK = 0x00A3;
+        public const int WM_NCRBUTTONDOWN = 0x00A4;
+        public const int WM_NCRBUTTONUP = 0x00A5;
+        public const int WM_NCRBUTTONDBLCLK = 0x00A6;
+        public const int WM_NCMBUTTONDOWN = 0x00A7;
+        public const int WM_NCMBUTTONUP = 0x00A8;
+        public const int WM_NCMBUTTONDBLCLK = 0x00A9;
+        public const int WM_NCXBUTTONDOWN = 0x00AB;
+        public const int WM_NCXBUTTONUP = 0x00AC;
+        public const int WM_NCXBUTTONDBLCLK = 0x00AD;
+        public const int WM_INPUT_DEVICE_CHANGE = 0x00FE;
+        public const int WM_INPUT = 0x00FF;
+        public const int WM_KEYFIRST = 0x0100;
+        public const int WM_KEYDOWN = 0x0100;
+        public const int WM_KEYUP = 0x0101;
+        public const int WM_CHAR = 0x0102;
+        public const int WM_DEADCHAR = 0x0103;
+        public const int WM_SYSKEYDOWN = 0x0104;
+        public const int WM_SYSKEYUP = 0x0105;
+        public const int WM_SYSCHAR = 0x0106;
+        public const int WM_SYSDEADCHAR = 0x0107;
+        public const int WM_UNICHAR = 0x0109;
+        public const int WM_KEYLAST = 0x0109;
+        public const int UNICODE_NOCHAR = 0xFFFF;
+        public const int WM_IME_STARTCOMPOSITION = 0x010D;
+        public const int WM_IME_ENDCOMPOSITION = 0x010E;
+        public const int WM_IME_COMPOSITION = 0x010F;
+        public const int WM_IME_KEYLAST = 0x010F;
+        public const int WM_INITDIALOG = 0x0110;
+        public const int WM_COMMAND = 0x0111;
+        public const int WM_SYSCOMMAND = 0x0112;
+        public const int WM_TIMER = 0x0113;
+        public const int WM_HSCROLL = 0x0114;
+        public const int WM_VSCROLL = 0x0115;
+        public const int WM_INITMENU = 0x0116;
+        public const int WM_INITMENUPOPUP = 0x0117;
+        public const int WM_MENUSELECT = 0x011F;
+        public const int WM_MENUCHAR = 0x0120;
+        public const int WM_ENTERIDLE = 0x0121;
+        public const int WM_CHANGEUISTATE = 0x0127;
+        public const int WM_UPDATEUISTATE = 0x0128;
+        public const int WM_QUERYUISTATE = 0x0129;
+        public const int WM_CTLCOLORMSGBOX = 0x0132;
+        public const int WM_CTLCOLOREDIT = 0x0133;
+        public const int WM_CTLCOLORLISTBOX = 0x0134;
+        public const int WM_CTLCOLORBTN = 0x0135;
+        public const int WM_CTLCOLORDLG = 0x0136;
+        public const int WM_CTLCOLORSCROLLBAR = 0x0137;
+        public const int WM_CTLCOLORSTATIC = 0x0138;
+        public const int MN_GETHMENU = 0x01E1;
+        public const int WM_MOUSEFIRST = 0x0200;
+        public const int WM_MOUSEMOVE = 0x0200;
+        public const int WM_LBUTTONDOWN = 0x0201;
+        public const int WM_LBUTTONUP = 0x0202;
+        public const int WM_LBUTTONDBLCLK = 0x0203;
+        public const int WM_RBUTTONDOWN = 0x0204;
+        public const int WM_RBUTTONUP = 0x0205;
+        public const int WM_RBUTTONDBLCLK = 0x0206;
+        public const int WM_MBUTTONDOWN = 0x0207;
+        public const int WM_MBUTTONUP = 0x0208;
+        public const int WM_MBUTTONDBLCLK = 0x0209;
+        public const int WM_MOUSEWHEEL = 0x020A;
+        public const int WM_XBUTTONDOWN = 0x020B;
+        public const int WM_XBUTTONUP = 0x020C;
+        public const int WM_XBUTTONDBLCLK = 0x020D;
+        public const int WM_MOUSEHWHEEL = 0x020E;
+        public const int WM_MOUSELAST = 0x020E;
+        public const int WM_PARENTNOTIFY = 0x0210;
+        public const int WM_ENTERMENULOOP = 0x0211;
+        public const int WM_EXITMENULOOP = 0x0212;
+        public const int WM_NEXTMENU = 0x0213;
+        public const int WM_SIZING = 0x0214;
+        public const int WM_CAPTURECHANGED = 0x0215;
+        public const int WM_MOVING = 0x0216;
+        public const int WM_MOUSEHOVER = 0x02A1;
+        public const int WM_MOUSELEAVE = 0x02A3;
+        public const int WM_DEVMODECHANGE = 0x001B;
+        public const int WM_ACTIVATEAPP = 0x001C;
+        public const int WM_FONTCHANGE = 0x001D;
+        public const int WM_TIMECHANGE = 0x001E;
+        public const int WM_CANCELMODE = 0x001F;
+        public const int WM_SETCURSOR = 0x0020;
+        public const int WM_MOUSEACTIVATE = 0x0021;
+        public const int WM_CHILDACTIVATE = 0x0022;
+        public const int WM_QUEUESYNC = 0x0023;
+        public const int WM_GETMINMAXINFO = 0x0024;
+    }
+
+    internal static class Win32ShellIconFlags
+    {
+        public const uint SHGFI_ICON = 0x000000100;  // get icon
+        public const uint SHGFI_DISPLAYNAME = 0x000000200;  // get display name
+        public const uint SHGFI_TYPENAME = 0x000000400;  // get type name
+        public const uint SHGFI_ATTRIBUTES = 0x000000800;  // get attributes
+        public const uint SHGFI_ICONLOCATION = 0x000001000;  // get icon location
+        public const uint SHGFI_EXETYPE = 0x000002000;  // return exe type
+        public const uint SHGFI_SYSICONINDEX = 0x000004000;  // get system icon index
+        public const uint SHGFI_LINKOVERLAY = 0x000008000;  // put a link overlay on icon
+        public const uint SHGFI_SELECTED = 0x000010000;  // show icon in selected state
+        public const uint SHGFI_ATTR_SPECIFIED = 0x000020000;  // get only specified attributes
+        public const uint SHGFI_LARGEICON = 0x000000000;  // get large icon
+        public const uint SHGFI_SMALLICON = 0x000000001;  // get small icon
+        public const uint SHGFI_OPENICON = 0x000000002;  // get open icon
+        public const uint SHGFI_SHELLICONSIZE = 0x000000004;  // get shell size icon
+        public const uint SHGFI_PIDL = 0x000000008;  // pszPath is a pidl
+        public const uint SHGFI_USEFILEATTRIBUTES = 0x000000010;  // use passed dwFileAttribute
+        public const uint SHGFI_ADDOVERLAYS = 0x000000020;  // apply the appropriate overlays
+        public const uint SHGFI_OVERLAYINDEX = 0x000000040;  // Get the index of the overlay in the upper 8 bits of the iIcon
+    }
+
+    internal static class FormatMessageFlags
+    {
+        public const uint FORMAT_MESSAGE_ALLOCATE_BUFFER = 0x00000100;
+        public const uint FORMAT_MESSAGE_IGNORE_INSERTS = 0x00000200;
+        public const uint FORMAT_MESSAGE_FROM_STRING = 0x00000400;
+        public const uint FORMAT_MESSAGE_FROM_HMODULE = 0x00000800;
+        public const uint FORMAT_MESSAGE_FROM_SYSTEM = 0x00001000;
+        public const uint FORMAT_MESSAGE_ARGUMENT_ARRAY = 0x00002000;
+        public const uint FORMAT_MESSAGE_MAX_WIDTH_MASK = 0x000000FF;
+    }
+
+    internal static class FileAttributeConstants
+    {
         internal const int FILE_ATTRIBUTE_NORMAL = 128;
         internal const int FILE_ATTRIBUTE_DIRECTORY = 16;
-        internal const int FORMAT_MESSAGE_ALLOCATE_BUFFER = 256;
-        internal const int FORMAT_MESSAGE_ARGUMENT_ARRAY = 8192;
-        internal const int FORMAT_MESSAGE_FROM_HMODULE = 2048;
-        internal const int FORMAT_MESSAGE_FROM_STRING = 1024;
-        internal const int FORMAT_MESSAGE_FROM_SYSTEM = 4096;
-        internal const int FORMAT_MESSAGE_IGNORE_INSERTS = 512;
-        internal const int FORMAT_MESSAGE_MAX_WIDTH_MASK = 255;
+    }
 
+    internal static class MiscConstants
+    {
+        internal const int MAX_PATH = 260;
         internal const int ATTACH_PARENT_PROCESS = -1;
     }
 }

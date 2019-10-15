@@ -8,12 +8,12 @@ using System.Windows.Forms;
 namespace FileList.Models
 {
 
-    public class CompareFiledataDefault : IComparer<TreeNode>
+    public class CompareFiledataName : IComparer<TreeNode>
     {
         private int _compareModifier = 0;
         private SortOrder _sortOrder;
 
-        public CompareFiledataDefault(SortOrder sortOrder)
+        public CompareFiledataName(SortOrder sortOrder)
         {
             this._sortOrder = sortOrder;
             switch (sortOrder)
@@ -34,7 +34,7 @@ namespace FileList.Models
         {
             get
             {
-                return Filter.None;
+                return Filter.Name;
             }
             private set
             {
@@ -287,7 +287,7 @@ namespace FileList.Models
             this.Comparers = comparers;
         }
 
-        public IEnumerable<IComparer<TreeNode>> Comparers { get; }
+        public IEnumerable<IComparer<TreeNode>> Comparers { get; private set; }
 
         public int Compare(TreeNode x, TreeNode y)
         {
@@ -309,6 +309,34 @@ namespace FileList.Models
             if (!(x is TreeNode) || !(y is TreeNode))
                 return 0;
             return this.Compare(x as TreeNode, y as TreeNode);
+        }
+
+        public void Clear()
+        {
+            this.Comparers = Enumerable.Empty<IComparer<TreeNode>>();
+        }
+
+        public void SetComparers(IEnumerable<IComparer<TreeNode>> comparers)
+        {
+            this.Clear();
+            this.Comparers = comparers;
+        }
+
+        public bool AddComparer(IComparer<TreeNode> comparer)
+        {
+            if (this.Comparers.Any(c => c.Equals(comparer)))
+                return false;
+
+            List<IComparer<TreeNode>> comparers = this.Comparers.ToList();
+            comparers.Add(comparer);
+            this.Comparers = comparers;
+            return true;
+        }
+
+        public bool Remove(IComparer<TreeNode> comparer)
+        {
+            List<IComparer<TreeNode>> comparers = this.Comparers.ToList();
+            return comparers.Remove(comparer);
         }
     }
 }

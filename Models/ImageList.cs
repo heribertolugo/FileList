@@ -84,7 +84,7 @@ namespace FileList.Models.ImageList
             if (!forceLoadFromDisk)
             {
                 fileInfoConstants |= Win32.SHGetFileInfoConstants.SHGFI_USEFILEATTRIBUTES;
-                dwFileAttributes = Win32.Win32Enums.FILE_ATTRIBUTE_NORMAL;
+                dwFileAttributes = Win32.FileAttributeConstants.FILE_ATTRIBUTE_NORMAL;
             }
             else
                 dwFileAttributes = 0;
@@ -224,7 +224,7 @@ namespace FileList.Models.ImageList
                     fileInfoConstants |= Win32.SHGetFileInfoConstants.SHGFI_SMALLICON;
                 Win32.SHFILEINFO psfi = new Win32.SHFILEINFO();
                 uint cbFileInfo = (uint)Marshal.SizeOf(psfi.GetType());
-                this.hIml = Win32.Win32Methods.SHGetFileInfo(".txt", Win32.Win32Enums.FILE_ATTRIBUTE_NORMAL, ref psfi, cbFileInfo, (uint)fileInfoConstants);
+                this.hIml = Win32.Win32Methods.SHGetFileInfo(".txt", Win32.FileAttributeConstants.FILE_ATTRIBUTE_NORMAL, ref psfi, cbFileInfo, (uint)fileInfoConstants);
                 Debug.Assert(this.hIml != IntPtr.Zero, "Failed to create Image List");
             }
         }

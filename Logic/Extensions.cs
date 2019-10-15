@@ -172,5 +172,12 @@ namespace FileList
             return (new System.Security.Principal.WindowsPrincipal(System.Security.Principal.WindowsIdentity.GetCurrent()))
                       .IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
         }
+
+        public static bool IsFullyVisible(this System.Windows.Forms.TreeNode node)
+        {
+            if (node == null)
+                return false;
+            return node.TreeView.ClientRectangle.Contains(node.Bounds);
+        }
     }
 }

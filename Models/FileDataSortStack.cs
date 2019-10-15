@@ -23,7 +23,7 @@ namespace FileList.Models
         {
             this.stack = new List<KeyValuePair<Filter, IComparer<TreeNode>>>();
             foreach (Filter key in Enum.GetValues(typeof(Filter)))
-                this.stack.Add(new KeyValuePair<Filter, IComparer<TreeNode>>(key, new CompareFiledataDefault(SortOrder.None)));
+                this.stack.Add(new KeyValuePair<Filter, IComparer<TreeNode>>(key, new CompareFiledataName(SortOrder.None)));
             this.enumerator = this.stack.GetEnumerator();
         }
 

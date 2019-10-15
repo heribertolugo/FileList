@@ -22,6 +22,8 @@ namespace FileList.Logic
         private bool _commitRequired;
         private DateTime startTime;
 
+        public static ConcurrentQueue<FileData> TestPool = new ConcurrentQueue<FileData>();
+
         public ConcurrentFileSearch(string rootPath, FileSearchWorkerArgs args)
         {
             this._root = rootPath;
@@ -29,6 +31,7 @@ namespace FileList.Logic
                 ConcurrentFileSearch._fileData = new ConcurrentCollection<FileData>("ConcurrentFileSearch fileData");
             this._fileListControl = args.FileListControl;
             this._commitRequired = true;// !args.LiveUpdate;
+
         }
 
         public void Start()
@@ -36,7 +39,6 @@ namespace FileList.Logic
             this.startTime = DateTime.Now;
             //ConcurrentFileSearchSta.Files = ConcurrentFileSearch._fileData;
             Shell32.ShellClass shell = new Shell32.ShellClass();
-            //ConcurrentFileSearchSta._shellPtr = 
             Models.Win32.Win32Methods.GetRegisteredInterfaceMarshalPtr<Shell32.IShellDispatch5>(shell); //.ToIntPtr();
             GC.KeepAlive(shell);
 
@@ -134,7 +136,7 @@ namespace FileList.Logic
         {
             ConcurrentFileSearchMinion searchSta = (ConcurrentFileSearchMinion)sender;
             searchSta.OnFinishedHandler -= this.ConcurrentFileSearch_OnFinishedHandler;
-            int maxThreads = 100;
+            int maxThreads = 0;
 
             this.SummonMinions(maxThreads);
 
@@ -503,15 +505,25 @@ namespace FileList.Logic
 
             private void GetFiles(string root, IList<FileData> files)
             {
-                this._fileSearch = new FileSearch(root, false, Models.Win32.Win32Methods.GetIShellDispatch5());
-
-                while (this._fileSearch.GetNext() != null)
+                try
                 {
-                    //ConcurrentFileSearchSta.Files.Add(this._fileSearch.Current.Value);
-                    Console.WriteLine("thread id #{0} found file {1}", this.ID, this._fileSearch.Current.Value.Path);
-                    //files.Add(this._fileSearch.Current.Value);
-                    this.AttachFileData(this._fileSearch.Current.Value, this._fileListControl, this._commitRequired);
-                    //Console.WriteLine(this._fileSearch.Current.Value.Path);
+                    this._fileSearch = new FileSearch(root, false, Models.Win32.Win32Methods.GetIShellDispatch5());
+
+                    while (this._fileSearch.GetNext() != null)
+                    {
+                        //ConcurrentFileSearchSta.Files.Add(this._fileSearch.Current.Value);
+                        Console.WriteLine("thread id #{0} found file {1}", this.ID, this._fileSearch.Current.Value.Path);
+                        //files.Add(this._fileSearch.Current.Value);
+                        this.AttachFileData(this._fileSearch.Current.Value, this._fileListControl, this._commitRequired);
+                        //Console.WriteLine(this._fileSearch.Current.Value.Path);
+                    }
+
+                    Console.WriteLine("this._fileSearch.GetNext() == null");
+                }catch(Exception ex)
+                {
+                    string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+                    System.IO.File.WriteAllText(dir + "err.txt", ex.Message);
+                    Console.WriteLine(ex.Message);
                 }
             }
 
@@ -543,6 +555,12 @@ namespace FileList.Logic
             private void AttachFileData(FileData file, FileListControl fileListControl, bool commitRequired)
             {
                 Console.WriteLine("requesting fileListControlLock");
+                //TestPool.Add(file);
+                //fileListControl.InvokeIfRequired(c =>
+                //{
+                //    c.IncrememntFileCOunt();
+                //});
+                //return;
                 //lock (fileListControlLock)
                 //{
                 fileListControl.InvokeIfRequired(c =>

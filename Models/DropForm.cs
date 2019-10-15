@@ -78,7 +78,7 @@ namespace FileList.Models
                 return false;
             int pfEnabled = 0;
             Win32.Win32Methods.DwmIsCompositionEnabled(ref pfEnabled);
-            return pfEnabled == Win32.Win32Enums.HTCLIENT;
+            return pfEnabled == Win32.Win32MousePositionCodes.HTCLIENT;
         }
 
         protected override CreateParams CreateParams
@@ -88,16 +88,16 @@ namespace FileList.Models
                 this.isAeroEnabled = this.CheckAeroEnabled();
                 CreateParams createParams = base.CreateParams;
                 if (!this.isAeroEnabled)
-                    createParams.ClassStyle |= Win32.Win32Enums.CS_DROPSHADOW;
+                    createParams.ClassStyle |= Win32.Win32ClassStyles.CS_DROPSHADOW;
                 return createParams;
             }
         }
         protected override void WndProc(ref Message m)
         {
-            if (m.Msg == Win32.Win32Enums.WM_NCPAINT && this.isAeroEnabled)
+            if (m.Msg == Win32.Win32Messages.WM_NCPAINT && this.isAeroEnabled)
             {
-                int attrValue = Win32.Win32Enums.HTCAPTION;
-                Win32.Win32Methods.DwmSetWindowAttribute(this.Handle, Win32.Win32Enums.HTCAPTION, ref attrValue, 4);
+                int attrValue = Win32.Win32MousePositionCodes.HTCAPTION;
+                Win32.Win32Methods.DwmSetWindowAttribute(this.Handle, Win32.Win32MousePositionCodes.HTCAPTION, ref attrValue, 4);
                 Win32MARGINS pMarInset = new Win32MARGINS()
                 {
                     bottomHeight = 1,
@@ -108,9 +108,9 @@ namespace FileList.Models
                 Win32.Win32Methods.DwmExtendFrameIntoClientArea(this.Handle, ref pMarInset);
             }
             base.WndProc(ref m);
-            if (m.Msg != Win32.Win32Enums.WM_NCHITTEST || (int)m.Result != Win32.Win32Enums.HTCLIENT)
+            if (m.Msg != Win32.Win32Messages.WM_NCHITTEST || (int)m.Result != Win32.Win32MousePositionCodes.HTCLIENT)
                 return;
-            m.Result = (IntPtr) Win32.Win32Enums.HTCAPTION;
+            m.Result = (IntPtr) Win32.Win32MousePositionCodes.HTCAPTION;
         }
         #endregion
     }

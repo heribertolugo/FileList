@@ -265,6 +265,7 @@ namespace FileList
             }
             catch (Exception ex)
             {
+                Console.WriteLine("LoadExtendedProperties exception: {0}", ex.Message);
             }
             finally
             {
@@ -284,6 +285,7 @@ namespace FileList
             }
             catch (Exception ex)
             {
+                Console.WriteLine("LoadExtendedPropertiesLight exception: {0}", ex.Message);
             }
         }
 
@@ -305,7 +307,7 @@ namespace FileList
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine("LoadFilePropertyNames exception: {0}", ex.Message);
             }
         }
 

@@ -11,7 +11,7 @@ namespace FileList.Models.Win32
         public IntPtr hIcon;
         public IntPtr iIcon;
         public uint dwAttributes;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = Win32Enums.MAX_PATH)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MiscConstants.MAX_PATH)]
         public string szDisplayName;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
         public string szTypeName;

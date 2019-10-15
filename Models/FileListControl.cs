@@ -20,10 +20,11 @@ namespace FileList.Models
         public event EventHandler<FileDataSelectedEventArgs> OnOpenLocationClicked;
         public event EventHandler<FileDataSelectedEventArgs> OnDeleteFileDataClicked;
 
-        private readonly List<TreeNode> TreeDataSource = new List<TreeNode>();
+        private IMultiComparer<TreeNode> treeNodeComparer;
+        private readonly SortedSet<TreeNode> TreeDataSource;
         private bool modifyFileTypesListBoxInternal = false;
-        private Dictionary<string, TreeNode> _treeKeys = new Dictionary<string, TreeNode>();
-        private List<string> _extensions = new List<string>();
+        private SortedList<string, TreeNode> _treeKeys = new SortedList<string, TreeNode>();
+        private SortedSet<string> _extensions = new SortedSet<string>();
         private FileFilterForm filterForm;
         private FileDataSortStack _sortStack;
         private bool _allCheck;
@@ -37,6 +38,9 @@ namespace FileList.Models
             this.filterForm = new FileFilterForm();
             this.filterForm.VisibleChanged += new EventHandler(this.FilterForm_VisibleChanged);
             this._sortStack = new FileDataSortStack();
+
+            treeNodeComparer = new MultiCompareFileData(Enumerable.Empty<IComparer<TreeNode>>());
+            TreeDataSource = new SortedSet<TreeNode>(treeNodeComparer);
         }
 
         #region Public
@@ -195,20 +199,65 @@ namespace FileList.Models
         public void AddFileData(FileData fileData, bool commitRequired)
         {
             this.modifyFileTypesListBoxInternal = true;
-            TreeNode treeNode;
-
-            if (!this._treeKeys.ContainsKey(fileData.Directory))
-            {
-                treeNode = new TreeNode(fileData.Directory);
-                treeNode.Name = fileData.Directory;
-                this.TreeDataSource.Add(treeNode);
-            }
-            else
-                treeNode = this.TreeDataSource.FirstOrDefault(n => n.Name.Equals(fileData.Directory));
-
-            TreeNode node = new TreeNode(fileData.Name + fileData.Extension);
+            TreeNode parentNode;
+            TreeNode parentClone = null;
             string fileImageKey = fileData.Extension.Equals(string.Empty) ? UiHelper.NoneFileExtension : fileData.Extension;
             string directoryImageKey = fileData.Directory.ToLowerInvariant().Contains(UiHelper.ZipExtension) ? UiHelper.ZipExtension : UiHelper.DirectoryKey;
+
+            if (this._treeKeys.ContainsKey(fileData.Directory))
+            {
+                parentNode = this._treeKeys[fileData.Directory];
+                //parentNode = this.TreeDataSource.FirstOrDefault(n => n.Name.Equals(fileData.Directory));
+            }
+            else
+            {
+                parentNode = new TreeNode(fileData.Directory);
+                parentNode.Name = fileData.Directory;
+                parentNode.ImageKey = directoryImageKey;
+                parentNode.SelectedImageKey = directoryImageKey;
+                parentNode.StateImageKey = directoryImageKey;
+                parentNode.Name = fileData.Directory;
+
+                this._treeKeys.Add(fileData.Directory, parentNode); 
+
+                // if should add node to view
+                if (this.treeView1.Nodes.Count < (this.treeView1.VisibleCount * 2)+1)
+                {
+                    // dont add the actual reference.. we dont want children involved
+                    parentClone = (TreeNode)parentNode.Clone();
+                    this.TreeDataSource.Add(parentClone);
+                    this.treeView1.Nodes.Add(parentClone);
+
+                    if (this.treeView1.Nodes.Count == (this.nodeReserveCount * 2)) // && this._treeKeys.Count == this.treeView1.Nodes.Count
+                    {
+                        this.SetTriggerNodes();
+                    }
+                }
+            }
+
+            if (!this._extensions.Contains(fileData.Extension))
+            {
+                this._extensions.Add(fileData.Extension);
+                this.fileTypesCheckedListBox.Items.Add(fileData.Extension, true);
+            }
+
+            //if (!this._treeKeys.ContainsKey(fileData.Directory))
+            //{
+            //    parentNode = new TreeNode(fileData.Directory);
+            //    parentNode.Name = fileData.Directory;
+            //    this._treeKeys.Add(fileData.Directory, parentNode);
+
+            //    // if should add node to view
+            //    if (this.treeView1.Nodes.Count < (this.treeView1.VisibleCount * 2))
+            //    {
+            //        // dont add the actual reference.. we dont want children involved
+            //        this.TreeDataSource.Add((TreeNode)parentNode.Clone());
+            //    }
+            //}
+            //else
+            //    parentNode = this.TreeDataSource.FirstOrDefault(n => n.Name.Equals(fileData.Directory));
+
+            TreeNode node = new TreeNode(fileData.Name + fileData.Extension);
 
             node.Tag = fileData;
             node.ToolTipText = string.Join(Environment.NewLine, fileData.ExtendedProperties.Select(p => string.Format("{0}: {1}", p.Key, p.Value)).ToArray());
@@ -216,38 +265,51 @@ namespace FileList.Models
             node.SelectedImageKey = fileImageKey;
             node.StateImageKey = fileImageKey;
             node.Name = fileData.Name + fileData.Extension;
-            treeNode.ImageKey = directoryImageKey;
-            treeNode.SelectedImageKey = directoryImageKey;
-            treeNode.StateImageKey = directoryImageKey;
-            treeNode.Name = fileData.Directory;
 
-            if (!this._treeKeys.ContainsKey(fileData.Directory))
+            //if (!this._treeKeys.ContainsKey(fileData.Directory))
+            //{
+            //    this._treeKeys.Add(fileData.Directory, parentNode.Clone() as TreeNode);
+
+            //    if (this.treeView1.Nodes.Count <= (this.nodeReserveCount*2))
+            //    {
+            //        this.treeView1.Nodes.Add(this._treeKeys[fileData.Directory]);
+            //        if (!this._extensions.Contains(fileData.Extension))
+            //            this.fileTypesCheckedListBox.Items.Add(fileData.Extension, true);
+            //    }
+            //    if (this.treeView1.Nodes.Count == (this.nodeReserveCount * 2) && this._treeKeys.Count == this.treeView1.Nodes.Count)
+            //    {
+            //        this.SetTriggerNodes();
+            //    }
+            //}
+            //this._treeKeys[fileData.Directory].ImageKey = directoryImageKey;
+            //this._treeKeys[fileData.Directory].SelectedImageKey = directoryImageKey;
+            //this._treeKeys[fileData.Directory].StateImageKey = directoryImageKey;
+            //this._treeKeys[fileData.Directory].Name = fileData.Directory;
+            //this._treeKeys[fileData.Directory].Nodes.Add(node.Clone() as TreeNode);
+            parentNode.Nodes.Add(node);
+
+            if (parentClone != null && parentClone.Nodes.Count == 0)
             {
-                this._treeKeys.Add(fileData.Directory, treeNode.Clone() as TreeNode);
-
-                if (!commitRequired)
-                {
-                    this.treeView1.Nodes.Add(this._treeKeys[fileData.Directory]);
-                    if (!this._extensions.Contains(fileData.Extension))
-                        this.fileTypesCheckedListBox.Items.Add(fileData.Extension, true);
-                }
+                // we need to add a node to treeview to enable node expanding in treeview
+                parentClone.Nodes.Add(node); ;
             }
-            this._treeKeys[fileData.Directory].ImageKey = directoryImageKey;
-            this._treeKeys[fileData.Directory].SelectedImageKey = directoryImageKey;
-            this._treeKeys[fileData.Directory].StateImageKey = directoryImageKey;
-            this._treeKeys[fileData.Directory].Name = fileData.Directory;
-            this._treeKeys[fileData.Directory].Nodes.Add(node.Clone() as TreeNode);
-            treeNode.Nodes.Add(node);
 
-            if (!this._extensions.Contains(fileData.Extension))
-                this._extensions.Add(fileData.Extension);
+            //if (!this._extensions.Contains(fileData.Extension))
+            //    this._extensions.Add(fileData.Extension);
             ++this._fileCount;
             this.countLabel.Text = this._fileCount.ToString(); // (c => c.Text = this._treeKeys.Sum(k => k.Value.Nodes.Count).ToString());
             this.modifyFileTypesListBoxInternal = false;
         }
 
+        public void IncrememntFileCOunt()
+        {
+            ++this._fileCount;
+            this.countLabel.Text = this._fileCount.ToString();
+        }
+
         public void Commit()
         {
+            return;
             //this.modifyFileTypesListBoxInternal = true;
             this.fileTypesCheckedListBox.Items.Clear();
             this.treeView1.Nodes.Clear();
@@ -555,7 +617,6 @@ namespace FileList.Models
             return new FileDataSelectedEventArgs(fileDataList.ToArray(), selectedPath, selectedNode.Level == 0);
         }
 
-
         private static void SortTree(TreeView treeView, FileDataSortStack sortStack)
         {
             List<IComparer<TreeNode>> comparerList = new List<IComparer<TreeNode>>();
@@ -680,7 +741,7 @@ namespace FileList.Models
         private static void SetNodeVisibility(
           TreeView tree,
           Func<FileData, bool> predicate,
-          List<TreeNode> treeDataSource)
+          IEnumerable<TreeNode> treeDataSource)
         {
             foreach (TreeNode treeNode in treeDataSource)
             {
@@ -732,6 +793,117 @@ namespace FileList.Models
         }
         #endregion
 
+        private int nodeReserveCount = 0;
+        private TreeNode topTrigger;
+        private TreeNode bottomTrigger;
+        private void treeView1_Scrolled(object sender, ScrollNotifyTreeViewEventArgs e)
+        {
+            if (e.Direction == Direction.Up && this.topTrigger.IsFullyVisible())
+                this.FillTopReserve();
+            else if (e.Direction == Direction.Down && this.bottomTrigger.IsFullyVisible())
+                this.FillBottomReserve();
+        }
+
+        private void FillTopReserve()
+        {
+            TreeNode topNode = this.treeView1.Nodes[0];
+            int bufferCount = this.topTrigger.Index - topNode.Index;
+            int nodeIndex = this._treeKeys.Values.ToList().IndexOf(topNode);
+            TreeNode[] nodes = this._treeKeys.Values.Where((n, i) => n.Index <= (bufferCount + nodeIndex)).Take(bufferCount).ToArray();
+
+            if (nodes == null)
+                return;
+
+            for (int node = nodes.Length - 1; node > -1; node--) {
+                this.treeView1.Nodes.Insert(0, nodes[node]);
+                if (this.treeView1.Nodes.Count > (this.treeView1.VisibleCount + nodeReserveCount))
+                    this.treeView1.Nodes.RemoveAt(this.treeView1.Nodes.Count - 1);
+            }
+
+            this.SetTriggerNodes();
+        }
+
+        private void FillBottomReserve()
+        {
+            TreeNode bottomNode = this.treeView1.Nodes[this.treeView1.Nodes.Count-1];
+            int bufferCount = bottomNode.Index - this.bottomTrigger.Index;
+            int nodeIndex = this._treeKeys.Values.ToList().IndexOf(bottomNode);
+            TreeNode[] nodes = this._treeKeys.Values.Where((n, i) => n.Index > (nodeIndex)).Take(bufferCount).ToArray();
+
+            if (nodes == null)
+                return;
+
+            for (int node = nodes.Length - 1; node > -1; node--)
+            {
+                this.treeView1.Nodes.Insert(this.treeView1.Nodes.Count-1, nodes[node]);
+                if (this.treeView1.Nodes.Count > (this.treeView1.VisibleCount + nodeReserveCount))
+                    this.treeView1.Nodes.RemoveAt(0);
+            }
+
+            this.SetTriggerNodes();
+        }
+
+        private void SetTriggerNodes()
+        {
+            int baseReserveCount = this.treeView1.Nodes.Count - this.treeView1.VisibleCount;
+            int topTriggerIndex = (int)Math.Ceiling(baseReserveCount / 2d);
+            int bottomTriggerIndex = (int)Math.Floor(baseReserveCount / 2d);
+
+            this.topTrigger = this.treeView1.Nodes[topTriggerIndex];
+            this.bottomTrigger = this.treeView1.Nodes[this.treeView1.Nodes.Count - bottomTriggerIndex];
+            this.nodeReserveCount = baseReserveCount;
+        }
+
+        private void FillChildTopReserve(TreeNode parent)
+        {
+            TreeNode topNode = parent.Nodes[0];
+            int bufferCount = this.topTrigger.Index - topNode.Index;
+            int nodeIndex = this._treeKeys.Values.FirstOrDefault(n => n.Name.Equals(parent.Name)).Nodes.Cast<TreeNode>().ToList().IndexOf(topNode);
+            TreeNode[] nodes = this._treeKeys.Values.Where((n, i) => n.Index <= (bufferCount + nodeIndex)).Take(bufferCount).ToArray();
+
+            if (nodes == null)
+                return;
+
+            for (int node = nodes.Length - 1; node > -1; node--)
+            {
+                this.treeView1.Nodes.Insert(0, nodes[node]);
+                if (this.treeView1.Nodes.Count > (this.treeView1.VisibleCount + nodeReserveCount))
+                    this.treeView1.Nodes.RemoveAt(this.treeView1.Nodes.Count - 1);
+            }
+
+            this.SetTriggerNodes();
+        }
+
+        private void FillChildBottomReserve()
+        {
+            TreeNode bottomNode = this.treeView1.Nodes[this.treeView1.Nodes.Count - 1];
+            int bufferCount = bottomNode.Index - this.bottomTrigger.Index;
+            int nodeIndex = this._treeKeys.Values.ToList().IndexOf(bottomNode);
+            TreeNode[] nodes = this._treeKeys.Values.Where((n, i) => n.Index > (nodeIndex)).Take(bufferCount).ToArray();
+
+            if (nodes == null)
+                return;
+
+            for (int node = nodes.Length - 1; node > -1; node--)
+            {
+                this.treeView1.Nodes.Insert(this.treeView1.Nodes.Count - 1, nodes[node]);
+                if (this.treeView1.Nodes.Count > (this.treeView1.VisibleCount + nodeReserveCount))
+                    this.treeView1.Nodes.RemoveAt(0);
+            }
+
+            this.SetTriggerNodes();
+        }
+
+        private void SetChildTriggerNodes()
+        {
+            int baseReserveCount = this.treeView1.Nodes.Count - this.treeView1.VisibleCount;
+            int topTriggerIndex = (int)Math.Ceiling(baseReserveCount / 2d);
+            int bottomTriggerIndex = (int)Math.Floor(baseReserveCount / 2d);
+
+            this.topTrigger = this.treeView1.Nodes[topTriggerIndex];
+            this.bottomTrigger = this.treeView1.Nodes[this.treeView1.Nodes.Count - bottomTriggerIndex];
+            this.nodeReserveCount = baseReserveCount;
+        }
     }
 
     public class FileDataSelectedEventArgs : EventArgs

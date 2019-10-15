@@ -3,6 +3,7 @@
     public enum Filter
     {
         None,
+        Name,
         Size,
         DateModified,
         DateCreated,

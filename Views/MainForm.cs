@@ -22,6 +22,8 @@ namespace FileList.Views
             InitializeComponent();
             this.backgroundWorker1.DoWork += new DoWorkEventHandler(this.BackgroundWorker1_DoWork);
             this.CreateImageLayoutButtons();
+            if (Extensions.IsAdministrator())
+                this.Text = string.Format("{0} - Administrator", this.Text);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -139,8 +141,8 @@ namespace FileList.Views
                 this.ToggleEnabled((Control)this);
                 this.Reset();
                 //#if DEBUG
-                //                this.GetFileCount(this.rootPathTextBox.Text);
-                //                Console.WriteLine(fc);
+                //this.GetFileCount(this.rootPathTextBox.Text);
+                //Console.WriteLine(fc);
                 //#else
                 this.Search();
                 //#endif
