@@ -38,7 +38,8 @@ namespace FileList.Logic
             UiHelper.OpenLocation(tag.HasValue ? tag.Value.Directory : treeView.SelectedNode.Text);
         }
 
-        public static void Search(string path, FileListControl fileListControl)
+        private static Action<ConcurrentFileSearchEventArgs> _searchFinishedCallback;
+        public static void Search(string path, FileListControl fileListControl, Action<ConcurrentFileSearchEventArgs> searchFinishedCallback)
         {
             if (UiHelper.worker == null)
             {
@@ -52,6 +53,7 @@ namespace FileList.Logic
             fileListControl.Clear();
 
             UiHelper.cancellationToken = new CancellationTokenSource();
+            UiHelper._searchFinishedCallback = searchFinishedCallback;
 
             FileSearchWorkerArgs args = new FileSearchWorkerArgs(path, fileListControl, true, UiHelper.cancellationToken.Token);
 
@@ -68,6 +70,7 @@ namespace FileList.Logic
 
         private static void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+
             //throw new NotImplementedException();
         }
 
@@ -86,7 +89,7 @@ namespace FileList.Logic
             //});
             //thread.SetApartmentState(ApartmentState.STA);
             //thread.Start();
-            
+
             ConcurrentFileSearch search = new ConcurrentFileSearch(args.Path, args);
             search.Finished += Search_Finished;
             search.Start();
@@ -94,7 +97,9 @@ namespace FileList.Logic
 
         private static void Search_Finished(object sender, ConcurrentFileSearchEventArgs e)
         {
+            // sender as ConcurrentFileSearch.Dispose()
             UiHelper.cancellationToken.Dispose();
+            UiHelper._searchFinishedCallback(e);
         }
 
         public static void DeleteItem(string path, FileListControl fileListControl)
@@ -113,9 +118,9 @@ namespace FileList.Logic
             new Process()
             {
                 StartInfo = {
-          FileName = "explorer",
-          Arguments = ("\"" + path + "\"")
-        }
+                  FileName = "explorer",
+                  Arguments = ("\"" + path + "\"")
+                }
             }.Start();
         }
 

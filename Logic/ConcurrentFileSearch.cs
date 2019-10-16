@@ -50,7 +50,7 @@ namespace FileList.Logic
             });
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start(searcher);
-            thread.Join();
+            //thread.Join();
         }
 
         private static volatile ConcurrentQueue<string> Directories = new ConcurrentQueue<string>("ConcurrentFileSearch Directories");
@@ -156,7 +156,7 @@ namespace FileList.Logic
             //    //this.OnUpdate(e);
             //}
 
-            if ((ConcurrentFileSearch.Directories.Count == 0 && ConcurrentFileSearchMinion.ThreadBucketCount() == 0) || this._cancelToken.IsCancellationRequested)
+            if ((ConcurrentFileSearch.Directories.Count == 0 || this._cancelToken.IsCancellationRequested) && ConcurrentFileSearchMinion.ThreadBucketCount() == 0)
             {
                 DateTime endTime = DateTime.Now;
                 TimeSpan timeSpan = endTime.Subtract(startTime);
@@ -166,6 +166,7 @@ namespace FileList.Logic
                 Console.WriteLine("finalizing");
                 this.FinalizeFileListControl(this._fileListControl, this._commitRequired);
                 this.OnFinished(e);
+                ConcurrentFileSearchMinion.ResetCancelled();
                 GC.Collect();
             }
         }
@@ -437,6 +438,14 @@ namespace FileList.Logic
                 lock (ConcurrentFileSearchMinion.CancelLock)
                 {
                     ConcurrentFileSearchMinion._isCancelled = true;
+                }
+            }
+
+            public static void ResetCancelled()
+            {
+                lock (ConcurrentFileSearchMinion.CancelLock)
+                {
+                    ConcurrentFileSearchMinion._isCancelled = false;
                 }
             }
 

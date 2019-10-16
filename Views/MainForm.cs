@@ -20,7 +20,7 @@ namespace FileList.Views
         public MainForm()
         {
             InitializeComponent();
-            this.backgroundWorker1.DoWork += new DoWorkEventHandler(this.BackgroundWorker1_DoWork);
+            //this.backgroundWorker1.DoWork += new DoWorkEventHandler(this.BackgroundWorker1_DoWork);
             this.CreateImageLayoutButtons();
             if (Extensions.IsAdministrator())
                 this.Text = string.Format("{0} - Administrator", this.Text);
@@ -105,7 +105,7 @@ namespace FileList.Views
 
         private void Search()
         {
-            UiHelper.Search(this.rootPathTextBox.Text, this.fileListControl1);
+            UiHelper.Search(this.rootPathTextBox.Text, this.fileListControl1, this.ToggleEnabled);
         }
 
         public void Reset()
@@ -138,7 +138,7 @@ namespace FileList.Views
                 //search.Start();
                 //return;
 
-                this.ToggleEnabled((Control)this);
+                this.ToggleEnabled(null);
                 this.Reset();
                 //#if DEBUG
                 //this.GetFileCount(this.rootPathTextBox.Text);
@@ -153,43 +153,46 @@ namespace FileList.Views
         private void CancelButton_Click(object sender, EventArgs e)
         {
             UiHelper.CancelSearch();
-            this.ToggleEnabled((Control)this);
+            //this.ToggleEnabled();
         }
 
-        public void ToggleEnabled(Control control)
+        public void ToggleEnabled(ConcurrentFileSearchEventArgs fileSearchEventArgs)
         {
-            foreach (Control control1 in (ArrangedElementCollection)control.Controls)
-                control1.Enabled = !control1.Enabled;
+            this.InvokeIfRequired(c => { 
+                Control control = (Control)c;
+                foreach (Control control1 in (ArrangedElementCollection)control.Controls)
+                    control1.Enabled = !control1.Enabled;
 
-            this.searchButton.Parent.Enabled = true;
-            if (this.searchButton.Text.ToUpper().Equals("SEARCH"))
-            {
-                this.searchButton.Text = "Cancel";
-                this.searchButton.Click -= SearchButton_Click;
-                this.searchButton.Click += CancelButton_Click;
-            }
-            else
-            {
-                this.searchButton.Text = "Search";
-                this.searchButton.Click -= CancelButton_Click;
-                this.searchButton.Click += SearchButton_Click;
-            }
+                //this.searchButton.Parent.Enabled = true;
+                if (this.searchButton.Text.ToUpper().Equals("SEARCH"))
+                {
+                    this.searchButton.Text = "Cancel";
+                    this.searchButton.Click -= SearchButton_Click;
+                    this.searchButton.Click += CancelButton_Click;
+                }
+                else
+                {
+                    this.searchButton.Text = "Search";
+                    this.searchButton.Click -= CancelButton_Click;
+                    this.searchButton.Click += SearchButton_Click;
+                }
+            });
         }
 
-        private void BackgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
-        {
-            FileSearch search = e.Argument as FileSearch;
-            if (search == null)
-                return;
-            FileData? fileData = null;
-            UiHelper.MoveNextFileDataFromMta(search);
-            FileData? current;
-            while ((current = search.Current).HasValue)
-            {
-                this.treeIconsImageList.Images.Add(current.Value.Extension, FileToIconConverter.GetFileIcon(current.Value.Extension, FileToIconConverter.IconSize.Small)); //IconManager.FindIconForFilename(current.Value.Extension, false));
-                UiHelper.MoveNextFileDataFromMta(search);
-            }
-        }
+        //private void BackgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+        //{
+        //    FileSearch search = e.Argument as FileSearch;
+        //    if (search == null)
+        //        return;
+        //    FileData? fileData = null;
+        //    UiHelper.MoveNextFileDataFromMta(search);
+        //    FileData? current;
+        //    while ((current = search.Current).HasValue)
+        //    {
+        //        this.treeIconsImageList.Images.Add(current.Value.Extension, FileToIconConverter.GetFileIcon(current.Value.Extension, FileToIconConverter.IconSize.Small)); //IconManager.FindIconForFilename(current.Value.Extension, false));
+        //        UiHelper.MoveNextFileDataFromMta(search);
+        //    }
+        //}
 
         public void SmartImageLayout(Control control, Control buttonContainer)
         {
@@ -300,6 +303,24 @@ namespace FileList.Views
             {
 
             }
+        }
+
+        private void browsePanel_EnabledChanged(object sender, EventArgs e)
+        {
+            Panel panel = sender as Panel;
+
+            panel.EnabledChanged -= browsePanel_EnabledChanged;
+
+            //bool enabled = panel.Enabled;
+
+            panel.Enabled = true;
+
+            foreach (Control control in panel.Controls)
+                control.Enabled = !control.Enabled;
+
+            panel.Controls["searchButton"].Enabled = true;
+
+            panel.EnabledChanged += browsePanel_EnabledChanged;
         }
     }
 }

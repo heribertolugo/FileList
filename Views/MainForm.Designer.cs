@@ -33,7 +33,7 @@ namespace FileList.Views
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.rootPathTextBox = new System.Windows.Forms.TextBox();
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.browsePanel = new System.Windows.Forms.Panel();
             this.label2 = new System.Windows.Forms.Label();
             this.browseButton = new System.Windows.Forms.Button();
             this.searchButton = new System.Windows.Forms.Button();
@@ -57,7 +57,8 @@ namespace FileList.Views
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.treeIconsImageList = new System.Windows.Forms.ImageList(this.components);
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.panel1.SuspendLayout();
+            this.browsePanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -78,17 +79,18 @@ namespace FileList.Views
             this.rootPathTextBox.TabIndex = 0;
             this.rootPathTextBox.TextChanged += new System.EventHandler(this.RootPathTextBox_TextChanged);
             // 
-            // panel1
+            // browsePanel
             // 
-            this.panel1.Controls.Add(this.label2);
-            this.panel1.Controls.Add(this.browseButton);
-            this.panel1.Controls.Add(this.searchButton);
-            this.panel1.Controls.Add(this.rootPathTextBox);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1410, 56);
-            this.panel1.TabIndex = 1;
+            this.browsePanel.Controls.Add(this.label2);
+            this.browsePanel.Controls.Add(this.browseButton);
+            this.browsePanel.Controls.Add(this.searchButton);
+            this.browsePanel.Controls.Add(this.rootPathTextBox);
+            this.browsePanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.browsePanel.Location = new System.Drawing.Point(0, 0);
+            this.browsePanel.Name = "browsePanel";
+            this.browsePanel.Size = new System.Drawing.Size(1410, 56);
+            this.browsePanel.TabIndex = 1;
+            this.browsePanel.EnabledChanged += new System.EventHandler(this.browsePanel_EnabledChanged);
             // 
             // label2
             // 
@@ -335,15 +337,16 @@ namespace FileList.Views
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1410, 790);
             this.Controls.Add(this.splitContainer1);
-            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.browsePanel);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
             this.Text = "File Thingy";
             this.Load += new System.EventHandler(this.Form1_Load);
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
+            this.browsePanel.ResumeLayout(false);
+            this.browsePanel.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.viewerTabControl.ResumeLayout(false);
             this.imageTabPage.ResumeLayout(false);
@@ -358,7 +361,7 @@ namespace FileList.Views
         #endregion
 
         private System.Windows.Forms.TextBox rootPathTextBox;
-        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel browsePanel;
         private System.Windows.Forms.Button searchButton;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.Panel panel2;
