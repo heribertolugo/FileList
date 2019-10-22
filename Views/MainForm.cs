@@ -1,10 +1,7 @@
-﻿//using FileList.Icons;
-using FileList.Logic;
+﻿using FileList.Logic;
 using FileList.Models;
-using FileList.Views;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -20,7 +17,6 @@ namespace FileList.Views
         public MainForm()
         {
             InitializeComponent();
-            //this.backgroundWorker1.DoWork += new DoWorkEventHandler(this.BackgroundWorker1_DoWork);
             this.CreateImageLayoutButtons();
             if (Extensions.IsAdministrator())
                 this.Text = string.Format("{0} - Administrator", this.Text);
@@ -133,27 +129,16 @@ namespace FileList.Views
                     this.Height = 829;
                     this.Width = 1350;
                 }
-                //ConcurrentFileSearch search = new ConcurrentFileSearch(this.rootPathTextBox.Text);
-                //search.OnFinishedHandler += Search_OnFinishedHandler;
-                //search.Start();
-                //return;
 
                 this.ToggleEnabled(null);
                 this.Reset();
-                //#if DEBUG
-                //this.GetFileCount(this.rootPathTextBox.Text);
-                //Console.WriteLine(fc);
-                //#else
                 this.Search();
-                //#endif
-                //this.ToggleEnabled((Control)this);
             }
         }
 
         private void CancelButton_Click(object sender, EventArgs e)
         {
             UiHelper.CancelSearch();
-            //this.ToggleEnabled();
         }
 
         public void ToggleEnabled(ConcurrentFileSearchEventArgs fileSearchEventArgs)
@@ -163,7 +148,6 @@ namespace FileList.Views
                 foreach (Control control1 in (ArrangedElementCollection)control.Controls)
                     control1.Enabled = !control1.Enabled;
 
-                //this.searchButton.Parent.Enabled = true;
                 if (this.searchButton.Text.ToUpper().Equals("SEARCH"))
                 {
                     this.searchButton.Text = "Cancel";
@@ -178,21 +162,6 @@ namespace FileList.Views
                 }
             });
         }
-
-        //private void BackgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
-        //{
-        //    FileSearch search = e.Argument as FileSearch;
-        //    if (search == null)
-        //        return;
-        //    FileData? fileData = null;
-        //    UiHelper.MoveNextFileDataFromMta(search);
-        //    FileData? current;
-        //    while ((current = search.Current).HasValue)
-        //    {
-        //        this.treeIconsImageList.Images.Add(current.Value.Extension, FileToIconConverter.GetFileIcon(current.Value.Extension, FileToIconConverter.IconSize.Small)); //IconManager.FindIconForFilename(current.Value.Extension, false));
-        //        UiHelper.MoveNextFileDataFromMta(search);
-        //    }
-        //}
 
         public void SmartImageLayout(Control control, Control buttonContainer)
         {
@@ -232,8 +201,14 @@ namespace FileList.Views
             else
             {
                 MoveFilesForm moveFilesForm = new MoveFilesForm(checkedPaths);
+                this.browsePanel.EnabledChanged -= this.browsePanel_EnabledChanged;
                 this.Enabled = false;
-                moveFilesForm.FormClosed += (FormClosedEventHandler)((s, e2) => this.Enabled = true);
+                moveFilesForm.FormClosed += (FormClosedEventHandler)((s, e2) => 
+                    { 
+                        this.Enabled = true;
+                        this.browsePanel.EnabledChanged += this.browsePanel_EnabledChanged; 
+                        (s as Form).Dispose(); 
+                    }); 
                 moveFilesForm.Show();
             }
         }
@@ -273,36 +248,9 @@ namespace FileList.Views
             UiHelper.OpenLocation(this.fileListControl1.SelectedPath);
         }
 
-        private void FileListControl1_OnDeleteFileDataClicked(
-          object sender,
-          FileDataSelectedEventArgs e)
+        private void FileListControl1_OnDeleteFileDataClicked(object sender, FileDataSelectedEventArgs e)
         {
             UiHelper.DeleteItem(this.fileListControl1.SelectedPath, this.fileListControl1);
-        }
-
-        private int fc = 0;
-        private void GetFileCount(string path)
-        {
-            Extensions.WriteToConsole("current file count: {0}", fc);
-            Extensions.WriteToConsole("gettting files count in:");
-            Extensions.WriteToConsole(path);
-            Extensions.WriteToConsole();
-            try
-            {
-                fc += Extensions.AccessableFiles(path).Count();
-            }catch(Exception ex)
-            {
-
-            }
-
-            try
-            {
-                foreach (string dir in Extensions.AccessableDirectories(path))
-                    GetFileCount(dir);
-            }catch (Exception ex2)
-            {
-
-            }
         }
 
         private void browsePanel_EnabledChanged(object sender, EventArgs e)
@@ -310,16 +258,12 @@ namespace FileList.Views
             Panel panel = sender as Panel;
 
             panel.EnabledChanged -= browsePanel_EnabledChanged;
-
-            //bool enabled = panel.Enabled;
-
             panel.Enabled = true;
 
             foreach (Control control in panel.Controls)
                 control.Enabled = !control.Enabled;
 
             panel.Controls["searchButton"].Enabled = true;
-
             panel.EnabledChanged += browsePanel_EnabledChanged;
         }
     }
