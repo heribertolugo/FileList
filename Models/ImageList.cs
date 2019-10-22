@@ -177,7 +177,7 @@ namespace FileList.Models.ImageList
             pimldp.cx = cx;
             pimldp.cy = cy;
             pimldp.rgbFg = Color.FromArgb(0, (int)foreColor.R, (int)foreColor.G, (int)foreColor.B).ToArgb();
-            Console.WriteLine("{0}", (object)pimldp.rgbFg);
+            Extensions.WriteToConsole("{0}", (object)pimldp.rgbFg);
             pimldp.fStyle = (int)flags;
             pimldp.fState = (int)stateFlags;
             if ((stateFlags & Win32.ImageListDrawStateConstants.ILS_ALPHA) == Win32.ImageListDrawStateConstants.ILS_ALPHA)

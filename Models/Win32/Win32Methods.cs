@@ -24,6 +24,22 @@ namespace FileList.Models.Win32
 
         [DllImport("user32.dll")]
         internal static extern int DestroyIcon(IntPtr hIcon);
+
+        [DllImport("user32.dll", EntryPoint = "GetWindowLong")]
+        private static extern IntPtr GetWindowLongPtr32(IntPtr hWnd, int nIndex);
+
+        [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr")]
+        private static extern IntPtr GetWindowLongPtr64(IntPtr hWnd, int nIndex);
+
+        // This static method is required because Win32 does not support
+        // GetWindowLongPtr directly
+        internal static IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex)
+        {
+            if (IntPtr.Size == 8)
+                return GetWindowLongPtr64(hWnd, nIndex);
+            else
+                return GetWindowLongPtr32(hWnd, nIndex);
+        }
         #endregion
 
         #region kernal32.dll
@@ -196,7 +212,7 @@ namespace FileList.Models.Win32
         //private static object localObject;
         public static Shell32.IShellDispatch5 GetIShellDispatch5()
         {
-            Console.WriteLine("requesting IShellDispatch5 lock @ 199");
+            Extensions.WriteToConsole("requesting IShellDispatch5 lock @ 199");
             lock (locker)
             {
                 object localObject = null;
@@ -221,7 +237,7 @@ namespace FileList.Models.Win32
         private static System.Runtime.InteropServices.ComTypes.IStream mystream;
         public static System.Runtime.InteropServices.ComTypes.IStream GetRegisteredInterfaceMarshalPtr<T>(object obj)
         {
-            Console.WriteLine("requesting IShellDispatch5 lock @ 222");
+            Extensions.WriteToConsole("requesting IShellDispatch5 lock @ 222");
             lock (locker)
             {
                 Guid guid = Marshal.GenerateGuidForType(typeof(T));
@@ -244,5 +260,9 @@ namespace FileList.Models.Win32
         );
         #endregion
 
+        #region uxtheme.dll
+        [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)]
+        internal extern static int SetWindowTheme(IntPtr hWnd, string pszSubAppName, string pszSubIdList);
+        #endregion
     }
 }

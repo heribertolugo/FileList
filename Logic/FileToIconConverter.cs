@@ -299,19 +299,19 @@ namespace FileList.Logic
             {
                 if (!FileToIconConverter.thumbDic.ContainsKey(key))
                 {
-                    Console.WriteLine("requesting thumbDic lock");
+                    Extensions.WriteToConsole("requesting thumbDic lock");
                     lock (FileToIconConverter.thumbDic)
                         FileToIconConverter.thumbDic.Add(key, this.getImage(fileName, size));
-                    Console.WriteLine("thumbDic lock released");
+                    Extensions.WriteToConsole("thumbDic lock released");
                 }
                 return FileToIconConverter.thumbDic[key];
             }
             if (!FileToIconConverter.iconDic.ContainsKey(key))
             {
-                Console.WriteLine("requesting iconDic lock");
+                Extensions.WriteToConsole("requesting iconDic lock");
                 lock (FileToIconConverter.iconDic)
                     FileToIconConverter.iconDic.Add(key, this.getImage(fileName, size));
-                Console.WriteLine("iconDic lock released");
+                Extensions.WriteToConsole("iconDic lock released");
             }
             return FileToIconConverter.iconDic[key];
         }

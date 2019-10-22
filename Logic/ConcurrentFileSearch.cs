@@ -19,7 +19,6 @@ namespace FileList.Logic
         //private static volatile ConcurrentCollection<string> _directories;
         private string _root;
         private FileListControl _fileListControl;
-        private bool _commitRequired;
         private DateTime startTime;
         private CancellationToken _cancelToken;
 
@@ -31,7 +30,6 @@ namespace FileList.Logic
             if (ConcurrentFileSearch._fileData == null)
                 ConcurrentFileSearch._fileData = new ConcurrentCollection<FileData>("ConcurrentFileSearch fileData");
             this._fileListControl = args.FileListControl;
-            this._commitRequired = true;// !args.LiveUpdate;
             this._cancelToken = args.CancellationToken;
         }
 
@@ -43,7 +41,7 @@ namespace FileList.Logic
             Models.Win32.Win32Methods.GetRegisteredInterfaceMarshalPtr<Shell32.IShellDispatch5>(shell); //.ToIntPtr();
             GC.KeepAlive(shell);
 
-            ConcurrentFileSearchMinion searcher = new ConcurrentFileSearchMinion(this._root, this.ConcurrentFileSearch_OnFinishedHandler, this._fileListControl, this._commitRequired);
+            ConcurrentFileSearchMinion searcher = new ConcurrentFileSearchMinion(this._root, this.ConcurrentFileSearch_OnFinishedHandler, this._fileListControl);
             Thread thread = new Thread((object s) =>
             {
                 ((ConcurrentFileSearchMinion)s).Start();
@@ -62,7 +60,7 @@ namespace FileList.Logic
         private static object fileListControlLock = new object();
         private void AttachFileData(IEnumerable<FileData> files, FileListControl fileListControl, bool commitRequired)
         {
-            Console.WriteLine("requesting fileListControlLock");
+            Extensions.WriteToConsole("requesting fileListControlLock");
             lock (fileListControlLock)
             {
                 fileListControl.InvokeIfRequired(c =>
@@ -90,20 +88,17 @@ namespace FileList.Logic
                             images.Add(file.Extension, icon);
                         }
 
-                        c.AddFileData(file, commitRequired);
+                        c.AddFileData(file);
                     }
                 });
             }
-            Console.WriteLine("released fileListControlLock");
+            Extensions.WriteToConsole("released fileListControlLock");
         }
 
-        private void FinalizeFileListControl(FileListControl fileListControl, bool commitRequired)
+        private void FinalizeFileListControl(FileListControl fileListControl)
         {
             fileListControl.InvokeIfRequired(c =>
             {
-                if (commitRequired)
-                    c.Commit();
-
                 //c.ExpandTree();
                 c.ScrollTreeToTop();
                 c.FileTypeListSorted = true;
@@ -148,7 +143,7 @@ namespace FileList.Logic
             //{
             int bucketCount = ConcurrentFileSearchMinion.ThreadBucketCount(); //ConcurrentFileSearch.Directories.Count; // 
             this._fileListControl.InvokeIfRequired(c => c.scoutCountLabel.Text = bucketCount.ToString());
-            Console.WriteLine("threads {0}", bucketCount);
+            Extensions.WriteToConsole("threads {0}", bucketCount);
 
             //if (e.Files.Count() > 0)
             //{
@@ -162,9 +157,9 @@ namespace FileList.Logic
                 TimeSpan timeSpan = endTime.Subtract(startTime);
 
 
-                Console.WriteLine("processing finished. took {0} hours, {1} minutes, {2} seconds", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
-                Console.WriteLine("finalizing");
-                this.FinalizeFileListControl(this._fileListControl, this._commitRequired);
+                Extensions.WriteToConsole("processing finished. took {0} hours, {1} minutes, {2} seconds", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
+                Extensions.WriteToConsole("finalizing");
+                this.FinalizeFileListControl(this._fileListControl);
                 this.OnFinished(e);
                 ConcurrentFileSearchMinion.ResetCancelled();
                 GC.Collect();
@@ -268,14 +263,14 @@ namespace FileList.Logic
             string directory = null;
             int bucketCount = 0;
 
-            Console.WriteLine("{0} directories to process", ConcurrentFileSearch.Directories.Count);
+            Extensions.WriteToConsole("{0} directories to process", ConcurrentFileSearch.Directories.Count);
 
             if ((bucketCount = ConcurrentFileSearchMinion.ThreadBucketCount()) > maxThreads)
                 return;
 
             while ((directory = ConcurrentFileSearch.Directories.Take()) != null)
             {
-                ConcurrentFileSearchMinion searcher = new ConcurrentFileSearchMinion(directory, this.ConcurrentFileSearch_OnFinishedHandler, this._fileListControl, this._commitRequired);
+                ConcurrentFileSearchMinion searcher = new ConcurrentFileSearchMinion(directory, this.ConcurrentFileSearch_OnFinishedHandler, this._fileListControl);
                 Thread thread = new Thread((object o) =>
                 {
                     //// moved searcher out because ThreadBucket.Add would interfere (thread lock) with while ((directory = ConcurrentFileSearch.Directories.Take()) != null)
@@ -290,7 +285,7 @@ namespace FileList.Logic
                 thread.Start(searcher);
                 //thread.Join();
 
-                Console.WriteLine("Created thread");
+                Extensions.WriteToConsole("Created thread");
                 if ((bucketCount = ConcurrentFileSearchMinion.ThreadBucketCount()) > maxThreads)
                     break;
             }
@@ -301,7 +296,7 @@ namespace FileList.Logic
             EventHandler<ConcurrentFileSearchEventArgs> handler = this.Finished;
             if (handler == null)
             {
-                Console.WriteLine("handler null");
+                Extensions.WriteToConsole("handler null");
                 return;
             }
             this.Finished(this, args);
@@ -348,8 +343,7 @@ namespace FileList.Logic
                 }
             }
             private FileListControl _fileListControl;
-            private bool _commitRequired;
-            public ConcurrentFileSearchMinion(string root, EventHandler<ConcurrentFileSearchEventArgs> onFinishedHandler, FileListControl fileListControl, bool commitRequired)
+            public ConcurrentFileSearchMinion(string root, EventHandler<ConcurrentFileSearchEventArgs> onFinishedHandler, FileListControl fileListControl)
             {
                 System.Threading.Interlocked.Increment(ref _bucketCount);
                 this._root = root;
@@ -360,7 +354,6 @@ namespace FileList.Logic
                 this.OnFinishedHandler = null;
 
                 this._fileListControl = fileListControl;
-                this._commitRequired = commitRequired;
                 this.OnFinishedHandler += this._handler;
                 this.ID = this.GetNextId();
                 //ConcurrentFileSearch.Directories.Remove(this._root);
@@ -406,7 +399,7 @@ namespace FileList.Logic
 
             private void RmoveFromThreadBucket()
             {
-                Console.WriteLine("removing thread id #{0}", this.ID);
+                Extensions.WriteToConsole("removing thread id #{0}", this.ID);
                 //ConcurrentFileSearchMinion.ThreadBucket.Remove(this.ID);
                 //Console.WriteLine("requesting bucketcount lock @ RmoveFromThreadBucket");
                 System.Threading.Interlocked.Decrement(ref _bucketCount);
@@ -461,7 +454,7 @@ namespace FileList.Logic
             private int GetNextId()
             {
                 int id = 0;
-                Console.WriteLine("requesting IdLock");
+                Extensions.WriteToConsole("requesting IdLock");
                 lock (ConcurrentFileSearchMinion.IdLock)
                 {
                     id = ConcurrentFileSearchMinion.IdTracker;
@@ -469,7 +462,7 @@ namespace FileList.Logic
                         ConcurrentFileSearchMinion.IdTracker = int.MinValue;
                     ++ConcurrentFileSearchMinion.IdTracker;
                 }
-                Console.WriteLine("IdLock released");
+                Extensions.WriteToConsole("IdLock released");
 
                 return id;
             }
@@ -484,8 +477,8 @@ namespace FileList.Logic
                     //{
                     foreach (string directory in Extensions.AccessableDirectories(root))
                     {
-                        Console.WriteLine("created minion");
-                        ConcurrentFileSearchMinion search = new ConcurrentFileSearchMinion(directory, this._handler, this._fileListControl, this._commitRequired); // arguments incorrect, only for ability to compile
+                        Extensions.WriteToConsole("created minion");
+                        ConcurrentFileSearchMinion search = new ConcurrentFileSearchMinion(directory, this._handler, this._fileListControl); // arguments incorrect, only for ability to compile
                         Thread thread = new Thread((object s) => ((ConcurrentFileSearchMinion)s).Start());
                         thread.SetApartmentState(ApartmentState.STA);
                         thread.Start(search);
@@ -507,7 +500,7 @@ namespace FileList.Logic
                 //    Console.WriteLine("thread id #{0} added dir {1}", this.ID, directory);
                 //}
 
-                Console.WriteLine("thread id #{0} adding dirs in {1}", this.ID, path);
+                Extensions.WriteToConsole("thread id #{0} adding dirs in {1}", this.ID, path);
                 directories.AddRange(Extensions.AccessableDirectories(path));
             }
 
@@ -520,18 +513,18 @@ namespace FileList.Logic
                     while (this._fileSearch.GetNext() != null)
                     {
                         //ConcurrentFileSearchSta.Files.Add(this._fileSearch.Current.Value);
-                        Console.WriteLine("thread id #{0} found file {1}", this.ID, this._fileSearch.Current.Value.Path);
+                        Extensions.WriteToConsole("thread id #{0} found file {1}", this.ID, this._fileSearch.Current.Value.Path);
                         //files.Add(this._fileSearch.Current.Value);
-                        this.AttachFileData(this._fileSearch.Current.Value, this._fileListControl, this._commitRequired);
+                        this.AttachFileData(this._fileSearch.Current.Value, this._fileListControl);
                         //Console.WriteLine(this._fileSearch.Current.Value.Path);
                     }
 
-                    Console.WriteLine("this._fileSearch.GetNext() == null");
+                    Extensions.WriteToConsole("this._fileSearch.GetNext() == null");
                 }catch(Exception ex)
                 {
                     string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
                     System.IO.File.WriteAllText(dir + "err.txt", ex.Message);
-                    Console.WriteLine(ex.Message);
+                    Extensions.WriteToConsole(ex.Message);
                 }
             }
 
@@ -554,15 +547,15 @@ namespace FileList.Logic
                 EventHandler<ConcurrentFileSearchEventArgs> handler = this.OnFinishedHandler;
                 if (handler == null)
                 {
-                    Console.WriteLine("ERROR thread id #{0} no handler", this.ID);
+                    Extensions.WriteToConsole("ERROR thread id #{0} no handler", this.ID);
                     return;
                 }
                 OnFinishedHandler(this, args);
             }
 
-            private void AttachFileData(FileData file, FileListControl fileListControl, bool commitRequired)
+            private void AttachFileData(FileData file, FileListControl fileListControl)
             {
-                Console.WriteLine("requesting fileListControlLock");
+                Extensions.WriteToConsole("requesting fileListControlLock");
                 //TestPool.Add(file);
                 //fileListControl.InvokeIfRequired(c =>
                 //{
@@ -596,11 +589,11 @@ namespace FileList.Logic
                         images.Add(file.Extension, icon);
                     }
 
-                    c.AddFileData(file, commitRequired);
+                    c.AddFileData(file);
                         //}
                     });
                 //}
-                Console.WriteLine("released fileListControlLock");
+                Extensions.WriteToConsole("released fileListControlLock");
             }
         }
     }

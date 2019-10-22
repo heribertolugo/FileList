@@ -283,10 +283,10 @@ namespace FileList.Views
         private int fc = 0;
         private void GetFileCount(string path)
         {
-            Console.WriteLine("current file count: {0}", fc);
-            Console.WriteLine("gettting files count in:");
-            Console.WriteLine(path);
-            Console.WriteLine();
+            Extensions.WriteToConsole("current file count: {0}", fc);
+            Extensions.WriteToConsole("gettting files count in:");
+            Extensions.WriteToConsole(path);
+            Extensions.WriteToConsole();
             try
             {
                 fc += Extensions.AccessableFiles(path).Count();

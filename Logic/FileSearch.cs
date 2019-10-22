@@ -94,7 +94,7 @@ namespace FileList.Logic
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine("{0} error", item.Path);
+                        Extensions.WriteToConsole("{0} error", item.Path);
                     }
                     if (fileData.HasValue)
                         yield return fileData.Value;
@@ -108,7 +108,7 @@ namespace FileList.Logic
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine("{0} error", item.Path);
+                        Extensions.WriteToConsole("{0} error", item.Path);
                     }
 
                     if (!fileData.HasValue)

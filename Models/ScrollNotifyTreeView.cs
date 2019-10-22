@@ -1,9 +1,5 @@
 ﻿using FileList.Models.Win32;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Windows.Forms;
 
 namespace FileList.Models
@@ -14,22 +10,41 @@ namespace FileList.Models
 
         public ScrollNotifyTreeView() : base()
         {
-            //this.Scrollable
+
         }
 
-        public new bool Scrollable
+        public bool VerticleScrollVisible()
         {
-            get;set;
+            long style = Win32Methods.GetWindowLongPtr(this.Handle, Win32GWL.GWL_STYLE).ToInt64();
+            return ((style & Win32WindowStyles.WS_VSCROLL) != 0);
         }
 
-        public bool VerticalScroll
+        public bool HorizontalScrollVisible()
         {
-            get;set;
+            long style = Win32Methods.GetWindowLongPtr(this.Handle, Win32GWL.GWL_STYLE).ToInt64();
+            return ((style & Win32WindowStyles.WS_HSCROLL) != 0);
         }
 
-        public bool HorizontalScroll
+        public TreeNode GetBottomVisibleNode()
         {
-            get;set;
+            TreeNode currentNode = this.TopNode;
+            TreeNode tempNode = currentNode;
+            int counter = this.VisibleCount;
+
+            while (tempNode != null)
+            {
+
+                tempNode = tempNode.NextVisibleNode;
+                counter--;
+
+                if (counter < 0)
+                    break;
+
+                if (tempNode != null)
+                    currentNode = tempNode;
+            }
+
+            return currentNode;
         }
 
         protected override void DefWndProc(ref Message m)
@@ -45,11 +60,6 @@ namespace FileList.Models
             base.DefWndProc(ref m);
         }
 
-        public void SetScrollInfo()
-        {
-
-        }
-
         protected void OnScrolled(Direction direction)
         {
             EventHandler<ScrollNotifyTreeViewEventArgs> handler = Scrolled;
@@ -58,17 +68,12 @@ namespace FileList.Models
                 handler(this, new ScrollNotifyTreeViewEventArgs(direction));
         }
 
-        #region Explorer Theme
-        [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)]
-        private extern static int SetWindowTheme(IntPtr hWnd, string pszSubAppName,
-                                            string pszSubIdList);
-
         protected override void CreateHandle()
         {
             base.CreateHandle();
-            SetWindowTheme(this.Handle, "explorer", null);
+            // Explorer Theme
+            Win32Methods.SetWindowTheme(this.Handle, "explorer", null);
         }
-        #endregion
     }
 
     public class ScrollNotifyTreeViewEventArgs : EventArgs
@@ -79,17 +84,6 @@ namespace FileList.Models
         }
 
         public Direction Direction { get; private set; }
-    }
-
-    public struct SCROLLINFO
-    {
-        uint cbSize;
-        uint fMask;
-        int nMin;
-        int nMax;
-        uint nPage;
-        int nPos;
-        int nTrackPos;
     }
     
 }

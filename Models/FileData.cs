@@ -33,7 +33,7 @@ namespace FileList
             if (FileData._filePropertyNamesLock == null)
                 FileData._filePropertyNamesLock = new object();
 
-            Console.WriteLine("requesting filePropertyNames lock @ 36");
+            Extensions.WriteToConsole("requesting filePropertyNames lock @ 36");
             lock (FileData._filePropertyNamesLock)
             {
                 if (FileData.FilePropertyNames == null)
@@ -62,7 +62,7 @@ namespace FileList
 
             if (FileData.FilePropertyNames == null || FileData.FilePropertyNames.Count < 1)
             {
-                Console.WriteLine("requesting filePropertyNames lock @ 63");
+                Extensions.WriteToConsole("requesting filePropertyNames lock @ 63");
                 lock (FileData._filePropertyNamesLock)
                 {
                     if (FileData.FilePropertyNames == null)
@@ -265,7 +265,7 @@ namespace FileList
             }
             catch (Exception ex)
             {
-                Console.WriteLine("LoadExtendedProperties exception: {0}", ex.Message);
+                Extensions.WriteToConsole("LoadExtendedProperties exception: {0}", ex.Message);
             }
             finally
             {
@@ -285,7 +285,7 @@ namespace FileList
             }
             catch (Exception ex)
             {
-                Console.WriteLine("LoadExtendedPropertiesLight exception: {0}", ex.Message);
+                Extensions.WriteToConsole("LoadExtendedPropertiesLight exception: {0}", ex.Message);
             }
         }
 
@@ -307,7 +307,7 @@ namespace FileList
             }
             catch (Exception ex)
             {
-                Console.WriteLine("LoadFilePropertyNames exception: {0}", ex.Message);
+                Extensions.WriteToConsole("LoadFilePropertyNames exception: {0}", ex.Message);
             }
         }
 

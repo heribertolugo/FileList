@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Forms;
@@ -13,6 +14,7 @@ namespace FileList
 {
     public static class Extensions
     {
+        #region Multi Threading
         public static void InvokeIfRequired(this ISynchronizeInvoke obj, MethodInvoker action)
         {
             if (obj.InvokeRequired)
@@ -38,6 +40,10 @@ namespace FileList
                 action(obj);
         }
 
+        public delegate void InvokeIfRequiredDelegate<T>(T obj) where T : ISynchronizeInvoke;
+        #endregion
+
+        #region Drawing
         public static Bitmap ToBitmap(this BitmapSource imgsrc)
         {
             int pixelWidth = imgsrc.PixelWidth;
@@ -47,9 +53,9 @@ namespace FileList
             imgsrc.CopyPixels(new Int32Rect(0, 0, pixelWidth, pixelHeight), num, pixelHeight * stride, stride);
             return new Bitmap(pixelWidth, pixelHeight, stride, PixelFormat.Format32bppArgb, num);
         }
+        #endregion
 
-        public delegate void InvokeIfRequiredDelegate<T>(T obj) where T : ISynchronizeInvoke;
-
+        #region I.O
         public static IEnumerable<string> AccessableDirectories(string path)
         {
             //List<string> accessable = new List<string>();
@@ -136,6 +142,45 @@ namespace FileList
             return false;
         }
 
+        public static bool IsAdministrator()
+        {
+            return (new System.Security.Principal.WindowsPrincipal(System.Security.Principal.WindowsIdentity.GetCurrent()))
+                      .IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
+        }
+
+        public static bool OutputIsRequested()
+        {
+            string[] args = Environment.GetCommandLineArgs();
+            bool requested = false;
+            
+            if (args.Length < 2)
+                return false;
+
+            if (!bool.TryParse(args[1], out requested))
+                return false;
+
+            return requested;
+        }
+
+        public static void WriteToConsole()
+        {
+            if (OutputIsRequested())
+                Console.WriteLine();
+        }
+
+        public static void WriteToConsole(object value)
+        {
+            if (OutputIsRequested())
+                Console.WriteLine(value);
+        }
+        public static void WriteToConsole(string format, params object[] values)
+        {
+            if (OutputIsRequested())
+                Console.WriteLine(format, values);
+        }
+        #endregion
+
+        #region IntPtr
         public static IntPtr ToIntPtr(this object target)
         {
             return (IntPtr)GCHandle.Alloc(target);
@@ -166,11 +211,14 @@ namespace FileList
             }
             return default(T);
         }
+        #endregion
 
-        public static bool IsAdministrator()
+        #region TreeView
+        public static bool IsInVisibleScope(this System.Windows.Forms.TreeNode node)
         {
-            return (new System.Security.Principal.WindowsPrincipal(System.Security.Principal.WindowsIdentity.GetCurrent()))
-                      .IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
+            if (node == null)
+                return false;
+            return node.TreeView.ClientRectangle.Contains(new Rectangle(node.Bounds.Location, new System.Drawing.Size(1, 1)));
         }
 
         public static bool IsFullyVisible(this System.Windows.Forms.TreeNode node)
@@ -179,5 +227,24 @@ namespace FileList
                 return false;
             return node.TreeView.ClientRectangle.Contains(node.Bounds);
         }
+
+        public static void SortChildNodes(this TreeNode parent, IComparer<TreeNode> comparer)
+        {
+            if (parent is null || parent.Nodes.Count < 2)
+                return;
+
+            TreeNode[] nodes = parent.Nodes.Cast<TreeNode>().OrderBy(n => comparer).ToArray();
+            parent.Nodes.Clear();
+            parent.Nodes.AddRange(nodes);
+        }
+
+        #endregion
+
+        #region Collections
+        public static IEnumerable<T> TakeLast<T>(this IEnumerable<T> collection, int count)
+        {
+            return collection.Reverse().Take(count).Reverse();
+        }
+        #endregion
     }
 }

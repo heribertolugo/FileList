@@ -43,7 +43,7 @@ namespace FileList.Models
 
         public int Compare(TreeNode x, TreeNode y)
         {
-            return x.Text.CompareTo(y.Text) * this._compareModifier;
+            return x.Name.CompareTo(y.Name) * this._compareModifier;
         }
     }
     public class CompareFiledataNodeByDateModified : IComparer<TreeNode>
@@ -295,7 +295,7 @@ namespace FileList.Models
             foreach (IComparer<TreeNode> comparer in this.Comparers)
             {
                 int comparison = comparer.Compare(x, y);
-                if (comparison > 0)
+                if (comparison != 0)
                 {
                     result = comparison;
                     break;

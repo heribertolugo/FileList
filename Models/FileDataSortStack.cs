@@ -118,5 +118,12 @@ namespace FileList.Models
 
             return fileDataSortStack;
         }
+
+        public void Clear()
+        {
+            this.enumerator.Dispose();
+            this.enumerator = this.stack.GetEnumerator();
+            this.stack.Clear();
+        }
     }
 }

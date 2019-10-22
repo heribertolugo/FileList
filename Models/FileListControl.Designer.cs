@@ -80,16 +80,15 @@
             this.treeView1.CheckBoxes = true;
             this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView1.HideSelection = false;
-            this.treeView1.HorizontalScroll = false;
             this.treeView1.Location = new System.Drawing.Point(129, 53);
             this.treeView1.Name = "treeView1";
-            this.treeView1.Scrollable = false;
             this.treeView1.ShowNodeToolTips = true;
             this.treeView1.Size = new System.Drawing.Size(530, 372);
             this.treeView1.TabIndex = 3;
-            this.treeView1.VerticalScroll = false;
             this.treeView1.Scrolled += new System.EventHandler<FileList.Models.ScrollNotifyTreeViewEventArgs>(this.treeView1_Scrolled);
             this.treeView1.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1_AfterCheck);
+            this.treeView1.AfterCollapse += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterCollapse);
+            this.treeView1.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeView1_BeforeExpand);
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1_AfterSelect);
             this.treeView1.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeView1_NodeMouseClick);
             // 
