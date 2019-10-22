@@ -90,9 +90,8 @@ namespace FileList.Models
             this.filterForm.VisibleChanged += new EventHandler(this.FilterForm_VisibleChanged);
             this._sortStack = new FileDataSortStack();
             this._extensions = new SortedSet<string>();
-            this._treeKeys = new Dictionary<string, TreeNode>(); //Enumerable.Empty<IComparer<TreeNode>>()
-            this.treeNodeComparer = new MultiCompareFileData(new IComparer<TreeNode>[] { new CompareFiledataName(SortOrder.Ascending) } ); //
-            //this.TreeDataSource = new List<TreeNode>();
+            this._treeKeys = new Dictionary<string, TreeNode>(); 
+            this.treeNodeComparer = new MultiCompareFileData(new IComparer<TreeNode>[] { new CompareFiledataName(SortOrder.Ascending) } ); 
             this.SortedNodes = new SortedSet<TreeNode>(this.treeNodeComparer);
             this.treeView1.TreeViewNodeSorter = (System.Collections.IComparer)this.treeNodeComparer;
             this.ChildNodeTriggers = new Dictionary<string, ChildNodeTriggers>();
@@ -275,10 +274,9 @@ namespace FileList.Models
         /// <param name="imageKey"></param>
         public void AddFileData(FileData fileData)
         {
-            this.treeView1.BeginUpdate();
+            //this.treeView1.BeginUpdate();
             this.modifyFileTypesListBoxInternal = true;
             TreeNode parentNode;
-            //TreeNode parentClone = null;
             string fileImageKey = fileData.Extension.Equals(string.Empty) ? UiHelper.NoneFileExtension : fileData.Extension;
             string directoryImageKey = fileData.Directory.ToLowerInvariant().Contains(UiHelper.ZipExtension) ? UiHelper.ZipExtension : UiHelper.DirectoryKey;
 
@@ -302,40 +300,21 @@ namespace FileList.Models
                     System.Diagnostics.Debugger.Break();
                 }
 
+                // this new item found needs to be inserted somewhere before last node currently in tree because of sort order
                 if (this.SortedNodes.IndexOf(parentNode) < (this.treeView1.VisibleCount * 2))
                 {
                     this.treeView1.Nodes.Add((TreeNode)parentNode.Clone());
-                    this.treeView1.Sort();
+
+                    if (this.treeView1.Nodes.Count == (this.treeView1.VisibleCount * 2))
+                        this.SetTriggerNodes();
                 }
 
+                // we added too many items to tree. remove
                 if (this.treeView1.Nodes.Count > (this.treeView1.VisibleCount * 2))
                 {
                     this.treeView1.Nodes.RemoveAt(this.treeView1.Nodes.Count - 1);
                     this.SetTriggerNodes();
                 }
-
-                //// add nodes and sort them
-                //if (this.treeView1.Nodes.Count < (this.treeView1.VisibleCount * 2))
-                //{
-                //    this.treeView1.Nodes.Add((TreeNode)parentNode.Clone());
-                //    this.treeView1.Sort();
-                //}
-                //// we might have nodes that should be in treeview because of sort order
-                //// so we need to insert those and remove excess
-                //else
-                //{
-                    
-                //}
-
-                //if (this.ShouldNodeVisible(parentNode, IsParentNode.Yes))
-                //{
-                //    //this.treeView1.SuspendLayout();
-                //    this.treeView1.Nodes.Add((TreeNode)parentNode.Clone());
-
-                //    this.treeView1.Sort();
-                //    this.SetTriggerNodes();
-                //    //this.treeView1.ResumeLayout();
-                //}
             }
 
             if (!this._extensions.Contains(fileData.Extension))
@@ -354,7 +333,6 @@ namespace FileList.Models
             node.Name = fileData.Name + fileData.Extension;
 
             parentNode.Nodes.Add(node);
-            //parentNode.SortChildNodes(this.treeNodeComparer); // do we need this here????
 
             // we need to add a node to treeview to enable node expanding in treeview
             if (this.treeView1.Nodes.ContainsKey(parentNode.Name) && (this.treeView1.Nodes[parentNode.Name].Nodes.Count < 1 || this.ShouldNodeVisible(node, IsParentNode.No)))
@@ -363,7 +341,7 @@ namespace FileList.Models
             ++this._fileCount;
             this.countLabel.Text = this._fileCount.ToString();
 
-            this.treeView1.EndUpdate();
+            //this.treeView1.EndUpdate();
             this.modifyFileTypesListBoxInternal = false;
         }
         #endregion
@@ -441,14 +419,14 @@ namespace FileList.Models
 
         private void TreeView1_AfterCheck(object sender, TreeViewEventArgs e)
         {
-                (sender as TreeView).AfterCheck -= new TreeViewEventHandler(this.TreeView1_AfterCheck);
+            (sender as TreeView).AfterCheck -= new TreeViewEventHandler(this.TreeView1_AfterCheck);
             string nodePath = FileListControl.GetNodePath(e.Node);
             if (nodePath.ToLowerInvariant().Contains(UiHelper.ZipExtension) && !Path.GetExtension(nodePath).ToLowerInvariant().Equals(UiHelper.ZipExtension) && e.Node.Checked)
             {
                 MessageBox.Show("Extracting zip files is not supported yet.\nSelect the actual zip to copy or move it", "", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                 e.Node.Checked = false;
                 string key = nodePath.Substring(0, nodePath.IndexOf(UiHelper.ZipExtension, StringComparison.OrdinalIgnoreCase) + UiHelper.ZipExtension.Length);
-                // dont check the zip for user.. let him do that
+                // dont set the zip to checked for user.. let him do that
                 //if (e.Node.TreeView.Nodes.ContainsKey(key))
                 //    e.Node.TreeView.Nodes[key].Checked = true;
                 //if (this._treeKeys.ContainsKey(key))
@@ -482,12 +460,12 @@ namespace FileList.Models
                         this._treeKeys[e.Node.Parent.Name].Checked = false;
                         e.Node.Parent.Checked = false;
                     }
-                    //return;
                 }
                 else
                 {
                     //foreach (TreeNode node in e.Node.Nodes)
                     //    node.Checked = e.Node.Checked;
+                    this._treeKeys[e.Node.Name].Checked = e.Node.Checked;
                     foreach (TreeNode node in this._treeKeys[e.Node.Name].Nodes)
                     {
                         node.Checked = e.Node.Checked;
@@ -496,7 +474,7 @@ namespace FileList.Models
                     }
                 }
             }
-                (sender as TreeView).AfterCheck += new TreeViewEventHandler(this.TreeView1_AfterCheck);
+            (sender as TreeView).AfterCheck += new TreeViewEventHandler(this.TreeView1_AfterCheck);
         }
 
         private void FilterButton_Click(object sender, EventArgs e)
@@ -662,7 +640,7 @@ namespace FileList.Models
         private IEnumerable<TreeNode> GetCheckedNodes(TreeView treeView)
         {
             List<TreeNode> treeNodeList = new List<TreeNode>();
-            //foreach (TreeNode node in treeView.Nodes)
+
             foreach (TreeNode node in this.SortedNodes)
                 treeNodeList.AddRange(this.GetCheckedNodes(node));
             return treeNodeList;
@@ -1063,7 +1041,6 @@ namespace FileList.Models
 
         private void FillTopReserve()
         {
-            this.treeView1.BeginUpdate();
             TreeNode trigger = this.topTrigger;
             TreeNode topNode = this.treeView1.Nodes[0];
             int bufferCount = this.treeView1.VisibleCount / 2;
@@ -1071,9 +1048,10 @@ namespace FileList.Models
             TreeNode bottomNode = this.treeView1.GetBottomVisibleNode(); 
             bool scrollBarWasVisible = this.treeView1.HorizontalScrollVisible();
 
-            if (nodes == null)
+            if (nodes == null || nodes.Length == 0)
                 return;
 
+            this.treeView1.BeginUpdate();
             for (int node = nodes.Length - 1; node > -1; node--)
             {
                 this.treeView1.Nodes.Insert(0, (TreeNode)nodes[node].Clone());
@@ -1095,7 +1073,6 @@ namespace FileList.Models
 
         private void FillBottomReserve()
         {
-            this.treeView1.BeginUpdate();
             TreeNode topNode = this.treeView1.TopNode;
             TreeNode bottomNode = this.treeView1.Nodes[this.treeView1.Nodes.Count - 1];
             int bufferCount = this.treeView1.VisibleCount / 2;
@@ -1103,8 +1080,9 @@ namespace FileList.Models
             TreeNode[] nodes = this.SortedNodes.SkipWhile(n => !n.Name.Equals(bottomNode.Name)).Skip(1).Take(bufferCount).ToArray();
             bool scrollBarWasVisible = this.treeView1.HorizontalScrollVisible();
 
-            if (nodes == null)
+            if (nodes == null || nodes.Length == 0)
                 return;
+            this.treeView1.BeginUpdate();
 
             for (int node = nodes.Length - 1; node > -1; node--)
             {
@@ -1138,14 +1116,14 @@ namespace FileList.Models
 
         private void FillChildTopReserve(TreeNode parent)
         {
-            this.treeView1.BeginUpdate();
             TreeNode topNode = parent.Nodes[0];
             int bufferCount = this.treeView1.VisibleCount / 2;
             int nodeIndex = this._treeKeys.Values.FirstOrDefault(n => n.Name.Equals(parent.Name)).Nodes.Cast<TreeNode>().ToList().IndexOf(topNode);
             TreeNode[] nodes = this._treeKeys.Values.Where((n, i) => n.Index <= (bufferCount + nodeIndex)).Take(bufferCount).ToArray();
 
-            if (nodes == null)
+            if (nodes == null || nodes.Length == 0)
                 return;
+            this.treeView1.BeginUpdate();
 
             for (int node = nodes.Length - 1; node > -1; node--)
             {
@@ -1161,15 +1139,15 @@ namespace FileList.Models
 
         private void FillChildBottomReserve(TreeNode parent)
         {
-            this.treeView1.BeginUpdate();
             TreeNode bottomNode = this.treeView1.Nodes[this.treeView1.Nodes.Count - 1];
             int bufferCount = this.treeView1.VisibleCount / 2;// bottomNode.Index - this.bottomTrigger.Index;
             int nodeIndex = this._treeKeys.Values.ToList().IndexOf(bottomNode);
             TreeNode[] nodes = this._treeKeys.Values.Where((n, i) => n.Index > (nodeIndex)).Take(bufferCount).ToArray();
 
-            if (nodes == null)
+            if (nodes == null || nodes.Length == 0)
                 return;
 
+            this.treeView1.BeginUpdate();
             for (int node = nodes.Length - 1; node > -1; node--)
             {
                 this.treeView1.Nodes.Insert(this.treeView1.Nodes.Count - 1, nodes[node]);
