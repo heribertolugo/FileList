@@ -8,12 +8,12 @@ using System.Windows.Forms;
 namespace FileList.Models
 {
 
-    public class CompareFiledataName : IComparer<TreeNode>
+    public class CompareFiledataNodeByName : IComparer<TreeNode>
     {
         private int _compareModifier = 0;
         private SortOrder _sortOrder;
 
-        public CompareFiledataName(SortOrder sortOrder)
+        public CompareFiledataNodeByName(SortOrder sortOrder)
         {
             this._sortOrder = sortOrder;
             switch (sortOrder)
@@ -224,7 +224,6 @@ namespace FileList.Models
         {
             FileData? filedata1 = x.Tag as FileData?;
             FileData? filedata2 = y.Tag as FileData?;
-            float? sizeInKilobytes1;
             float xValue;
             float yValue;
 
@@ -232,8 +231,7 @@ namespace FileList.Models
             {
                 if (filedata1.Value.SizeInKilobytes.HasValue)
                 {
-                    sizeInKilobytes1 = filedata1.Value.SizeInKilobytes;
-                    xValue = sizeInKilobytes1.Value;
+                    xValue = filedata1.Value.SizeInKilobytes.Value;
                 }
                 else
                     xValue = 0;
@@ -241,24 +239,18 @@ namespace FileList.Models
             else
                 xValue = x.Nodes.Cast<TreeNode>().Sum(n =>
                 {
-                    if (!(n.Tag as FileData?).HasValue)
+                    FileData? fileData = n.Tag as FileData?;
+                    if (!fileData.HasValue)
                         return 0;
-                    FileData fileData = (n.Tag as FileData?).Value;
-                    float? sizeInKilobytes2 = fileData.SizeInKilobytes;
-                    if (!sizeInKilobytes2.HasValue)
-                        return 0;
-                    fileData = (n.Tag as FileData?).Value;
-                    sizeInKilobytes2 = fileData.SizeInKilobytes;
-                    return sizeInKilobytes2.Value;
+
+                    return fileData.Value.SizeInKilobytes.HasValue ? fileData.Value.SizeInKilobytes.Value : 0;
                 });
 
             if (filedata2.HasValue)
             {
-                sizeInKilobytes1 = filedata2.Value.SizeInKilobytes;
-                if (sizeInKilobytes1.HasValue)
+                if (filedata2.Value.SizeInKilobytes.HasValue)
                 {
-                    sizeInKilobytes1 = filedata2.Value.SizeInKilobytes;
-                    yValue = sizeInKilobytes1.Value;
+                    yValue = filedata2.Value.SizeInKilobytes.Value;
                 }
                 else
                     yValue = 0;
@@ -266,15 +258,11 @@ namespace FileList.Models
             else
                 yValue = y.Nodes.Cast<TreeNode>().Sum(n =>
                 {
-                    if (!(n.Tag as FileData?).HasValue)
+                    FileData? fileData = n.Tag as FileData?;
+                    if (!fileData.HasValue)
                         return 0;
-                    filedata2 = (FileData?)n.Tag;
-                    float? sizeInKilobytes2 = filedata2.Value.SizeInKilobytes;
-                    if (!sizeInKilobytes2.HasValue)
-                        return 0;
-                    filedata2 = (FileData)n.Tag;
-                    sizeInKilobytes2 = filedata2.Value.SizeInKilobytes;
-                    return sizeInKilobytes2.Value;
+
+                    return fileData.Value.SizeInKilobytes.HasValue ? fileData.Value.SizeInKilobytes.Value : 0;
                 });
 
             return xValue.CompareTo(yValue) * this._compareModifier;

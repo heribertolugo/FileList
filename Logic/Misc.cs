@@ -115,9 +115,9 @@ namespace FileList.Logic
             }
             else
             {
-                if (!Misc.TerabyteVariants.Contains(values[1].ToLowerInvariant()))
+                if (!Misc.ByteVariants.Contains(values[1].ToLowerInvariant()))
                     return 0.0f;
-                storageSize *= (float)multiplier;
+                storageSize /= (float)multiplier;
                 storageType = StorageSize.Kb;
             }
             try

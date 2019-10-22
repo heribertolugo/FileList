@@ -210,10 +210,10 @@ namespace FileList
 
         private float? GetSizeInKiloBytes()
         {
-            string fileSIze = this.ExtendedProperties.FirstOrDefault(p => p.Key.ToLowerInvariant().Equals("size")).Value;
+            string fileSIze = this.ExtendedProperties.FirstOrDefault(p => p.Key.ToUpperInvariant().Equals("SIZE")).Value;
             if (string.IsNullOrEmpty(fileSIze))
             {
-                fileSIze = this.ExtendedProperties.Where(p => p.Key.ToLowerInvariant().Equals("Length")).Select(p => p.Value).FirstOrDefault();
+                fileSIze = this.ExtendedProperties.Where(p => p.Key.ToUpperInvariant().Equals("LENGTH")).Select(p => p.Value).FirstOrDefault();
                 if (!string.IsNullOrEmpty(fileSIze))
                     return Misc.ConvertStorageValueToKb(fileSIze);
             }
@@ -226,7 +226,7 @@ namespace FileList
         private DateTime? GetDateFromExtendedProperties(string propertyName)
         {
             DateTime result;
-            if (!DateTime.TryParse(this.ExtendedProperties.FirstOrDefault(p => p.Key.ToLowerInvariant().Equals(propertyName.ToLowerInvariant())).Value, out result))
+            if (!DateTime.TryParse(this.ExtendedProperties.FirstOrDefault(p => p.Key.ToUpperInvariant().Equals(propertyName.ToUpperInvariant())).Value, out result))
                 return null;
             return result;
         }

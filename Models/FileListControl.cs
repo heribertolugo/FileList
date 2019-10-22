@@ -27,10 +27,10 @@ namespace FileList.Models
             No
         }
 
-        /// <summary>
-        /// comparer we use to sort treenodes
-        /// </summary>
-        private IMultiComparer<TreeNode> treeNodeComparer;
+        ///// <summary>
+        ///// comparer we use to sort treenodes
+        ///// </summary>
+        //private IMultiComparer<TreeNode> treeNodeComparer;
         ///// <summary>
         ///// contains the nodes in our treeview. we remove and add from here to change node visibility in treeview.
         ///// </summary>
@@ -90,10 +90,11 @@ namespace FileList.Models
             this.filterForm.VisibleChanged += new EventHandler(this.FilterForm_VisibleChanged);
             this._sortStack = new FileDataSortStack();
             this._extensions = new SortedSet<string>();
-            this._treeKeys = new Dictionary<string, TreeNode>(); 
-            this.treeNodeComparer = new MultiCompareFileData(new IComparer<TreeNode>[] { new CompareFiledataName(SortOrder.Ascending) } ); 
-            this.SortedNodes = new SortedSet<TreeNode>(this.treeNodeComparer);
-            this.treeView1.TreeViewNodeSorter = (System.Collections.IComparer)this.treeNodeComparer;
+            this._treeKeys = new Dictionary<string, TreeNode>();
+            this._sortStack.Push(Filter.Name, new CompareFiledataNodeByName(SortOrder.Ascending));
+            MultiCompareFileData multi = new MultiCompareFileData(this._sortStack); 
+            this.SortedNodes = new SortedSet<TreeNode>(multi);
+            this.treeView1.TreeViewNodeSorter = (System.Collections.IComparer)multi;
             this.ChildNodeTriggers = new Dictionary<string, ChildNodeTriggers>();
         }
 
@@ -263,6 +264,7 @@ namespace FileList.Models
             this.filterForm.Reset();
             this._treeKeys.Clear();
             this._fileCount = 0;
+            this._sortStack.Push(Filter.Name, new CompareFiledataNodeByName(SortOrder.Ascending));
         }
 
 
@@ -463,8 +465,6 @@ namespace FileList.Models
                 }
                 else
                 {
-                    //foreach (TreeNode node in e.Node.Nodes)
-                    //    node.Checked = e.Node.Checked;
                     this._treeKeys[e.Node.Name].Checked = e.Node.Checked;
                     foreach (TreeNode node in this._treeKeys[e.Node.Name].Nodes)
                     {
@@ -489,7 +489,7 @@ namespace FileList.Models
         {
             this._sortStack.Push(Filter.Size, new CompareFiledataNodeBySize((sender as SortButton).SortOrder));
             this.SortTree(this.treeView1, this._sortStack);
-            this.treeView1.ExpandAll();
+            //this.treeView1.ExpandAll();
             this.ScrollTreeToTop();
         }
 
@@ -497,7 +497,7 @@ namespace FileList.Models
         {
             this._sortStack.Push(Filter.DateCreated, new CompareFiledataNodeByDateCreated((sender as SortButton).SortOrder));
             this.SortTree(this.treeView1, this._sortStack);
-            this.treeView1.ExpandAll();
+            //this.treeView1.ExpandAll();
             this.ScrollTreeToTop();
         }
 
@@ -505,7 +505,7 @@ namespace FileList.Models
         {
             this._sortStack.Push(Filter.DateModified, new CompareFiledataNodeByDateModified((sender as SortButton).SortOrder));
             this.SortTree(this.treeView1, this._sortStack);
-            this.treeView1.ExpandAll();
+            //this.treeView1.ExpandAll();
             this.ScrollTreeToTop();
         }
 
@@ -685,23 +685,27 @@ namespace FileList.Models
 
         private void SortTree(TreeView treeView, FileDataSortStack sortStack)
         {
-            List<IComparer<TreeNode>> comparerList = new List<IComparer<TreeNode>>();
-            while (sortStack.MoveNext())
-                comparerList.Add(sortStack.CurrentComparer);
-            MultiCompareFileData comparer = new MultiCompareFileData(comparerList);
+            //List<IComparer<TreeNode>> comparerList = new List<IComparer<TreeNode>>();
+            //while (sortStack.MoveNext())
+            //    comparerList.Add(sortStack.CurrentComparer);
+            MultiCompareFileData comparer = new MultiCompareFileData(sortStack);
 
-            this._treeKeys.Values.AsParallel().ForAll(n => n.SortChildNodes(comparer));
-            this.SortedNodes = new SortedSet<TreeNode>(this.SortedNodes, comparer);
+            //this._treeKeys.Values.AsParallel().ForAll(n => n.SortChildNodes(comparer));
+            // this hacky sort seems to have the best performance.. sigh.........
+            IEnumerable<TreeNode> temp = this.SortedNodes.ToList();
+            this.SortedNodes = new SortedSet<TreeNode>( comparer);
+            foreach (TreeNode node in temp)
+                this.SortedNodes.Add(node);
+            this.treeView1.Nodes.Clear();
+            this.treeView1.TreeViewNodeSorter = comparer; // we shouldnt need sort anymore. we can depend on out SortedSet
+            this.treeView1.Nodes.AddRange(this.SortedNodes.Take(this.treeView1.VisibleCount*2).Select(n => 
+                {
+                    TreeNode clone = (TreeNode)n.Clone();
+                    clone.Nodes.Add((TreeNode)n.Nodes[0].Clone());
+                    return clone;
+                    }).ToArray());
 
-            // now that we've sorted the nodes, the treeview needs to update what nodes are visible
-            // since the order will change, so will the nodes which were visible.
-            // would not make sense to scroll a user to nodes which have changed order
-            // reset the tree and re-add nodes
-
-            // ideally we would use the built in tree sort. but because we need to maintain all nodes sorted (not only just the nodes currently in tree) 
-            // for add and remove operations, it makes no sense to re-sort the few nodes currently in tree
-            //treeView.TreeViewNodeSorter = (System.Collections.IComparer)comparer;
-            //treeView.Sort();
+            this.SetTriggerNodes();
         }
 
         [Obsolete("Performance kill. replaced by passing comparer directly to treeview sort method", true)]
@@ -1076,7 +1080,6 @@ namespace FileList.Models
             TreeNode topNode = this.treeView1.TopNode;
             TreeNode bottomNode = this.treeView1.Nodes[this.treeView1.Nodes.Count - 1];
             int bufferCount = this.treeView1.VisibleCount / 2;
-            int nodeIndex = this._treeKeys.Values.ToList().IndexOf(bottomNode);
             TreeNode[] nodes = this.SortedNodes.SkipWhile(n => !n.Name.Equals(bottomNode.Name)).Skip(1).Take(bufferCount).ToArray();
             bool scrollBarWasVisible = this.treeView1.HorizontalScrollVisible();
 
@@ -1189,7 +1192,7 @@ namespace FileList.Models
         {
             TreeNode parentNode = e.Node;
             parentNode.Nodes.Clear();
-            this._treeKeys[parentNode.Name].SortChildNodes(this.treeNodeComparer);
+            this._treeKeys[parentNode.Name].SortChildNodes(new MultiCompareFileData(this._sortStack));
             parentNode.Nodes.AddRange(this._treeKeys[parentNode.Name].Nodes.Cast<TreeNode>().TakeWhile((n, i) => i <= this.treeView1.VisibleCount * 2).Select(n => (TreeNode)n.Clone()).ToArray());
 
             this.SetChildTriggerNodes(parentNode);
