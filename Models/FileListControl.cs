@@ -177,7 +177,7 @@ namespace FileList.Models
                 if (parentNode.Nodes.ContainsKey(childName))
                 {
                     treeNode = parentNode.Nodes[childName];
-                    _treeKeys[parentName].Nodes.RemoveByKey(childName);
+                    this._treeKeys[parentName].Nodes.RemoveByKey(childName);
                     removed = true;
                 }
                 else
@@ -192,8 +192,7 @@ namespace FileList.Models
                         }
                     }
             }
-            //if (!this.TreeDataSource.Remove(treeNode))
-            //    return false;
+
             if (treeNode != null)
                 treeNode.Remove();
             return removed;
@@ -276,6 +275,7 @@ namespace FileList.Models
         /// <param name="imageKey"></param>
         public void AddFileData(FileData fileData)
         {
+            this.treeView1.BeginUpdate();
             this.modifyFileTypesListBoxInternal = true;
             TreeNode parentNode;
             //TreeNode parentClone = null;
@@ -300,17 +300,42 @@ namespace FileList.Models
                 if (!this.SortedNodes.Add(parentNode))
                 {
                     System.Diagnostics.Debugger.Break();
-                } 
-
-                if (this.ShouldNodeVisible(parentNode, IsParentNode.Yes))
-                {
-                    //this.treeView1.SuspendLayout();
-                    this.treeView1.Nodes.Add((TreeNode)parentNode.Clone());
-
-                    this.treeView1.Sort();
-                    this.SetTriggerNodes();
-                    //this.treeView1.ResumeLayout();
                 }
+
+                if (this.SortedNodes.IndexOf(parentNode) < (this.treeView1.VisibleCount * 2))
+                {
+                    this.treeView1.Nodes.Add((TreeNode)parentNode.Clone());
+                    this.treeView1.Sort();
+                }
+
+                if (this.treeView1.Nodes.Count > (this.treeView1.VisibleCount * 2))
+                {
+                    this.treeView1.Nodes.RemoveAt(this.treeView1.Nodes.Count - 1);
+                    this.SetTriggerNodes();
+                }
+
+                //// add nodes and sort them
+                //if (this.treeView1.Nodes.Count < (this.treeView1.VisibleCount * 2))
+                //{
+                //    this.treeView1.Nodes.Add((TreeNode)parentNode.Clone());
+                //    this.treeView1.Sort();
+                //}
+                //// we might have nodes that should be in treeview because of sort order
+                //// so we need to insert those and remove excess
+                //else
+                //{
+                    
+                //}
+
+                //if (this.ShouldNodeVisible(parentNode, IsParentNode.Yes))
+                //{
+                //    //this.treeView1.SuspendLayout();
+                //    this.treeView1.Nodes.Add((TreeNode)parentNode.Clone());
+
+                //    this.treeView1.Sort();
+                //    this.SetTriggerNodes();
+                //    //this.treeView1.ResumeLayout();
+                //}
             }
 
             if (!this._extensions.Contains(fileData.Extension))
@@ -338,6 +363,7 @@ namespace FileList.Models
             ++this._fileCount;
             this.countLabel.Text = this._fileCount.ToString();
 
+            this.treeView1.EndUpdate();
             this.modifyFileTypesListBoxInternal = false;
         }
         #endregion
@@ -415,24 +441,62 @@ namespace FileList.Models
 
         private void TreeView1_AfterCheck(object sender, TreeViewEventArgs e)
         {
+                (sender as TreeView).AfterCheck -= new TreeViewEventHandler(this.TreeView1_AfterCheck);
             string nodePath = FileListControl.GetNodePath(e.Node);
             if (nodePath.ToLowerInvariant().Contains(UiHelper.ZipExtension) && !Path.GetExtension(nodePath).ToLowerInvariant().Equals(UiHelper.ZipExtension) && e.Node.Checked)
             {
-                (sender as TreeView).AfterCheck -= new TreeViewEventHandler(this.TreeView1_AfterCheck);
                 MessageBox.Show("Extracting zip files is not supported yet.\nSelect the actual zip to copy or move it", "", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                 e.Node.Checked = false;
                 string key = nodePath.Substring(0, nodePath.IndexOf(UiHelper.ZipExtension, StringComparison.OrdinalIgnoreCase) + UiHelper.ZipExtension.Length);
-                if (e.Node.TreeView.Nodes.ContainsKey(key))
-                    e.Node.TreeView.Nodes[key].Checked = true;
-                (sender as TreeView).AfterCheck += new TreeViewEventHandler(this.TreeView1_AfterCheck);
+                // dont check the zip for user.. let him do that
+                //if (e.Node.TreeView.Nodes.ContainsKey(key))
+                //    e.Node.TreeView.Nodes[key].Checked = true;
+                //if (this._treeKeys.ContainsKey(key))
+                //    this._treeKeys[key].Checked = true;
             }
             else
             {
-                if (e.Node.Level > 0 || Path.GetExtension(nodePath).Equals(UiHelper.ZipExtension))
+                if (Path.GetExtension(nodePath).Equals(UiHelper.ZipExtension))
+                {
+                    (sender as TreeView).AfterCheck += new TreeViewEventHandler(this.TreeView1_AfterCheck);
                     return;
-                foreach (TreeNode node in e.Node.Nodes)
-                    node.Checked = e.Node.Checked;
+                }
+                if (e.Node.Level > 0)
+                {
+                    this._treeKeys[e.Node.Parent.Name].Nodes[e.Node.Name].Checked = e.Node.Checked; 
+                    // we should uncheck parent here if child is being unchecked
+                    // if all childs checked, check parent
+                    if (e.Node.Checked)
+                    {
+                        bool allChecked = true;
+                        foreach (TreeNode node in this._treeKeys[e.Node.Parent.Name].Nodes)
+                        {
+                            if (!node.Checked)
+                                allChecked = false;
+                        }
+                        this._treeKeys[e.Node.Parent.Name].Checked = allChecked;
+                        e.Node.Parent.Checked = allChecked;
+                    }
+                    else
+                    {
+                        this._treeKeys[e.Node.Parent.Name].Checked = false;
+                        e.Node.Parent.Checked = false;
+                    }
+                    //return;
+                }
+                else
+                {
+                    //foreach (TreeNode node in e.Node.Nodes)
+                    //    node.Checked = e.Node.Checked;
+                    foreach (TreeNode node in this._treeKeys[e.Node.Name].Nodes)
+                    {
+                        node.Checked = e.Node.Checked;
+                        if (e.Node.Nodes.ContainsKey(node.Name))
+                            e.Node.Nodes[node.Name].Checked = e.Node.Checked;
+                    }
+                }
             }
+                (sender as TreeView).AfterCheck += new TreeViewEventHandler(this.TreeView1_AfterCheck);
         }
 
         private void FilterButton_Click(object sender, EventArgs e)
@@ -598,7 +662,8 @@ namespace FileList.Models
         private IEnumerable<TreeNode> GetCheckedNodes(TreeView treeView)
         {
             List<TreeNode> treeNodeList = new List<TreeNode>();
-            foreach (TreeNode node in treeView.Nodes)
+            //foreach (TreeNode node in treeView.Nodes)
+            foreach (TreeNode node in this.SortedNodes)
                 treeNodeList.AddRange(this.GetCheckedNodes(node));
             return treeNodeList;
         }
@@ -962,22 +1027,37 @@ namespace FileList.Models
         {
             TreeNode parentNode = this.treeView1.TopNode.Parent;
 
+            if (this.treeView1.SelectedNode != null)
+                this.treeView1.SelectedNode = null;
+
             // we have an expanded parent node. need to check child triggers
             if (parentNode != null && this.ChildNodeTriggers.ContainsKey(parentNode.Name))
             {
                 ChildNodeTriggers triggers = this.ChildNodeTriggers[parentNode.Name];
 
-                if (e.Direction == Direction.Up && triggers.Top.IsFullyVisible())
+                if (e.Direction == Direction.Up && triggers.Top.IsInVisibleScope())
+                {
                     this.FillChildTopReserve(parentNode);
-                else if (e.Direction == Direction.Down && triggers.Bottom.IsFullyVisible())
+                    FileListControl.ScrollTreeLeft(this.treeView1);
+                }
+                else if (e.Direction == Direction.Down && triggers.Bottom.IsInVisibleScope())
+                {
                     this.FillChildBottomReserve(parentNode);
+                    FileListControl.ScrollTreeLeft(this.treeView1);
+                }
             }
             else
             {
-                if (this.topTrigger != null && e.Direction == Direction.Up && this.topTrigger.IsFullyVisible())
+                if (this.topTrigger != null && e.Direction == Direction.Up && this.topTrigger.IsInVisibleScope())
+                {
                     this.FillTopReserve();
-                else if (this.bottomTrigger != null && e.Direction == Direction.Down && this.bottomTrigger.IsFullyVisible())
+                    FileListControl.ScrollTreeLeft(this.treeView1);
+                }
+                else if (this.bottomTrigger != null && e.Direction == Direction.Down && this.bottomTrigger.IsInVisibleScope())
+                {
                     this.FillBottomReserve();
+                    FileListControl.ScrollTreeLeft(this.treeView1);
+                }
             }
         }
 
@@ -997,6 +1077,7 @@ namespace FileList.Models
             for (int node = nodes.Length - 1; node > -1; node--)
             {
                 this.treeView1.Nodes.Insert(0, (TreeNode)nodes[node].Clone());
+                this.treeView1.Nodes[0].Checked = nodes[node].Checked;
                 if (this.treeView1.Nodes.Count > (this.treeView1.VisibleCount * 2))
                     this.treeView1.Nodes.RemoveAt(this.treeView1.Nodes.Count - 1);
             }
@@ -1028,6 +1109,7 @@ namespace FileList.Models
             for (int node = nodes.Length - 1; node > -1; node--)
             {
                 this.treeView1.Nodes.Insert(this.treeView1.Nodes.Count - 1, (TreeNode)nodes[node].Clone());
+                this.treeView1.Nodes[this.treeView1.Nodes.Count - 1].Checked = nodes[node].Checked;
                 if (this.treeView1.Nodes.Count > (this.treeView1.VisibleCount * 2))
                     this.treeView1.Nodes.RemoveAt(0);
             }
@@ -1068,6 +1150,7 @@ namespace FileList.Models
             for (int node = nodes.Length - 1; node > -1; node--)
             {
                 this.treeView1.Nodes.Insert(0, nodes[node]);
+                this.treeView1.Nodes[0].Checked = nodes[node].Checked;
                 if (this.treeView1.Nodes.Count > (this.treeView1.VisibleCount + (this.treeView1.Nodes.Count - this.treeView1.VisibleCount)))
                     this.treeView1.Nodes.RemoveAt(this.treeView1.Nodes.Count - 1);
             }
@@ -1090,6 +1173,7 @@ namespace FileList.Models
             for (int node = nodes.Length - 1; node > -1; node--)
             {
                 this.treeView1.Nodes.Insert(this.treeView1.Nodes.Count - 1, nodes[node]);
+                this.treeView1.Nodes[this.treeView1.Nodes.Count - 1].Checked = nodes[node].Checked;
                 if (this.treeView1.Nodes.Count > (this.treeView1.VisibleCount + (this.treeView1.Nodes.Count - this.treeView1.VisibleCount)))
                     this.treeView1.Nodes.RemoveAt(0);
             }

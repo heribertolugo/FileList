@@ -245,6 +245,20 @@ namespace FileList
         {
             return collection.Reverse().Take(count).Reverse();
         }
+
+        public static int IndexOf<T>(this SortedSet<T> set, T item)
+        {
+            try
+            {
+                // which has better performance??
+                //return set.Select((o, i) => new { o, i }).First(o => o.o.Equals(item)).i;
+                return set.TakeWhile((o, i) => !o.Equals(item)).Count()-1;
+            }
+            catch(Exception ex)
+            {
+                return -1;
+            }
+        }
         #endregion
     }
 }
