@@ -96,6 +96,8 @@ namespace FileList.Views
             this.Reset();
             if (!this.splitContainer1.Visible)
                 return;
+
+            this.ToggleEnabled(null);
             this.Search();
         }
 

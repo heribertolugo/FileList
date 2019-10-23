@@ -62,7 +62,7 @@ namespace FileList.Logic
 
         public static void CancelSearch()
         {
-            if (UiHelper.worker != null && !UiHelper.cancellationToken.IsCancellationRequested)
+            if (UiHelper.worker != null && UiHelper.cancellationToken != null && !UiHelper.cancellationToken.IsCancellationRequested)
             {
                 UiHelper.cancellationToken.Cancel();
             }
@@ -71,7 +71,6 @@ namespace FileList.Logic
         private static void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
 
-            //throw new NotImplementedException();
         }
 
         private static void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -81,14 +80,6 @@ namespace FileList.Logic
         private static void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
             FileSearchWorkerArgs args = (FileSearchWorkerArgs)e.Argument;
-
-            //Thread thread = new Thread(() =>
-            //{
-            //    ConcurrentFileSearch searcher = new ConcurrentFileSearch(args.Path, args);
-            //    searcher.Start();
-            //});
-            //thread.SetApartmentState(ApartmentState.STA);
-            //thread.Start();
 
             ConcurrentFileSearch search = new ConcurrentFileSearch(args.Path, args);
             search.Finished += Search_Finished;

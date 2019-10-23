@@ -228,14 +228,46 @@ namespace FileList
             return node.TreeView.ClientRectangle.Contains(node.Bounds);
         }
 
-        public static void SortChildNodes(this TreeNode parent, IComparer<TreeNode> comparer)
+        public static IEnumerable<TreeNode> SortChildNodes(this TreeNode parent, IComparer<TreeNode> comparer)
         {
             if (parent is null || parent.Nodes.Count < 2)
-                return;
+                return parent == null ? Enumerable.Empty<TreeNode>() : parent.Nodes.Cast<TreeNode>();
 
             TreeNode[] nodes = parent.Nodes.Cast<TreeNode>().OrderBy(n => comparer).ToArray();
             parent.Nodes.Clear();
             parent.Nodes.AddRange(nodes);
+
+            return nodes;
+        }
+
+        public static int GetNodeCount(this TreeView treeView)
+        {
+            if (treeView.Nodes.Count < 1)
+                return 0;
+
+            int count = 0;
+            TreeNode node = treeView.Nodes[0];
+            
+            while (node != null)
+            {
+                count++;
+
+                if (node.IsExpanded)
+                {
+                    node = node.Nodes[0];
+                    continue;
+                }
+
+                TreeNode tempNode = node;
+                node = node.NextNode;
+
+                if (node == null && tempNode.Parent != null)
+                {
+                    node = tempNode.Parent.NextNode;
+                }
+            }
+
+            return count;
         }
 
         #endregion
