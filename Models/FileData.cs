@@ -1,6 +1,7 @@
 ﻿using FileList.Logic;
 using Shell32;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -33,14 +34,14 @@ namespace FileList
             if (FileData._filePropertyNamesLock == null)
                 FileData._filePropertyNamesLock = new object();
 
-            Extensions.WriteToConsole("requesting filePropertyNames lock @ 36");
-            lock (FileData._filePropertyNamesLock)
-            {
-                if (FileData.FilePropertyNames == null)
-                {
-                    FileData.FilePropertyNames = new List<string>(); //  Models.ConcurrentCollection<string>("FileData FilePropertyNames");
-                }
-            }
+            //Extensions.WriteToConsole("requesting filePropertyNames lock @ 36");
+            //lock (FileData._filePropertyNamesLock)
+            //{
+            //    if (FileData.FilePropertyNames == null)
+            //    {
+            //        FileData.FilePropertyNames = new List<string>(); //  Models.ConcurrentCollection<string>("FileData FilePropertyNames");
+            //    }
+            //}
         }
 
         public FileData(string path, IShellDispatch5 shell = null)
@@ -60,17 +61,17 @@ namespace FileList
             this._isDateModifiedSet = false;
             this._shell = shell; // ?? new ShellClass();
 
-            if (FileData.FilePropertyNames == null || FileData.FilePropertyNames.Count < 1)
-            {
-                Extensions.WriteToConsole("requesting filePropertyNames lock @ 63");
-                lock (FileData._filePropertyNamesLock)
-                {
-                    if (FileData.FilePropertyNames == null)
-                        FileData.FilePropertyNames = new List<string>(); //  Models.ConcurrentCollection<string>("FileData FilePropertyNames 2");
-                    if (FileData.FilePropertyNames.Count < 1)
-                        FileData.LoadFilePropertyNames(System.IO.Path.GetDirectoryName(path));
-                }
-            }
+            //if (FileData.FilePropertyNames == null || FileData.FilePropertyNames.Count < 1)
+            //{
+            //    Extensions.WriteToConsole("requesting filePropertyNames lock @ 63");
+            //    lock (FileData._filePropertyNamesLock)
+            //    {
+            //        if (FileData.FilePropertyNames == null)
+            //            FileData.FilePropertyNames = new List<string>(); //  Models.ConcurrentCollection<string>("FileData FilePropertyNames 2");
+            //        if (FileData.FilePropertyNames.Count < 1)
+            //            FileData.LoadFilePropertyNames(System.IO.Path.GetDirectoryName(path));
+            //    }
+            //}
 
             this.LoadExtendedProperties();
             //GC.Collect();
@@ -213,7 +214,7 @@ namespace FileList
             string fileSIze = this.ExtendedProperties.FirstOrDefault(p => p.Key.ToUpperInvariant().Equals("SIZE")).Value;
             if (string.IsNullOrEmpty(fileSIze))
             {
-                fileSIze = this.ExtendedProperties.Where(p => p.Key.ToUpperInvariant().Equals("LENGTH")).Select(p => p.Value).FirstOrDefault();
+                fileSIze = this.ExtendedProperties.Where(p => p.Key.ToUpperInvariant().Equals("LENGTH")).Select(p => p.Value).FirstOrDefault(p => !string.IsNullOrWhiteSpace(p));
                 if (!string.IsNullOrEmpty(fileSIze))
                     return Misc.ConvertStorageValueToKb(fileSIze);
             }
@@ -235,37 +236,26 @@ namespace FileList
         {
             try
             {
-
-
-                //Folder objFolder = null;
-
-                //try
-                //{
-                //    objFolder = (Folder)shell.NameSpace(path);
-                //}
-                //catch (Exception ex)
-                //{
-
-                //}
-
-                //if (objFolder == null)
-                //{
-                //    //Marshal.ReleaseComObject(objFolder);
-                //    fileData.ZipContents.Add(new FileData(path));
-                //    return;
-                //}
-                //Shell shell = new ShellClass();
                 if (this._shell != null)
                 {
                     Folder folder = this._shell.NameSpace(System.IO.Path.GetDirectoryName(this.Path));
                     FolderItem name = folder.ParseName(System.IO.Path.GetFileName(this.Path));
-                    for (int iColumn = 0; iColumn < FileData.FilePropertyNames.Count; ++iColumn)
-                        this._extendedProperties.Add(new KeyValuePair<string, string>(FileData.FilePropertyNames[iColumn], folder.GetDetailsOf(name, iColumn)));
+                    
+                    for (int iColumn = -1; iColumn < 100; iColumn++) //(int)short.MaxValue
+                    {
+                        string detailsOf = folder.GetDetailsOf(null, iColumn);
+                        if (string.IsNullOrEmpty(detailsOf))
+                            continue;
+                        string value = folder.GetDetailsOf(name, iColumn);
+                        if (!string.IsNullOrEmpty(value))
+                            this._extendedProperties.Add(new KeyValuePair<string, string>(detailsOf, value));
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Extensions.WriteToConsole("LoadExtendedProperties exception: {0}", ex.Message);
+                //throw ex;
             }
             finally
             {
@@ -295,11 +285,11 @@ namespace FileList
             {
                 Shell shell1 = new ShellClass();
                 Folder folder = shell1.NameSpace(nspace);
-                for (int iColumn = 0; iColumn < (int)short.MaxValue; ++iColumn)
+                for (int iColumn = -1; iColumn < (int)short.MaxValue; ++iColumn)
                 {
                     string detailsOf = folder.GetDetailsOf(null, iColumn);
                     if (string.IsNullOrEmpty(detailsOf))
-                        break;
+                        continue;
                     FileData.FilePropertyNames.Add(detailsOf);
                 }
                 Marshal.ReleaseComObject(folder);
@@ -320,4 +310,118 @@ namespace FileList
             return new FileData(this.Path);
         }
     }
+
+    public class FileTypeExtendedProperties
+    {
+        Dictionary<string, HashSet<string>> _properties;
+        public FileTypeExtendedProperties() 
+        {
+            this._properties = new Dictionary<string, HashSet<string>>();
+        }
+
+        public ISet<string> this[string extension]
+        {
+            get
+            {
+                if (!this._properties.ContainsKey(extension))
+                    this._properties.Add(extension, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
+                return this._properties[extension];                
+            }
+        }
+    }
+
+    public class FileExtendedProperties : IEnumerable<FileProperty>, IComparable<FileExtendedProperties>
+    {
+        private Dictionary<string, string> _properties;
+
+        public FileExtendedProperties(string fileExtension)
+        {
+            this._properties = new Dictionary<string, string>();
+            this.FileExtension = fileExtension;
+        }
+
+        public string FileExtension { get; private set; }
+
+        public string this[string propertyName]
+        {
+            get
+            {
+                if (this._properties.ContainsKey(propertyName))
+                    return this._properties[propertyName];
+                return null;
+            }
+            set
+            {
+                if (this._properties.ContainsKey(propertyName))
+                    this._properties[propertyName] = value;
+                else
+                    this._properties.Add(propertyName, value);
+            }
+        }
+
+        public IEnumerator<FileProperty> GetEnumerator()
+        {
+            return new FileExtensionPropertyEnumerator(this);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+
+        public int CompareTo(FileExtendedProperties other)
+        {
+            return this.FileExtension.CompareTo(other.FileExtension);
+        }
+
+        public class FileExtensionPropertyEnumerator : IEnumerator<FileProperty>
+        {
+            private IEnumerator<KeyValuePair<string,string>> enumerator;
+            public FileExtensionPropertyEnumerator(FileExtendedProperties properties)
+            {
+                this.enumerator = properties._properties.GetEnumerator();
+            }
+
+            public FileProperty Current
+            {
+                get
+                {
+                    return new FileProperty(enumerator.Current.Key, enumerator.Current.Value);
+                }
+            }
+
+            object IEnumerator.Current
+            {
+                get { return this.Current; }
+            }
+
+            public void Dispose()
+            {
+                this.enumerator.Dispose();
+            }
+
+            public bool MoveNext()
+            {
+                return this.enumerator.MoveNext();
+            }
+
+            public void Reset()
+            {
+                this.enumerator.Reset();
+            }
+        }
+    }
+
+    public struct FileProperty
+    {
+        public FileProperty(string name, string value)
+        {
+            this.Name = name;
+            this.Value = value;
+        }
+
+        public string Name { get; private set; }
+        public string Value { get; private set; }
+    }
+
 }

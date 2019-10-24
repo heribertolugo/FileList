@@ -359,6 +359,7 @@ namespace FileList.Logic
             //            stringList.Add(Path.GetDirectoryName(part.Uri.LocalPath));
             //    }
             //}
+            throw new NotImplementedException();
             return stringList;
         }
 

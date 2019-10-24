@@ -15,14 +15,16 @@ namespace FileList.Logic
         public event EventHandler<ConcurrentFileSearchEventArgs> Finished;
         public event EventHandler<ConcurrentFileSearchEventArgs> Update;
 
-        private static volatile ConcurrentCollection<FileData> _fileData;
         //private static volatile ConcurrentCollection<string> _directories;
         private string _root;
         private FileListControl _fileListControl;
         private DateTime startTime;
         private CancellationToken _cancelToken;
+        private static volatile ConcurrentCollection<FileData> _fileData;
+        private static volatile ConcurrentQueue<string> Directories = new ConcurrentQueue<string>("ConcurrentFileSearch Directories");
 
-        public static ConcurrentQueue<FileData> TestPool = new ConcurrentQueue<FileData>();
+        private static object fileListControlLock = new object();
+        private static object locker = new object();
 
         public ConcurrentFileSearch(string rootPath, FileSearchWorkerArgs args)
         {
@@ -51,13 +53,10 @@ namespace FileList.Logic
             //thread.Join();
         }
 
-        private static volatile ConcurrentQueue<string> Directories = new ConcurrentQueue<string>("ConcurrentFileSearch Directories");
         private void ProcessDirecory(string path)
         {
 
         }
-
-        private static object fileListControlLock = new object();
         private void AttachFileData(IEnumerable<FileData> files, FileListControl fileListControl, bool commitRequired)
         {
             Extensions.WriteToConsole("requesting fileListControlLock");
@@ -105,8 +104,6 @@ namespace FileList.Logic
                 c.Enabled = true;
             });
         }
-
-        private static object locker = new object();
 
         //private void ConcurrentFileSearch_OnFinishedHandler(object sender, ConcurrentFileSearchEventArgs e)
         //{
@@ -162,6 +159,8 @@ namespace FileList.Logic
                 this.FinalizeFileListControl(this._fileListControl);
                 this.OnFinished(e);
                 ConcurrentFileSearchMinion.ResetCancelled();
+                ConcurrentFileSearch.Directories = new ConcurrentQueue<string>("ConcurrentFileSearch Directories");
+                ConcurrentFileSearch._fileData = new ConcurrentCollection<FileData>("ConcurrentFileSearch fileData");
                 GC.Collect();
             }
         }
