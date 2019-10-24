@@ -81,7 +81,6 @@ namespace FileList.Logic
                 FolderItem2 item = folderItem2;
                 string itempath = item.Path;
 
-
                 //if (!Extensions.IsSystemObjectAccessable(item.Path))
                 //{
                 //    Console.WriteLine("{0} inaccessable", item.Path);

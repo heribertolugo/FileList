@@ -372,15 +372,21 @@ namespace FileList.Models
             this.SetVisibleNodes();
 
             List<string> filters = new List<string>();
+            string sizeDescription = this.filterForm.SizeFilter.ToString();
+            string modifiedDateDescription = this.filterForm.ModifiedDateFilter.ToString();
+            string createdDateDescription = this.filterForm.CreatedDateFilter.ToString();
 
-            filters.Add(this.filterForm.SizeFilter.ToString());
-            filters.Add(this.filterForm.ModifiedDateFilter.ToString());
-            filters.Add(this.filterForm.CreatedDateFilter.ToString());
+            if (!string.IsNullOrEmpty(sizeDescription))
+                filters.Add($"size {this.filterForm.SizeFilter.ToString()}");
+            if (!string.IsNullOrEmpty(modifiedDateDescription))
+                filters.Add($"modified {modifiedDateDescription}");
+            if (!string.IsNullOrEmpty(createdDateDescription))
+                filters.Add($"created {createdDateDescription}");
 
-            string filterDescription = string.Join(" ,and ", filters.Where(f => !string.IsNullOrEmpty(f)));
+            string filterDescription = string.Join(" ,and ", filters);
 
             if (!string.IsNullOrEmpty(filterDescription))
-                this.filterSummaryLabel.Text = string.Concat("Where files ", filterDescription);
+                this.filterSummaryLabel.Text = string.Concat("Where ", filterDescription);
             else
                 this.filterSummaryLabel.Text = string.Empty;
         }
