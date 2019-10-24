@@ -1,0 +1,36 @@
+﻿file properties
+https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-icolumnmanager-getcolumncount
+https://blogs.msdn.microsoft.com/winsdk/2015/05/18/how-to-obtain-the-list-of-visible-columns-in-a-shell-view/
+https://stackoverflow.com/questions/26633794/copying-file-details-from-explorer-as-tabular-text
+https://www.autohotkey.com/boards/viewtopic.php?f=6&t=33129
+https://docs.microsoft.com/en-us/windows/win32/api/shobjidl_core/nf-shobjidl_core-ishellview-getitemobject
+
+recycle bin
+https://www.codeproject.com/Articles/2783/How-to-programmatically-use-the-Recycle-Bin
+https://stackoverflow.com/questions/911391/how-do-i-restore-a-file-from-the-recycle-bin-using-c
+
+scrollbars (virtual scroll)
+http://forums.codeguru.com/showthread.php?512169-RESOLVED-ShowScrollBar-fails-to-remove-scrollbars
+https://docs.microsoft.com/en-us/windows/win32/controls/en-update?redirectedfrom=MSDN
+https://stackoverflow.com/questions/18144388/how-to-auto-hide-scrollbars-on-edit-control
+https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-showscrollbar
+https://stackoverflow.com/questions/32094254/how-to-control-scrollbar-in-vc-win32-api
+https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-scrollwindowex
+https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setscrollinfo
+https://pinvoke.net/default.aspx/user32/ScrollWindowEx.html
+https://www.codeproject.com/Articles/1042516/Custom-Controls-in-Win-API-Scrolling
+https://docs.microsoft.com/de-de/windows/win32/controls/scroll-text-in-scroll-bars
+https://www.codeproject.com/Articles/32925/Scrollable-Dialog-in-Pure-Win32-API
+https://social.msdn.microsoft.com/Forums/windows/en-US/4aa4dade-53a2-4e2e-a8b4-b4980da1f39c/hide-horizontal-scrollbar-in-listview?forum=winforms
+https://stackoverflow.com/questions/10052572/c-sharp-winforms-treeview-remove-horizontal-scrollbar
+
+word documents
+https://www.codingame.com/playgrounds/11047/edit-word-documents-using-openxml-and-c-without-automationinterop
+https://social.msdn.microsoft.com/Forums/vstudio/en-US/2dfdf0c3-d9d4-4ed0-ba30-ff18b2f774a7/how-to-import-a-documentsdocx-to-richtextbox-in-c?forum=csharpgeneral
+https://docs.microsoft.com/en-us/visualstudio/vsto/office-primary-interop-assemblies?redirectedfrom=MSDN&view=vs-2019
+https://stackoverflow.com/questions/390006/openoffice-and-net
+https://stackoverflow.com/questions/30722434/load-word-file-docx-in-richtextbox
+https://www.codeproject.com/Articles/3582/Word-Control-for-NET
+
+excel documents
+https://www.codingame.com/playgrounds/9014/read-write-excel-file-with-oledb-in-c-without-interop

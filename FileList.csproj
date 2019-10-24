@@ -187,7 +187,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\createHresult.html" />
+    <None Include="Assets\createHresult.html" />
+    <None Include="Assets\OnlineReferences.txt" />
     <Content Include="folder_search.ico" />
   </ItemGroup>
   <ItemGroup>
