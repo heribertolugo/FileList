@@ -585,7 +585,7 @@ namespace FileList.Models
             return (file =>
             {
                 // check for file extensions filtered out
-                List<string> list = this.fileTypesCheckedListBox.CheckedItems.Cast<string>().ToList();
+                List<string> list = this.fileTypesCheckedListBox.CheckedItems.Cast<FileExtensionCount>().Select(f => f.Extension).ToList();
                 if (checkedExt != null)
                 {
                     string str = this.fileTypesCheckedListBox.Items[checkedExt.Index].ToString();

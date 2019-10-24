@@ -44,11 +44,7 @@ namespace FileList.Logic
 
             try
             {
-                //Console.WriteLine("requesting shell lock @ 47");
-                //lock (shellLock)
-                //{
                 objFolder = shell.NameSpace(path);
-                //}
             }
             catch (Exception ex) // file would be inaccessable to shellclass
             {
@@ -78,6 +74,8 @@ namespace FileList.Logic
             foreach (FolderItem2 folderItem2 in objFolder.Items())
             {
                 FolderItem2 item = folderItem2;
+                string itempath = item.Path;
+
 
                 //if (!Extensions.IsSystemObjectAccessable(item.Path))
                 //{
@@ -122,9 +120,7 @@ namespace FileList.Logic
                 {
                     foreach (FileData file in this.Search(item.Path))
                     {
-                        //FileData file = fileData;
                         yield return file;
-                        //file = new FileData();
                     }
                     item = null;
                 }
@@ -164,11 +160,7 @@ namespace FileList.Logic
 
             try
             {
-                //Console.WriteLine("requesting shell lock @ 117");
-                //lock (shellLock)
-                //{
                 objFolder = shell.NameSpace(path);
-                //}
             }
             catch (Exception ex)
             {

@@ -50,11 +50,11 @@
             this.fileLocationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.deleteFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.treeView1 = new FileList.Models.ScrollNotifyTreeView();
             this.dateModifiedButton = new FileList.Models.SortButton();
             this.dateCreatedButton = new FileList.Models.SortButton();
             this.sizeSortButton = new FileList.Models.SortButton();
-            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();

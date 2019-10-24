@@ -51,6 +51,7 @@ namespace FileList.Logic
             });
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start(searcher);
+            this._fileListControl.InvokeIfRequired(f => f.SearcherThreads = 1);
             //thread.Join();
         }
         private void AttachFileData(IEnumerable<FileData> files, FileListControl fileListControl, bool commitRequired)
@@ -112,7 +113,7 @@ namespace FileList.Logic
                 ConcurrentFileSearchMinion.Cancel();
 
             int bucketCount = ConcurrentFileSearchMinion.ThreadBucketCount();
-            this._fileListControl.InvokeIfRequired(c => c.scoutCountLabel.Text = bucketCount.ToString());
+            this._fileListControl.InvokeIfRequired(c => c.SearcherThreads = bucketCount);
             Extensions.WriteToConsole("threads {0}", bucketCount);
 
             if ((ConcurrentFileSearch.Directories.Count == 0 || this._cancelToken.IsCancellationRequested) && ConcurrentFileSearchMinion.ThreadBucketCount() == 0)
@@ -157,6 +158,7 @@ namespace FileList.Logic
                 thread.IsBackground = true;
                 thread.Start(searcher);
                 //thread.Join();
+                this._fileListControl.InvokeIfRequired(f => f.SearcherThreads += 1);
 
                 Extensions.WriteToConsole("Created thread");
                 if ((bucketCount = ConcurrentFileSearchMinion.ThreadBucketCount()) >= maxThreads)
