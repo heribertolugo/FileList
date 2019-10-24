@@ -38,7 +38,7 @@ namespace FileList.Logic
 
         public void Start()
         {
-            this.MaxThreads = Math.Max(1, this._fileListControl.Threads);
+            this.MaxThreads = Math.Max(1, this._fileListControl.SearcherThreads);
             this.startTime = DateTime.Now;
             Shell32.ShellClass shell = new Shell32.ShellClass();
             Models.Win32.Win32Methods.GetRegisteredInterfaceMarshalPtr<Shell32.IShellDispatch5>(shell); //.ToIntPtr();

@@ -158,7 +158,7 @@ namespace FileList.Models
             }
         }
 
-        public int Threads
+        public int SearcherThreads
         {
             get
             {
@@ -216,7 +216,8 @@ namespace FileList.Models
             if (treeNode == null)
                 return new FileDataGroup(null, Enumerable.Empty<FileData>());
             if (treeNode.Level > 0)
-                treeNode = treeNode.Parent;
+                treeNode = this._treeKeys[treeNode.Parent.Name];
+            else treeNode = this._treeKeys[treeNode.Name];
             return new FileDataGroup(treeNode.Text, treeNode.Nodes.Cast<TreeNode>().Select(n => (FileData)n.Tag));
         }
 
@@ -715,7 +716,7 @@ namespace FileList.Models
             string selectedPath;
             if (selectedNode.Level == 0)
             {
-                foreach (TreeNode node in selectedNode.Nodes)
+                foreach (TreeNode node in this._treeKeys[selectedNode.Name].Nodes)
                     fileDataList.Add((FileData)node.Tag);
                 selectedPath = selectedNode.Text;
             }

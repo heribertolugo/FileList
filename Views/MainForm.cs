@@ -229,13 +229,24 @@ namespace FileList.Views
             UiHelper.DisplayPreview(!e.IsRootPath ? e.FileData[0] : new FileData(selectedPath), this.viewerTabControl, this.contentsListView, (Control)this.imageViewerPanel, this.textViewerTextBox, this.documentTabPage, this.contentTabPage, this.imageTabPage, this.previousButton == null ? ImageLayout.None : (ImageLayout)this.previousButton.Tag);
             if (!e.IsRootPath)
             {
-                this.filePropertiesTextBox.Text = string.Join(Environment.NewLine, e.FileData[0].ExtendedProperties.Select<KeyValuePair<string, string>, string>((Func<KeyValuePair<string, string>, string>)(k => string.Format("{0}: {1}", (object)k.Key, (object)k.Value))).ToArray<string>());
+                this.filePropertiesTextBox.Text = string.Join(Environment.NewLine, e.FileData[0].ExtendedProperties.Select(k => string.Format("{0}: {1}", k.Key, k.Value)).ToArray());
             }
             else
             {
-                string[] strArray = Directory.Exists(selectedPath) ? ((IEnumerable<string>)Directory.GetDirectories(selectedPath)).Select<string, string>((Func<string, string>)(d => Path.GetDirectoryName(d))).ToArray<string>() : new string[0];
+                string[] directories = Directory.Exists(selectedPath) ? Directory.GetDirectories(selectedPath).Select(d => {
+                    //Path.GetDirectoryName(d)
+                    int lastDirSeparator = d.TrimEnd('\\').LastIndexOf('\\');
+                    return d.Substring(lastDirSeparator+1);
+                    }).ToArray() : new string[0];
                 FileDataGroup groupFromSelected = this.fileListControl1.GetFileDataGroupFromSelected();
-                this.filePropertiesTextBox.Text = string.Format("Path:{3}{0}Children: {1}{0}{2}{0}{0}Directories:{4}{0}{5}", (object)Environment.NewLine, (object)((IEnumerable<FileData>)groupFromSelected.FileData).Count<FileData>(), (object)string.Join(Environment.NewLine, ((IEnumerable<FileData>)groupFromSelected.FileData).Select<FileData, string>((Func<FileData, string>)(f => f.Name + f.Extension)).ToArray<string>()), (object)selectedPath, (object)strArray.Length, (object)string.Join(Environment.NewLine, strArray));
+                this.filePropertiesTextBox.Text = string.Format("Path:{3}{0}Children: {1}{0}{2}{0}{0}Directories:{4}{0}{5}"
+                    , Environment.NewLine
+                    , groupFromSelected.FileData.Count()
+                    , string.Join
+                        (Environment.NewLine
+                        , groupFromSelected.FileData.Select(f => f.Name + f.Extension).ToArray()
+                        )
+                    , selectedPath, directories.Length, string.Join(Environment.NewLine, directories));
             }
             this.SmartImageLayout((Control)this.imageViewerPanel, (Control)this.imageDisplayStylePanel);
         }
