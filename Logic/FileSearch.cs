@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace FileList.Logic
@@ -70,6 +71,10 @@ namespace FileList.Logic
                 yield break;
             }
 
+            // temp fix for processing hidden files
+            // shell objFolder.Items() will not enumerate these items
+            List<string> netItems = System.IO.Directory.GetFiles(path).ToList();
+            List<string> netFolders = System.IO.Directory.GetDirectories(path).ToList();
 
             foreach (FolderItem2 folderItem2 in objFolder.Items())
             {
@@ -89,6 +94,7 @@ namespace FileList.Logic
                     try
                     {
                         fileData = new FileData(item.Path, this._shell);
+                        netItems.Remove(item.Path);
                     }
                     catch (Exception ex)
                     {
@@ -103,6 +109,7 @@ namespace FileList.Logic
                     try
                     {
                         fileData = new FileData(item.Path, this._shell);
+                        netItems.Remove(item.Path);
                     }
                     catch (Exception ex)
                     {
@@ -120,9 +127,18 @@ namespace FileList.Logic
                 {
                     foreach (FileData file in this.Search(item.Path))
                     {
+                        netFolders.Remove(item.Path);
                         yield return file;
                     }
                     item = null;
+
+                    foreach (string netFolder in netFolders)
+                    {
+                        foreach (FileData file in this.Search(netFolder))
+                        {
+                            yield return file;
+                        }
+                    }
                 }
             }
             try
@@ -132,6 +148,12 @@ namespace FileList.Logic
             catch (Exception ex1)
             {
 
+            }
+
+            foreach (string netItem in netItems)
+            {
+                FileData fileData = new FileData(netItem, this._shell);
+                yield return fileData;
             }
         }
 
