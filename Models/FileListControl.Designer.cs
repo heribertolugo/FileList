@@ -29,7 +29,9 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FileListControl));
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.splitContainer1 = new FileList.Models.GripSplitContainer();
             this.fileTypesCheckedListBox = new System.Windows.Forms.CheckedListBox();
+            this.treeView1 = new FileList.Models.ScrollNotifyTreeView();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
@@ -37,6 +39,9 @@
             this.countLabel = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.dateModifiedButton = new FileList.Models.SortButton();
+            this.dateCreatedButton = new FileList.Models.SortButton();
+            this.sizeSortButton = new FileList.Models.SortButton();
             this.infoPanel = new System.Windows.Forms.Panel();
             this.filterSummaryLabel = new System.Windows.Forms.Label();
             this.filterButton = new System.Windows.Forms.Button();
@@ -51,11 +56,11 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.deleteFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.treeView1 = new FileList.Models.ScrollNotifyTreeView();
-            this.dateModifiedButton = new FileList.Models.SortButton();
-            this.dateCreatedButton = new FileList.Models.SortButton();
-            this.sizeSortButton = new FileList.Models.SortButton();
             this.tableLayoutPanel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+            this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
+            this.splitContainer1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -69,8 +74,7 @@
             this.tableLayoutPanel1.ColumnCount = 2;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.treeView1, 1, 1);
-            this.tableLayoutPanel1.Controls.Add(this.fileTypesCheckedListBox, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.splitContainer1, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
@@ -81,16 +85,51 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(662, 428);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
+            // splitContainer1
+            // 
+            this.tableLayoutPanel1.SetColumnSpan(this.splitContainer1, 2);
+            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.Location = new System.Drawing.Point(3, 53);
+            this.splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.fileTypesCheckedListBox);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.treeView1);
+            this.splitContainer1.Size = new System.Drawing.Size(656, 372);
+            this.splitContainer1.SplitterDistance = 120;
+            this.splitContainer1.TabIndex = 0;
+            // 
             // fileTypesCheckedListBox
             // 
-            this.fileTypesCheckedListBox.Dock = System.Windows.Forms.DockStyle.Left;
+            this.fileTypesCheckedListBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.fileTypesCheckedListBox.FormattingEnabled = true;
-            this.fileTypesCheckedListBox.Location = new System.Drawing.Point(3, 53);
+            this.fileTypesCheckedListBox.Location = new System.Drawing.Point(0, 0);
             this.fileTypesCheckedListBox.MinimumSize = new System.Drawing.Size(120, 372);
             this.fileTypesCheckedListBox.Name = "fileTypesCheckedListBox";
             this.fileTypesCheckedListBox.Size = new System.Drawing.Size(120, 372);
             this.fileTypesCheckedListBox.TabIndex = 2;
             this.fileTypesCheckedListBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.FileTypesCheckedListBox_ItemCheck);
+            // 
+            // treeView1
+            // 
+            this.treeView1.CheckBoxes = true;
+            this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeView1.HideSelection = false;
+            this.treeView1.Location = new System.Drawing.Point(0, 0);
+            this.treeView1.Name = "treeView1";
+            this.treeView1.ShowNodeToolTips = true;
+            this.treeView1.Size = new System.Drawing.Size(532, 372);
+            this.treeView1.TabIndex = 3;
+            this.treeView1.Scrolled += new System.EventHandler<FileList.Models.ScrollNotifyTreeViewEventArgs>(this.treeView1_Scrolled);
+            this.treeView1.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1_AfterCheck);
+            this.treeView1.AfterCollapse += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterCollapse);
+            this.treeView1.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeView1_BeforeExpand);
+            this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1_AfterSelect);
+            this.treeView1.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeView1_NodeMouseClick);
             // 
             // panel1
             // 
@@ -193,6 +232,54 @@
             this.label2.TabIndex = 1;
             this.label2.Text = "Threads";
             this.toolTip1.SetToolTip(this.label2, "Number of threads dedicated to searching for files. 1 is recommended.");
+            // 
+            // dateModifiedButton
+            // 
+            this.dateModifiedButton.FlatAppearance.BorderColor = System.Drawing.Color.DarkGray;
+            this.dateModifiedButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.dateModifiedButton.Image = ((System.Drawing.Image)(resources.GetObject("dateModifiedButton.Image")));
+            this.dateModifiedButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.dateModifiedButton.Location = new System.Drawing.Point(280, 2);
+            this.dateModifiedButton.Name = "dateModifiedButton";
+            this.dateModifiedButton.Size = new System.Drawing.Size(116, 23);
+            this.dateModifiedButton.SortOrder = System.Windows.Forms.SortOrder.None;
+            this.dateModifiedButton.TabIndex = 2;
+            this.dateModifiedButton.Text = "Date Modified";
+            this.dateModifiedButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.dateModifiedButton.UseVisualStyleBackColor = true;
+            this.dateModifiedButton.Click += new System.EventHandler(this.DateModifiedButton_Click);
+            // 
+            // dateCreatedButton
+            // 
+            this.dateCreatedButton.FlatAppearance.BorderColor = System.Drawing.Color.DarkGray;
+            this.dateCreatedButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.dateCreatedButton.Image = ((System.Drawing.Image)(resources.GetObject("dateCreatedButton.Image")));
+            this.dateCreatedButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.dateCreatedButton.Location = new System.Drawing.Point(161, 2);
+            this.dateCreatedButton.Name = "dateCreatedButton";
+            this.dateCreatedButton.Size = new System.Drawing.Size(113, 23);
+            this.dateCreatedButton.SortOrder = System.Windows.Forms.SortOrder.None;
+            this.dateCreatedButton.TabIndex = 1;
+            this.dateCreatedButton.Text = "Date Created";
+            this.dateCreatedButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.dateCreatedButton.UseVisualStyleBackColor = true;
+            this.dateCreatedButton.Click += new System.EventHandler(this.DateCreatedButton_Click);
+            // 
+            // sizeSortButton
+            // 
+            this.sizeSortButton.FlatAppearance.BorderColor = System.Drawing.Color.DarkGray;
+            this.sizeSortButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.sizeSortButton.Image = ((System.Drawing.Image)(resources.GetObject("sizeSortButton.Image")));
+            this.sizeSortButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.sizeSortButton.Location = new System.Drawing.Point(80, 2);
+            this.sizeSortButton.Name = "sizeSortButton";
+            this.sizeSortButton.Size = new System.Drawing.Size(75, 23);
+            this.sizeSortButton.SortOrder = System.Windows.Forms.SortOrder.None;
+            this.sizeSortButton.TabIndex = 0;
+            this.sizeSortButton.Text = "Size";
+            this.sizeSortButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.sizeSortButton.UseVisualStyleBackColor = true;
+            this.sizeSortButton.Click += new System.EventHandler(this.SizeSortButton_Click);
             // 
             // infoPanel
             // 
@@ -303,71 +390,6 @@
             this.deleteFileToolStripMenuItem.Text = "Delete";
             this.deleteFileToolStripMenuItem.Click += new System.EventHandler(this.DeleteFileToolStripMenuItem_Click);
             // 
-            // treeView1
-            // 
-            this.treeView1.CheckBoxes = true;
-            this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.treeView1.HideSelection = false;
-            this.treeView1.Location = new System.Drawing.Point(129, 53);
-            this.treeView1.Name = "treeView1";
-            this.treeView1.ShowNodeToolTips = true;
-            this.treeView1.Size = new System.Drawing.Size(530, 372);
-            this.treeView1.TabIndex = 3;
-            this.treeView1.Scrolled += new System.EventHandler<FileList.Models.ScrollNotifyTreeViewEventArgs>(this.treeView1_Scrolled);
-            this.treeView1.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1_AfterCheck);
-            this.treeView1.AfterCollapse += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterCollapse);
-            this.treeView1.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeView1_BeforeExpand);
-            this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1_AfterSelect);
-            this.treeView1.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeView1_NodeMouseClick);
-            // 
-            // dateModifiedButton
-            // 
-            this.dateModifiedButton.FlatAppearance.BorderColor = System.Drawing.Color.DarkGray;
-            this.dateModifiedButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.dateModifiedButton.Image = ((System.Drawing.Image)(resources.GetObject("dateModifiedButton.Image")));
-            this.dateModifiedButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.dateModifiedButton.Location = new System.Drawing.Point(280, 2);
-            this.dateModifiedButton.Name = "dateModifiedButton";
-            this.dateModifiedButton.Size = new System.Drawing.Size(116, 23);
-            this.dateModifiedButton.SortOrder = System.Windows.Forms.SortOrder.None;
-            this.dateModifiedButton.TabIndex = 2;
-            this.dateModifiedButton.Text = "Date Modified";
-            this.dateModifiedButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.dateModifiedButton.UseVisualStyleBackColor = true;
-            this.dateModifiedButton.Click += new System.EventHandler(this.DateModifiedButton_Click);
-            // 
-            // dateCreatedButton
-            // 
-            this.dateCreatedButton.FlatAppearance.BorderColor = System.Drawing.Color.DarkGray;
-            this.dateCreatedButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.dateCreatedButton.Image = ((System.Drawing.Image)(resources.GetObject("dateCreatedButton.Image")));
-            this.dateCreatedButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.dateCreatedButton.Location = new System.Drawing.Point(161, 2);
-            this.dateCreatedButton.Name = "dateCreatedButton";
-            this.dateCreatedButton.Size = new System.Drawing.Size(113, 23);
-            this.dateCreatedButton.SortOrder = System.Windows.Forms.SortOrder.None;
-            this.dateCreatedButton.TabIndex = 1;
-            this.dateCreatedButton.Text = "Date Created";
-            this.dateCreatedButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.dateCreatedButton.UseVisualStyleBackColor = true;
-            this.dateCreatedButton.Click += new System.EventHandler(this.DateCreatedButton_Click);
-            // 
-            // sizeSortButton
-            // 
-            this.sizeSortButton.FlatAppearance.BorderColor = System.Drawing.Color.DarkGray;
-            this.sizeSortButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.sizeSortButton.Image = ((System.Drawing.Image)(resources.GetObject("sizeSortButton.Image")));
-            this.sizeSortButton.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.sizeSortButton.Location = new System.Drawing.Point(80, 2);
-            this.sizeSortButton.Name = "sizeSortButton";
-            this.sizeSortButton.Size = new System.Drawing.Size(75, 23);
-            this.sizeSortButton.SortOrder = System.Windows.Forms.SortOrder.None;
-            this.sizeSortButton.TabIndex = 0;
-            this.sizeSortButton.Text = "Size";
-            this.sizeSortButton.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.sizeSortButton.UseVisualStyleBackColor = true;
-            this.sizeSortButton.Click += new System.EventHandler(this.SizeSortButton_Click);
-            // 
             // FileListControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -376,6 +398,10 @@
             this.Name = "FileListControl";
             this.Size = new System.Drawing.Size(662, 428);
             this.tableLayoutPanel1.ResumeLayout(false);
+            this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+            this.splitContainer1.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
@@ -418,5 +444,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ToolTip toolTip1;
+        private GripSplitContainer splitContainer1;
     }
 }
