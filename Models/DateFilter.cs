@@ -50,5 +50,26 @@ namespace FileList.Models
             {
             }
         }
+
+        public override string ToString()
+        {
+            StringBuilder builder = new StringBuilder();
+
+            if (this.FilterType != FilterType.None)
+            {
+                builder.Append(Enum.GetName(typeof(FilterType), this.FilterType));
+
+                if (this.DateTime1.HasValue)
+                    builder.Append($" {this.DateTime1.Value.ToString("MM/dd/yy mm:hh tt")}");
+
+                if (this.FilterType == FilterType.Between)
+                    builder.Append(" and ");
+
+                if (this.FilterType == FilterType.Between && this.DateTime2.HasValue)
+                        builder.Append($"{this.DateTime2.Value.ToString("MM/dd/yy mm:hh tt")}");
+            }
+
+            return builder.ToString();
+        }
     }
 }

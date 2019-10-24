@@ -158,6 +158,18 @@ namespace FileList.Models
             }
         }
 
+        public int Threads
+        {
+            get
+            {
+                return (int)this.scoutCountLabel.Value;
+            }
+            set
+            {
+                this.scoutCountLabel.Value = value;
+            }
+        }
+
         public bool RemoveByPath(string path)
         {
             // if path doesnt exist, then this should be a child node. 
@@ -354,6 +366,19 @@ namespace FileList.Models
             if (this.filterForm.Visible)
                 return;
             this.SetVisibleNodes();
+
+            List<string> filters = new List<string>();
+
+            filters.Add(this.filterForm.SizeFilter.ToString());
+            filters.Add(this.filterForm.ModifiedDateFilter.ToString());
+            filters.Add(this.filterForm.CreatedDateFilter.ToString());
+
+            string filterDescription = string.Join(" ,and ", filters.Where(f => !string.IsNullOrEmpty(f)));
+
+            if (!string.IsNullOrEmpty(filterDescription))
+                this.filterSummaryLabel.Text = string.Concat("Where files ", filterDescription);
+            else
+                this.filterSummaryLabel.Text = string.Empty;
         }
 
         private void TreeView1_AfterSelect(object sender, TreeViewEventArgs e)

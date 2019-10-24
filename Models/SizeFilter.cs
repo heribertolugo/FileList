@@ -82,5 +82,25 @@ namespace FileList.Models
             {
             }
         }
+
+        public override string ToString()
+        {
+            StringBuilder builder = new StringBuilder();
+
+            if (this.FilterType != FilterType.None)
+            {
+                builder.Append(Enum.GetName(typeof(FilterType), this.FilterType));
+                
+                builder.Append($" {this.Value1} {Enum.GetName(typeof(StorageSize), this.StorageSize1)}");
+
+                if (this.FilterType == FilterType.Between)
+                    builder.Append(" and ");
+
+                if (this.FilterType  == FilterType.Between && this.StorageSize2.HasValue)
+                    builder.Append($"{this.Value2} {Enum.GetName(typeof(StorageSize), this.StorageSize2.Value)}");
+            }
+
+            return builder.ToString();
+        }
     }
 }
