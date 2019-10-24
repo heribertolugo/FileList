@@ -335,8 +335,11 @@ namespace FileList.Models
             if (!this._extensions.Contains(fileData.Extension))
             {
                 this._extensions.Add(fileData.Extension);
-                this.fileTypesCheckedListBox.Items.Add(fileData.Extension, true);
-
+                this.fileTypesCheckedListBox.Items.Add(new FileExtensionCount(fileData.Extension, 1), true);
+            }
+            else
+            {
+                this.fileTypesCheckedListBox.Items.Cast<FileExtensionCount>().FirstOrDefault(f => f.Extension.Equals(fileData.Extension)).IncrementCount();
             }
 
             TreeNode node = new TreeNode(fileData.Name + fileData.Extension);
@@ -1256,5 +1259,40 @@ namespace FileList.Models
         public string SelectedPath { get; private set; }
 
         public FileData[] FileData { get; private set; }
+    }
+
+    public class FileExtensionCount
+    {
+        private volatile int _count;
+        public FileExtensionCount(string extension, int initialCount = 0)
+        {
+            this.Extension = extension;
+            this._count = initialCount;
+        }
+
+        public string Extension { get; private set; }
+
+        public int Count
+        {
+            get
+            {
+                return System.Threading.Interlocked.CompareExchange(ref this._count, 0, 0);
+            }
+            set
+            {
+                int count = this._count;
+                System.Threading.Interlocked.CompareExchange(ref this._count, count + value, count);
+            }
+        }
+
+        public void IncrementCount()
+        {
+            System.Threading.Interlocked.Increment(ref this._count);
+        }
+
+        public override string ToString()
+        {
+            return $"{this.Extension} ({this.Count})";
+        }
     }
 }

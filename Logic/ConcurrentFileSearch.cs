@@ -159,7 +159,7 @@ namespace FileList.Logic
                 //thread.Join();
 
                 Extensions.WriteToConsole("Created thread");
-                if ((bucketCount = ConcurrentFileSearchMinion.ThreadBucketCount()) > maxThreads)
+                if ((bucketCount = ConcurrentFileSearchMinion.ThreadBucketCount()) >= maxThreads)
                     break;
             }
         }
