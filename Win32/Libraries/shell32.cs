@@ -9,7 +9,7 @@ namespace Win32.Libraries
         #region shell32.dll
 
         [DllImport("shell32.dll")]
-        internal static extern IntPtr SHGetFileInfo(
+        public static extern IntPtr SHGetFileInfo(
           string pszPath,
           uint dwFileAttributes,
           ref SHFILEINFO psfi,
@@ -17,13 +17,13 @@ namespace Win32.Libraries
           uint uFlags);
 
         [DllImport("shell32.dll", EntryPoint = "#727")]
-        internal static extern int SHGetImageList(
+        public static extern int SHGetImageList(
         int iImageList,
         ref Guid riid,
         ref IImageList ppv);
 
         [DllImport("shell32.dll", EntryPoint = "#727")]
-        internal static extern int SHGetImageListHandle(
+        public static extern int SHGetImageListHandle(
           int iImageList,
           ref Guid riid,
           ref IntPtr handle);

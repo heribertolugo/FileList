@@ -1,4 +1,5 @@
-﻿using Shell32;
+﻿using Common.Helpers;
+using Shell32;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -113,7 +114,7 @@ namespace FileList.Logic
                     }
                     catch (Exception ex)
                     {
-                        Extensions.WriteToConsole("{0} error", item.Path);
+                        IoHelper.WriteToConsole("{0} error", item.Path);
                     }
                     if (fileData.HasValue)
                         yield return fileData.Value;
@@ -128,7 +129,7 @@ namespace FileList.Logic
                     }
                     catch (Exception ex)
                     {
-                        Extensions.WriteToConsole("{0} error", item.Path);
+                        IoHelper.WriteToConsole("{0} error", item.Path);
                     }
 
                     if (!fileData.HasValue)
@@ -174,7 +175,7 @@ namespace FileList.Logic
 
         private IEnumerable<FileData> RegularSearch(string path, bool searchSubdirectories = true)
         {
-            IEnumerable<string> files = Extensions.AccessableFiles(path);
+            IEnumerable<string> files = IoHelper.AccessableFiles(path);
 
             foreach (string file in files)
             {
@@ -182,7 +183,7 @@ namespace FileList.Logic
             }
 
             if (searchSubdirectories)
-                foreach (string directory in Extensions.AccessableDirectories(path))
+                foreach (string directory in IoHelper.AccessableDirectories(path))
                 {
                     IEnumerator<FileData> filez = this.Search(directory, searchSubdirectories).GetEnumerator();
                     while (filez.MoveNext())

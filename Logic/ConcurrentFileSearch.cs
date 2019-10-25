@@ -1,4 +1,6 @@
-﻿using FileList.Models;
+﻿using Common.Extensions;
+using Common.Helpers;
+using FileList.Models;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -7,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using Win32.Libraries;
 
 namespace FileList.Logic
 {
@@ -41,7 +44,7 @@ namespace FileList.Logic
             this.MaxThreads = Math.Max(1, this._fileListControl.SearcherThreads);
             this.startTime = DateTime.Now;
             Shell32.ShellClass shell = new Shell32.ShellClass();
-            Models.Win32.Win32Methods.GetRegisteredInterfaceMarshalPtr<Shell32.IShellDispatch5>(shell); //.ToIntPtr();
+            ole32.GetRegisteredInterfaceMarshalPtr<Shell32.IShellDispatch5>(shell); //.ToIntPtr();
             GC.KeepAlive(shell);
 
             ConcurrentFileSearchMinion searcher = new ConcurrentFileSearchMinion(this._root, this.ConcurrentFileSearch_OnFinishedHandler, this._fileListControl);
@@ -56,7 +59,7 @@ namespace FileList.Logic
         }
         private void AttachFileData(IEnumerable<FileData> files, FileListControl fileListControl, bool commitRequired)
         {
-            Extensions.WriteToConsole("requesting fileListControlLock");
+            IoHelper.WriteToConsole("requesting fileListControlLock");
             lock (fileListControlLock)
             {
                 fileListControl.InvokeIfRequired(c =>
@@ -88,7 +91,7 @@ namespace FileList.Logic
                     }
                 });
             }
-            Extensions.WriteToConsole("released fileListControlLock");
+            IoHelper.WriteToConsole("released fileListControlLock");
         }
 
         private void FinalizeFileListControl(FileListControl fileListControl)
@@ -114,15 +117,15 @@ namespace FileList.Logic
 
             int bucketCount = ConcurrentFileSearchMinion.ThreadBucketCount();
             this._fileListControl.InvokeIfRequired(c => c.SearcherThreads = bucketCount);
-            Extensions.WriteToConsole("threads {0}", bucketCount);
+            IoHelper.WriteToConsole("threads {0}", bucketCount);
 
             if ((ConcurrentFileSearch.Directories.Count == 0 || this._cancelToken.IsCancellationRequested) && ConcurrentFileSearchMinion.ThreadBucketCount() == 0)
             {
                 DateTime endTime = DateTime.Now;
                 TimeSpan timeSpan = endTime.Subtract(startTime);
 
-                Extensions.WriteToConsole("processing finished. took {0} hours, {1} minutes, {2} seconds", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
-                Extensions.WriteToConsole("finalizing");
+                IoHelper.WriteToConsole("processing finished. took {0} hours, {1} minutes, {2} seconds", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
+                IoHelper.WriteToConsole("finalizing");
                 this.FinalizeFileListControl(this._fileListControl);
                 this.OnFinished(e);
                 ConcurrentFileSearchMinion.ResetCancelled();
@@ -137,7 +140,7 @@ namespace FileList.Logic
             string directory = null;
             int bucketCount = 0;
 
-            Extensions.WriteToConsole("{0} directories to process", ConcurrentFileSearch.Directories.Count);
+            IoHelper.WriteToConsole("{0} directories to process", ConcurrentFileSearch.Directories.Count);
 
             if ((bucketCount = ConcurrentFileSearchMinion.ThreadBucketCount()) > maxThreads)
                 return;
@@ -162,7 +165,7 @@ namespace FileList.Logic
 
                 bucketCount++;
 
-                Extensions.WriteToConsole("Created thread");
+                IoHelper.WriteToConsole("Created thread");
                 if (bucketCount >= maxThreads || (bucketCount = ConcurrentFileSearchMinion.ThreadBucketCount()) >= maxThreads)
                 //if ((bucketCount = ConcurrentFileSearchMinion.ThreadBucketCount()) >= maxThreads)
                         break;
@@ -174,7 +177,7 @@ namespace FileList.Logic
             EventHandler<ConcurrentFileSearchEventArgs> handler = this.Finished;
             if (handler == null)
             {
-                Extensions.WriteToConsole("handler null");
+                IoHelper.WriteToConsole("handler null");
                 return;
             }
             this.Finished(this, args);
@@ -250,7 +253,7 @@ namespace FileList.Logic
 
             private void RmoveFromThreadBucket()
             {
-                Extensions.WriteToConsole("removing thread id #{0}", this.ID);
+                IoHelper.WriteToConsole("removing thread id #{0}", this.ID);
                 System.Threading.Interlocked.Decrement(ref _bucketCount);
             }
 
@@ -289,7 +292,7 @@ namespace FileList.Logic
             private int GetNextId()
             {
                 int id = 0;
-                Extensions.WriteToConsole("requesting IdLock");
+                IoHelper.WriteToConsole("requesting IdLock");
                 lock (ConcurrentFileSearchMinion.IdLock)
                 {
                     id = ConcurrentFileSearchMinion.IdTracker;
@@ -297,7 +300,7 @@ namespace FileList.Logic
                         ConcurrentFileSearchMinion.IdTracker = int.MinValue;
                     ++ConcurrentFileSearchMinion.IdTracker;
                 }
-                Extensions.WriteToConsole("IdLock released");
+                IoHelper.WriteToConsole("IdLock released");
 
                 return id;
             }
@@ -307,9 +310,9 @@ namespace FileList.Logic
             {
                 try
                 {
-                    foreach (string directory in Extensions.AccessableDirectories(root))
+                    foreach (string directory in IoHelper.AccessableDirectories(root))
                     {
-                        Extensions.WriteToConsole("created minion");
+                        IoHelper.WriteToConsole("created minion");
                         ConcurrentFileSearchMinion search = new ConcurrentFileSearchMinion(directory, this._handler, this._fileListControl); // arguments incorrect, only for ability to compile
                         Thread thread = new Thread((object s) => ((ConcurrentFileSearchMinion)s).Start());
                         thread.SetApartmentState(ApartmentState.STA);
@@ -324,15 +327,15 @@ namespace FileList.Logic
 
             private void AddDirectories(string path, ConcurrentQueue<string> directories)
             {
-                Extensions.WriteToConsole("thread id #{0} adding dirs in {1}", this.ID, path);
-                directories.AddRange(Extensions.AccessableDirectories(path));
+                IoHelper.WriteToConsole("thread id #{0} adding dirs in {1}", this.ID, path);
+                directories.AddRange(IoHelper.AccessableDirectories(path));
             }
 
             private void GetFiles(string root, IList<FileData> files)
             {
                 try
                 {
-                    this._fileSearch = new FileSearch(root, false, Models.Win32.Win32Methods.GetIShellDispatch5());
+                    this._fileSearch = new FileSearch(root, false, ole32.GetIShellDispatch5());
 
                     // access thread unsafe ConcurrentFileSearchMinion._isCancelled
                     // its ok because its not a big deal to get incorrect value right away
@@ -340,17 +343,17 @@ namespace FileList.Logic
                     // we catch the error, forcing us to quit.
                     while (this._fileSearch.GetNext() != null && !ConcurrentFileSearchMinion._isCancelled)
                     {
-                        Extensions.WriteToConsole("thread id #{0} found file {1}", this.ID, this._fileSearch.Current.Value.Path);
+                        IoHelper.WriteToConsole("thread id #{0} found file {1}", this.ID, this._fileSearch.Current.Value.Path);
                         this.AttachFileData(this._fileSearch.Current.Value, this._fileListControl);
                     }
 
-                    Extensions.WriteToConsole("this._fileSearch.GetNext() == null");
+                    IoHelper.WriteToConsole("this._fileSearch.GetNext() == null");
                 }
                 catch (Exception ex)
                 {
                     string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
                     System.IO.File.WriteAllText(dir + "err.txt", ex.Message);
-                    Extensions.WriteToConsole(ex.Message);
+                    IoHelper.WriteToConsole(ex.Message);
                 }
             }
 
@@ -373,7 +376,7 @@ namespace FileList.Logic
                 EventHandler<ConcurrentFileSearchEventArgs> handler = this.OnFinishedHandler;
                 if (handler == null)
                 {
-                    Extensions.WriteToConsole("ERROR thread id #{0} no handler", this.ID);
+                    IoHelper.WriteToConsole("ERROR thread id #{0} no handler", this.ID);
                     return;
                 }
                 OnFinishedHandler(this, args);
@@ -381,7 +384,7 @@ namespace FileList.Logic
 
             private void AttachFileData(FileData file, FileListControl fileListControl)
             {
-                Extensions.WriteToConsole("requesting fileListControlLock");
+                IoHelper.WriteToConsole("requesting fileListControlLock");
 
                 fileListControl.InvokeIfRequired(c =>
                 {
@@ -410,7 +413,7 @@ namespace FileList.Logic
 
                 });
 
-                Extensions.WriteToConsole("released fileListControlLock");
+                IoHelper.WriteToConsole("released fileListControlLock");
             }
         }
     }

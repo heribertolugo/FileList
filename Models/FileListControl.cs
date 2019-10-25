@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-using System.Runtime.InteropServices;
+﻿using FileList.Logic;
 using FileList.Views;
+using System;
+using System.Collections.Generic;
+using System.Data;
 using System.IO;
-using FileList.Logic;
+using System.Linq;
+using System.Windows.Forms;
+using Win32.Constants;
+using Win32.Libraries;
+using Common.Extensions;
 
 namespace FileList.Models
 {
@@ -575,7 +574,7 @@ namespace FileList.Models
         /// <param name="tree"></param>
         private static void ScrollTreeLeft(TreeView tree)
         {
-            Win32.Win32Methods.SendMessage(tree.Handle, WM_HSCROLL, SB_LEFT, 0);
+            user32.SendMessage(tree.Handle, MessageCodes.WM_HSCROLL, HorizontalScrollBarCommands.SB_LEFT, 0);
         }
 
         /// <summary>
@@ -767,9 +766,9 @@ namespace FileList.Models
           KeyValuePair<float, StorageSize>? filter2,
           KeyValuePair<float, StorageSize> fileSize)
         {
-            float kb1 = Misc.ConvertStorageValueToKb(filter1.Key, filter1.Value);
-            float kb2 = filter2.HasValue ? Misc.ConvertStorageValueToKb(filter2.Value.Key, filter2.Value.Value) : 0.0f;
-            float fileKb = Misc.ConvertStorageValueToKb(fileSize.Key, fileSize.Value);
+            float kb1 = Logic.Misc.ConvertStorageValueToKb(filter1.Key, filter1.Value);
+            float kb2 = filter2.HasValue ? Logic.Misc.ConvertStorageValueToKb(filter2.Value.Key, filter2.Value.Value) : 0.0f;
+            float fileKb = Logic.Misc.ConvertStorageValueToKb(fileSize.Key, fileSize.Value);
             switch (filterType)
             {
                 case FilterType.Between:

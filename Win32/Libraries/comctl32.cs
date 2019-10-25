@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Win32.Models;
 
 namespace Win32.Libraries
 {
@@ -7,7 +8,7 @@ namespace Win32.Libraries
     {
         #region comctl32.dll
         [DllImport("comctl32")]
-        internal static extern int ImageList_Draw(
+        public static extern int ImageList_Draw(
           IntPtr hIml,
           int i,
           IntPtr hdcDst,
@@ -16,13 +17,13 @@ namespace Win32.Libraries
           int fStyle);
 
         [DllImport("comctl32")]
-        internal static extern int ImageList_DrawIndirect(ref IMAGELISTDRAWPARAMS pimldp);
+        public static extern int ImageList_DrawIndirect(ref IMAGELISTDRAWPARAMS pimldp);
 
         [DllImport("comctl32")]
-        internal static extern int ImageList_GetIconSize(IntPtr himl, ref int cx, ref int cy);
+        public static extern int ImageList_GetIconSize(IntPtr himl, ref int cx, ref int cy);
 
         [DllImport("comctl32")]
-        internal static extern IntPtr ImageList_GetIcon(IntPtr himl, int i, int flags);
+        public static extern IntPtr ImageList_GetIcon(IntPtr himl, int i, int flags);
 
         #endregion
     }

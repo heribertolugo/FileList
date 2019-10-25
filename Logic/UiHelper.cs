@@ -1,4 +1,5 @@
-﻿using FileList.Models;
+﻿using Common.Extensions;
+using FileList.Models;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;

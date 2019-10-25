@@ -48,10 +48,11 @@
     <Compile Include="Constants\ImageListDrawItem.cs" />
     <Compile Include="Constants\ImageListDrawState.cs" />
     <Compile Include="Constants\MessageCodes.cs" />
-    <Compile Include="Constants\Misc.cs" />
+    <Compile Include="Constants\SystemConsts.cs" />
     <Compile Include="Constants\MousePositionCodes.cs" />
     <Compile Include="Constants\MSHCTX.cs" />
     <Compile Include="Constants\MSHLFLAGS.cs" />
+    <Compile Include="Constants\ScrollBarCommands.cs" />
     <Compile Include="Constants\ShellIconFlags.cs" />
     <Compile Include="Constants\ShellIconState.cs" />
     <Compile Include="Constants\SHGetFileInfo.cs" />

@@ -7,6 +7,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using Win32.Constants;
+using Win32.Libraries;
+using Win32.Models;
 
 namespace FileList.Models
 {
@@ -77,8 +80,8 @@ namespace FileList.Models
             if (Environment.OSVersion.Version.Major < 6)
                 return false;
             int pfEnabled = 0;
-            Win32.Win32Methods.DwmIsCompositionEnabled(ref pfEnabled);
-            return pfEnabled == Win32.Win32MousePositionCodes.HTCLIENT;
+            dwmapi.DwmIsCompositionEnabled(ref pfEnabled);
+            return pfEnabled == MousePositionCodes.HTCLIENT;
         }
 
         protected override CreateParams CreateParams
@@ -88,29 +91,29 @@ namespace FileList.Models
                 this.isAeroEnabled = this.CheckAeroEnabled();
                 CreateParams createParams = base.CreateParams;
                 if (!this.isAeroEnabled)
-                    createParams.ClassStyle |= Win32.Win32ClassStyles.CS_DROPSHADOW;
+                    createParams.ClassStyle |= ClassStyles.CS_DROPSHADOW;
                 return createParams;
             }
         }
         protected override void WndProc(ref Message m)
         {
-            if (m.Msg == Win32.Win32Messages.WM_NCPAINT && this.isAeroEnabled)
+            if (m.Msg == MessageCodes.WM_NCPAINT && this.isAeroEnabled)
             {
-                int attrValue = Win32.Win32MousePositionCodes.HTCAPTION;
-                Win32.Win32Methods.DwmSetWindowAttribute(this.Handle, Win32.Win32MousePositionCodes.HTCAPTION, ref attrValue, 4);
-                Win32MARGINS pMarInset = new Win32MARGINS()
+                int attrValue = MousePositionCodes.HTCAPTION;
+                dwmapi.DwmSetWindowAttribute(this.Handle, MousePositionCodes.HTCAPTION, ref attrValue, 4);
+                MARGINS pMarInset = new MARGINS()
                 {
                     bottomHeight = 1,
                     leftWidth = 1,
                     rightWidth = 1,
                     topHeight = 1
                 };
-                Win32.Win32Methods.DwmExtendFrameIntoClientArea(this.Handle, ref pMarInset);
+                dwmapi.DwmExtendFrameIntoClientArea(this.Handle, ref pMarInset);
             }
             base.WndProc(ref m);
-            if (m.Msg != Win32.Win32Messages.WM_NCHITTEST || (int)m.Result != Win32.Win32MousePositionCodes.HTCLIENT)
+            if (m.Msg != MessageCodes.WM_NCHITTEST || (int)m.Result != MousePositionCodes.HTCLIENT)
                 return;
-            m.Result = (IntPtr) Win32.Win32MousePositionCodes.HTCAPTION;
+            m.Result = (IntPtr) MousePositionCodes.HTCAPTION;
         }
         #endregion
     }

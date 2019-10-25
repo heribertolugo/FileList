@@ -1,4 +1,5 @@
-﻿using FileList.Models;
+﻿using Common.Helpers;
+using FileList.Models;
 using FileList.Models.ImageList;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,10 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using Win32;
+using Win32.Constants;
+using Win32.Libraries;
+using Win32.Models;
 
 namespace FileList.Logic
 {
@@ -21,7 +26,7 @@ namespace FileList.Logic
         private static string imageFilter = ".jpg,.jpeg,.png,.gif";
         private static string exeFilter = ".exe,.lnk";
         private static Dictionary<string, BitmapSource> iconDic = new Dictionary<string, BitmapSource>();
-        private static SysImageList _imgList = new SysImageList(Models.Win32.SysImageListSize.jumbo);
+        private static SysImageList _imgList = new SysImageList(SysImageListSize.jumbo);
         private static Dictionary<string, BitmapSource> thumbDic = new Dictionary<string, BitmapSource>();
         private int defaultsize;
 
@@ -39,12 +44,12 @@ namespace FileList.Logic
 
         internal static Icon GetFileIcon(string fileName, FileToIconConverter.IconSize size)
         {
-            Models.Win32.SHFILEINFO psfi = new Models.Win32.SHFILEINFO();
-            uint num = Models.Win32.Win32ShellIconFlags.SHGFI_SYSICONINDEX; 
+            SHFILEINFO psfi = new SHFILEINFO();
+            uint num = ShellIconFlags.SHGFI_SYSICONINDEX; 
             if (fileName.IndexOf(":") == -1)
-                num |= Models.Win32.Win32ShellIconFlags.SHGFI_USEFILEATTRIBUTES; 
-            uint uFlags = size != FileToIconConverter.IconSize.Small ? num | Models.Win32.Win32ShellIconFlags.SHGFI_ICON : (uint)((int)num | Models.Win32.Win32ShellIconFlags.SHGFI_ICON | Models.Win32.Win32ShellIconFlags.SHGFI_SMALLICON);
-            Models.Win32.Win32Methods.SHGetFileInfo(fileName, Models.Win32.Win32ShellIconFlags.SHGFI_LARGEICON, ref psfi, (uint)Marshal.SizeOf(psfi), uFlags);
+                num |= ShellIconFlags.SHGFI_USEFILEATTRIBUTES; 
+            uint uFlags = size != FileToIconConverter.IconSize.Small ? num | ShellIconFlags.SHGFI_ICON : (uint)((int)num | ShellIconFlags.SHGFI_ICON | ShellIconFlags.SHGFI_SMALLICON);
+            shell32.SHGetFileInfo(fileName, ShellIconFlags.SHGFI_LARGEICON, ref psfi, (uint)Marshal.SizeOf(psfi), uFlags);
             return Icon.FromHandle(psfi.hIcon);
         }
 
@@ -181,7 +186,7 @@ namespace FileList.Logic
             }
             finally
             {
-                Models.Win32.Win32Methods.DeleteObject(hbitmap);
+               Gdi32.DeleteObject(hbitmap);
             }
         }
 
@@ -238,7 +243,7 @@ namespace FileList.Logic
 
         private Bitmap loadJumbo(string lookup)
         {
-            FileToIconConverter._imgList.ImageListSize = FileToIconConverter.isVistaUp() ? Models.Win32.SysImageListSize.jumbo : Models.Win32.SysImageListSize.extraLargeIcons;
+            FileToIconConverter._imgList.ImageListSize = FileToIconConverter.isVistaUp() ? SysImageListSize.jumbo : SysImageListSize.extraLargeIcons;
             Icon icon = FileToIconConverter._imgList.Icon(FileToIconConverter._imgList.IconIndex(lookup, FileToIconConverter.isFolder(lookup)));
             Bitmap imgToResize = icon.ToBitmap();
             icon.Dispose();
@@ -247,7 +252,7 @@ namespace FileList.Logic
                 imgToResize = FileToIconConverter.resizeImage(imgToResize, new System.Drawing.Size(256, 256), 0);
             else if (imgToResize.GetPixel(100, 100) == color && imgToResize.GetPixel(200, 200) == color && imgToResize.GetPixel(200, 200) == color)
             {
-                FileToIconConverter._imgList.ImageListSize = Models.Win32.SysImageListSize.largeIcons;
+                FileToIconConverter._imgList.ImageListSize = SysImageListSize.largeIcons;
                 imgToResize = FileToIconConverter.resizeJumbo(FileToIconConverter._imgList.Icon(FileToIconConverter._imgList.IconIndex(lookup)).ToBitmap(), new System.Drawing.Size(200, 200), 5);
             }
             return imgToResize;
@@ -299,19 +304,19 @@ namespace FileList.Logic
             {
                 if (!FileToIconConverter.thumbDic.ContainsKey(key))
                 {
-                    Extensions.WriteToConsole("requesting thumbDic lock");
+                    IoHelper.WriteToConsole("requesting thumbDic lock");
                     lock (FileToIconConverter.thumbDic)
                         FileToIconConverter.thumbDic.Add(key, this.getImage(fileName, size));
-                    Extensions.WriteToConsole("thumbDic lock released");
+                    IoHelper.WriteToConsole("thumbDic lock released");
                 }
                 return FileToIconConverter.thumbDic[key];
             }
             if (!FileToIconConverter.iconDic.ContainsKey(key))
             {
-                Extensions.WriteToConsole("requesting iconDic lock");
+                IoHelper.WriteToConsole("requesting iconDic lock");
                 lock (FileToIconConverter.iconDic)
                     FileToIconConverter.iconDic.Add(key, this.getImage(fileName, size));
-                Extensions.WriteToConsole("iconDic lock released");
+                IoHelper.WriteToConsole("iconDic lock released");
             }
             return FileToIconConverter.iconDic[key];
         }
@@ -356,7 +361,7 @@ namespace FileList.Logic
             switch (size)
             {
                 case FileToIconConverter.IconSize.ExtraLarge:
-                    FileToIconConverter._imgList.ImageListSize = Models.Win32.SysImageListSize.extraLargeIcons;
+                    FileToIconConverter._imgList.ImageListSize = SysImageListSize.extraLargeIcons;
                     return FileToIconConverter.loadBitmap(FileToIconConverter._imgList.Icon(FileToIconConverter._imgList.IconIndex(str2, FileToIconConverter.isFolder(fileName))).ToBitmap());
                 case FileToIconConverter.IconSize.Jumbo:
                     return FileToIconConverter.loadBitmap(this.loadJumbo(str2));

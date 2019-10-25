@@ -51,6 +51,7 @@
     <Compile Include="Extensions\MultiThreading.cs" />
     <Compile Include="Extensions\TreeViewExtensions.cs" />
     <Compile Include="Helpers\IoHelper.cs" />
+    <Compile Include="Models\IPreviewFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

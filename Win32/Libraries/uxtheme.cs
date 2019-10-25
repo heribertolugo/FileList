@@ -8,7 +8,7 @@ namespace Win32.Libraries
     {
         #region uxtheme.dll
         [DllImport("uxtheme.dll", CharSet = CharSet.Unicode)]
-        internal extern static int SetWindowTheme(IntPtr hWnd, string pszSubAppName, string pszSubIdList);
+        public extern static int SetWindowTheme(IntPtr hWnd, string pszSubAppName, string pszSubIdList);
         #endregion
     }
 }

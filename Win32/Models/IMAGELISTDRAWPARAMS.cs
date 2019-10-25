@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Win32
+namespace Win32.Models
 {
     public struct IMAGELISTDRAWPARAMS
     {

@@ -1,4 +1,5 @@
-﻿using FileList.Logic;
+﻿using Common.Extensions;
+using FileList.Logic;
 using FileList.Models;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace FileList.Views
         {
             InitializeComponent();
             this.CreateImageLayoutButtons();
-            if (Extensions.IsAdministrator())
+            if (Common.Helpers.IoHelper.IsAdministrator())
                 this.Text = string.Format("{0} - Administrator", this.Text);
         }
 

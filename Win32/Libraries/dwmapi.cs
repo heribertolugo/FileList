@@ -9,19 +9,19 @@ namespace Win32.Libraries
         #region dwmapi.dll
 
         [DllImport("dwmapi.dll")]
-        internal static extern int DwmExtendFrameIntoClientArea(
+        public static extern int DwmExtendFrameIntoClientArea(
           IntPtr hWnd,
           ref MARGINS pMarInset);
 
         [DllImport("dwmapi.dll")]
-        internal static extern int DwmSetWindowAttribute(
+        public static extern int DwmSetWindowAttribute(
           IntPtr hwnd,
           int attr,
           ref int attrValue,
           int attrSize);
 
         [DllImport("dwmapi.dll")]
-        internal static extern int DwmIsCompositionEnabled(ref int pfEnabled);
+        public static extern int DwmIsCompositionEnabled(ref int pfEnabled);
         #endregion
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
-using FileList.Models;
+using Win32.Libraries;
 
 namespace FileList.Logic
 {
@@ -15,9 +14,9 @@ namespace FileList.Logic
                 return;
             process.WaitForInputIdle();
             if (!string.IsNullOrEmpty(title))
-                Models.Win32.Win32Methods.SetWindowText(process.MainWindowHandle, title);
+                user32.SetWindowText(process.MainWindowHandle, title);
             if (!string.IsNullOrEmpty(message))
-                 Models.Win32.Win32Methods.SendMessage(Models.Win32.Win32Methods.FindWindowEx(process.MainWindowHandle, new IntPtr(0), "Edit", null), 12, 0, message);
+                 user32.SendMessage(user32.FindWindowEx(process.MainWindowHandle, new IntPtr(0), "Edit", null), 12, 0, message);
         }
     }
 }

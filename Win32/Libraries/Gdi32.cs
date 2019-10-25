@@ -8,10 +8,10 @@ namespace Win32.Libraries
         #region Gdi32.dll
 
         [DllImport("Gdi32.dll")]
-        internal static extern bool DeleteObject(IntPtr hObject);
+        public static extern bool DeleteObject(IntPtr hObject);
 
         [DllImport("Gdi32.dll")]
-        internal static extern IntPtr CreateRoundRectRgn(
+        public static extern IntPtr CreateRoundRectRgn(
           int nLeftRect,
           int nTopRect,
           int nRightRect,

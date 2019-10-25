@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common.Helpers;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -35,12 +36,12 @@ namespace FileList.Models
             }
             set
             {
-                Extensions.WriteToConsole("requesting item lock @ this[int index] {0}", this.Name);
+                IoHelper.WriteToConsole("requesting item lock @ this[int index] {0}", this.Name);
                 lock (this._itemLock)
                 {
                     this._items[index] = value;
                 }
-                Extensions.WriteToConsole("released item lock @ this[int index] {0}", this.Name);
+                IoHelper.WriteToConsole("released item lock @ this[int index] {0}", this.Name);
             }
         }
 
@@ -48,13 +49,13 @@ namespace FileList.Models
         {
             get
             {
-                Extensions.WriteToConsole("requesting item lock @ Count {0}", this.Name);
+                IoHelper.WriteToConsole("requesting item lock @ Count {0}", this.Name);
                 int c = 0;
                 lock (this._itemLock)
                 {
                     c = this._items.Count;
                 }
-                Extensions.WriteToConsole("released item lock @ Count {0}", this.Name);
+                IoHelper.WriteToConsole("released item lock @ Count {0}", this.Name);
                 return c;
             }
         }
@@ -66,49 +67,49 @@ namespace FileList.Models
 
         public void Add(T item)
         {
-            Extensions.WriteToConsole("requesting item lock @ Add(T item) {0}", this.Name);
+            IoHelper.WriteToConsole("requesting item lock @ Add(T item) {0}", this.Name);
             lock (this._itemLock)
             {
                 this._items.Add(item);
             }
-            Extensions.WriteToConsole("released item lock @ Add(T item) {0}", this.Name);
+            IoHelper.WriteToConsole("released item lock @ Add(T item) {0}", this.Name);
         }
 
         public void Add(T item, out int count)
         {
-            Extensions.WriteToConsole("requesting item lock @ Add(T item, out int count) {0}", this.Name);
+            IoHelper.WriteToConsole("requesting item lock @ Add(T item, out int count) {0}", this.Name);
             lock (this._itemLock)
             {
                 this._items.Add(item);
                 count = this._items.Count;
             }
-            Extensions.WriteToConsole("released item lock @ Add(T item, out int count) {0}", this.Name);
+            IoHelper.WriteToConsole("released item lock @ Add(T item, out int count) {0}", this.Name);
         }
 
         public void AddRange(IEnumerable<T> items)
         {
-            Extensions.WriteToConsole("requesting item lock @ AddRange(IEnumerable<T> items) {0}", this.Name);
+            IoHelper.WriteToConsole("requesting item lock @ AddRange(IEnumerable<T> items) {0}", this.Name);
             lock (this._itemLock)
             {
                 this._items.AddRange(items);
             }
-            Extensions.WriteToConsole("released item lock @ AddRange(IEnumerable<T> items) {0}", this.Name);
+            IoHelper.WriteToConsole("released item lock @ AddRange(IEnumerable<T> items) {0}", this.Name);
         }
 
         public void AddRange(IEnumerable<T> items, out int count)
         {
-            Extensions.WriteToConsole("requesting item lock @ AddRange(IEnumerable<T> items, out int count) {0}", this.Name);
+            IoHelper.WriteToConsole("requesting item lock @ AddRange(IEnumerable<T> items, out int count) {0}", this.Name);
             lock (this._itemLock)
             {
                 this._items.AddRange(items);
                 count = this._items.Count;
             }
-            Extensions.WriteToConsole("released item lock @ AddRange(IEnumerable<T> items, out int count) {0}", this.Name);
+            IoHelper.WriteToConsole("released item lock @ AddRange(IEnumerable<T> items, out int count) {0}", this.Name);
         }
 
         public T Take()
         {
-            Extensions.WriteToConsole("requesting item lock @ Take {0}", this.Name);
+            IoHelper.WriteToConsole("requesting item lock @ Take {0}", this.Name);
             T itm = default(T);
             lock (this._itemLock)
             {
@@ -120,13 +121,13 @@ namespace FileList.Models
                     this._enumerator.MoveBack();
                 itm = item;
             }
-            Extensions.WriteToConsole("released item lock @ Take {0}", this.Name);
+            IoHelper.WriteToConsole("released item lock @ Take {0}", this.Name);
             return itm;
         }
 
         public T[] TakeAll()
         {
-            Extensions.WriteToConsole("requesting item lock @ TakeAll {0}", this.Name);
+            IoHelper.WriteToConsole("requesting item lock @ TakeAll {0}", this.Name);
             T[] itms = null;
             lock (this._itemLock)
             {
@@ -135,59 +136,59 @@ namespace FileList.Models
                 //this._enumerator = new ConcurrentCollectionEnumerator<T>(this);
                 itms = items;
             }
-            Extensions.WriteToConsole("released item lock @ TakeAll {0}", this.Name);
+            IoHelper.WriteToConsole("released item lock @ TakeAll {0}", this.Name);
             return itms;
         }
 
         public void Clear()
         {
-            Extensions.WriteToConsole("requesting item lock @ Clear {0}", this.Name);
+            IoHelper.WriteToConsole("requesting item lock @ Clear {0}", this.Name);
             lock (this._itemLock)
             {
                 this._enumerator.Reset();
                 this._items.Clear();
             }
-            Extensions.WriteToConsole("released item lock @ Clear {0}", this.Name);
+            IoHelper.WriteToConsole("released item lock @ Clear {0}", this.Name);
         }
 
         public bool Contains(T item)
         {
             bool has = false;
-            Extensions.WriteToConsole("requesting item lock @ Contains {0}", this.Name);
+            IoHelper.WriteToConsole("requesting item lock @ Contains {0}", this.Name);
             lock (this._itemLock)
             {
                 has = this._items.Contains(item);
             }
-            Extensions.WriteToConsole("released item lock @ Contains {0}", this.Name);
+            IoHelper.WriteToConsole("released item lock @ Contains {0}", this.Name);
             return has;
         }
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            Extensions.WriteToConsole("requesting item lock @ CopyTo {0}", this.Name);
+            IoHelper.WriteToConsole("requesting item lock @ CopyTo {0}", this.Name);
             lock (this._itemLock)
             {
                 this._items.CopyTo(array, arrayIndex);
             }
-            Extensions.WriteToConsole("released item lock @ CopyTo {0}", this.Name);
+            IoHelper.WriteToConsole("released item lock @ CopyTo {0}", this.Name);
         }
 
         public IEnumerator<T> GetEnumerator()
         {
             ConcurrentCollectionEnumerator<T> enumer = null;
-            Extensions.WriteToConsole("requesting item lock @ GetEnumerator {0}", this.Name);
+            IoHelper.WriteToConsole("requesting item lock @ GetEnumerator {0}", this.Name);
             lock (this._itemLock)
             {
                 enumer = this._enumerator; // new ConcurrentCollectionEnumerator<T>(this._items);
             }
-            Extensions.WriteToConsole("released item lock @ GetEnumerator {0}", this.Name);
+            IoHelper.WriteToConsole("released item lock @ GetEnumerator {0}", this.Name);
             return enumer;
         }
 
         public bool Remove(T item)
         {
             bool success = false;
-            Extensions.WriteToConsole("requesting item lock @ Remove {0}", this.Name);
+            IoHelper.WriteToConsole("requesting item lock @ Remove {0}", this.Name);
             lock (this._itemLock)
             {
                 int index = this._items.IndexOf(item);
@@ -195,7 +196,7 @@ namespace FileList.Models
                 if (success && index < this._enumerator.CurrentIndex)
                     this._enumerator.MoveBack();
             }
-            Extensions.WriteToConsole("released item lock @ Remove {0}", this.Name);
+            IoHelper.WriteToConsole("released item lock @ Remove {0}", this.Name);
             return success;
         }
 
@@ -222,13 +223,13 @@ namespace FileList.Models
             get
             {
                 T c = default(T);
-                Extensions.WriteToConsole("requesting SyncRoot lock @ Current");
+                IoHelper.WriteToConsole("requesting SyncRoot lock @ Current");
                 lock ((this._collection as ConcurrentCollection<T>).SyncRoot)
                 {
                     if (!(this._lastIndex < 0 || (this._collection as ConcurrentCollection<T>).Count <= this._lastIndex))
                         c = this._collection.ElementAtOrDefault(this._lastIndex);
                 }
-                Extensions.WriteToConsole("released SyncRoot lock @ Current");
+                IoHelper.WriteToConsole("released SyncRoot lock @ Current");
                 return c;
             }
         }

@@ -4,14 +4,18 @@ using System.Drawing;
 using FileList.Models;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Win32.Models;
+using Win32.Constants;
+using Win32.Libraries;
+using Common.Helpers;
 
 namespace FileList.Models.ImageList
 {
     public class SysImageList : IDisposable
     {
         private IntPtr hIml = IntPtr.Zero;
-        private Win32.IImageList iImageList = null;
-        private Win32.SysImageListSize size = Win32.SysImageListSize.smallIcons;
+        private IImageList iImageList = null;
+        private SysImageListSize size = SysImageListSize.smallIcons;
         private bool disposed = false;
 
         public IntPtr Handle
@@ -22,7 +26,7 @@ namespace FileList.Models.ImageList
             }
         }
 
-        internal Win32.SysImageListSize ImageListSize
+        internal SysImageListSize ImageListSize
         {
             get
             {
@@ -42,7 +46,7 @@ namespace FileList.Models.ImageList
                 int cx = 0;
                 int cy = 0;
                 if (this.iImageList == null)
-                    Win32.Win32Methods.ImageList_GetIconSize(this.hIml, ref cx, ref cy);
+                    comctl32.ImageList_GetIconSize(this.hIml, ref cx, ref cy);
                 else
                     this.iImageList.GetIconSize(ref cx, ref cy);
                 return new Size(cx, cy);
@@ -54,7 +58,7 @@ namespace FileList.Models.ImageList
             Icon icon = (Icon)null;
             IntPtr picon = IntPtr.Zero;
             if (this.iImageList == null)
-                picon = Win32.Win32Methods.ImageList_GetIcon(this.hIml, index, 1);
+                picon = comctl32.ImageList_GetIcon(this.hIml, index, 1);
             else
                 this.iImageList.GetIcon(index, 1, ref picon);
             if (picon != IntPtr.Zero)
@@ -69,28 +73,28 @@ namespace FileList.Models.ImageList
 
         public int IconIndex(string fileName, bool forceLoadFromDisk)
         {
-            return this.IconIndex(fileName, forceLoadFromDisk, Win32.ShellIconStateConstants.ShellIconStateNormal);
+            return this.IconIndex(fileName, forceLoadFromDisk, ShellIconState.ShellIconStateNormal);
         }
 
         internal int IconIndex(
           string fileName,
           bool forceLoadFromDisk,
-          Win32.ShellIconStateConstants iconState)
+          ShellIconState iconState)
         {
-            Win32.SHGetFileInfoConstants fileInfoConstants = Win32.SHGetFileInfoConstants.SHGFI_SYSICONINDEX;
-            if (this.size == Win32.SysImageListSize.smallIcons)
-                fileInfoConstants |= Win32.SHGetFileInfoConstants.SHGFI_SMALLICON;
+            SHGetFileInfo fileInfoConstants = SHGetFileInfo.SHGFI_SYSICONINDEX;
+            if (this.size == SysImageListSize.smallIcons)
+                fileInfoConstants |= SHGetFileInfo.SHGFI_SMALLICON;
             uint dwFileAttributes;
             if (!forceLoadFromDisk)
             {
-                fileInfoConstants |= Win32.SHGetFileInfoConstants.SHGFI_USEFILEATTRIBUTES;
-                dwFileAttributes = Win32.FileAttributeConstants.FILE_ATTRIBUTE_NORMAL;
+                fileInfoConstants |= SHGetFileInfo.SHGFI_USEFILEATTRIBUTES;
+                dwFileAttributes = FileAttribute.FILE_ATTRIBUTE_NORMAL;
             }
             else
                 dwFileAttributes = 0;
-            Win32.SHFILEINFO psfi = new Win32.SHFILEINFO();
+            SHFILEINFO psfi = new SHFILEINFO();
             uint cbFileInfo = (uint)Marshal.SizeOf(psfi.GetType());
-            IntPtr fileInfo = Win32.Win32Methods.SHGetFileInfo(fileName, dwFileAttributes, ref psfi, cbFileInfo, (uint)(fileInfoConstants | (Win32.SHGetFileInfoConstants)iconState));
+            IntPtr fileInfo = shell32.SHGetFileInfo(fileName, dwFileAttributes, ref psfi, cbFileInfo, (uint)(fileInfoConstants | (SHGetFileInfo)iconState));
             if (!fileInfo.Equals(IntPtr.Zero))
                 return (int)psfi.iIcon;
             Debug.Assert(!fileInfo.Equals(IntPtr.Zero), "Failed to get icon index");
@@ -99,18 +103,18 @@ namespace FileList.Models.ImageList
 
         internal void DrawImage(IntPtr hdc, int index, int x, int y)
         {
-            this.DrawImage(hdc, index, x, y, Win32.ImageListDrawItemConstants.ILD_TRANSPARENT);
+            this.DrawImage(hdc, index, x, y, ImageListDrawItem.ILD_TRANSPARENT);
         }
 
-        internal void DrawImage(IntPtr hdc, int index, int x, int y, Win32.ImageListDrawItemConstants flags)
+        internal void DrawImage(IntPtr hdc, int index, int x, int y, ImageListDrawItem flags)
         {
             if (this.iImageList == null)
             {
-                Win32.Win32Methods.ImageList_Draw(this.hIml, index, hdc, x, y, (int)flags);
+                comctl32.ImageList_Draw(this.hIml, index, hdc, x, y, (int)flags);
             }
             else
             {
-                Win32.IMAGELISTDRAWPARAMS pimldp = new Win32.IMAGELISTDRAWPARAMS()
+                IMAGELISTDRAWPARAMS pimldp = new IMAGELISTDRAWPARAMS()
                 {
                     hdcDst = hdc
                 };
@@ -129,11 +133,11 @@ namespace FileList.Models.ImageList
           int index,
           int x,
           int y,
-          Win32.ImageListDrawItemConstants flags,
+          ImageListDrawItem flags,
           int cx,
           int cy)
         {
-            Win32.IMAGELISTDRAWPARAMS pimldp = new Win32.IMAGELISTDRAWPARAMS()
+            IMAGELISTDRAWPARAMS pimldp = new IMAGELISTDRAWPARAMS()
             {
                 hdcDst = hdc
             };
@@ -147,7 +151,7 @@ namespace FileList.Models.ImageList
             if (this.iImageList == null)
             {
                 pimldp.himl = this.hIml;
-                Win32.Win32Methods.ImageList_DrawIndirect(ref pimldp);
+                comctl32.ImageList_DrawIndirect(ref pimldp);
             }
             else
                 this.iImageList.Draw(ref pimldp);
@@ -158,15 +162,15 @@ namespace FileList.Models.ImageList
           int index,
           int x,
           int y,
-          Win32.ImageListDrawItemConstants flags,
+          ImageListDrawItem flags,
           int cx,
           int cy,
           Color foreColor,
-          Win32.ImageListDrawStateConstants stateFlags,
+          ImageListDrawState stateFlags,
           Color saturateColorOrAlpha,
           Color glowOrShadowColor)
         {
-            Win32.IMAGELISTDRAWPARAMS pimldp = new Win32.IMAGELISTDRAWPARAMS()
+            IMAGELISTDRAWPARAMS pimldp = new IMAGELISTDRAWPARAMS()
             {
                 hdcDst = hdc
             };
@@ -177,12 +181,12 @@ namespace FileList.Models.ImageList
             pimldp.cx = cx;
             pimldp.cy = cy;
             pimldp.rgbFg = Color.FromArgb(0, (int)foreColor.R, (int)foreColor.G, (int)foreColor.B).ToArgb();
-            Extensions.WriteToConsole("{0}", (object)pimldp.rgbFg);
+            IoHelper.WriteToConsole("{0}", (object)pimldp.rgbFg);
             pimldp.fStyle = (int)flags;
             pimldp.fState = (int)stateFlags;
-            if ((stateFlags & Win32.ImageListDrawStateConstants.ILS_ALPHA) == Win32.ImageListDrawStateConstants.ILS_ALPHA)
+            if ((stateFlags & ImageListDrawState.ILS_ALPHA) == ImageListDrawState.ILS_ALPHA)
                 pimldp.Frame = (int)saturateColorOrAlpha.A;
-            else if ((stateFlags & Win32.ImageListDrawStateConstants.ILS_SATURATE) == Win32.ImageListDrawStateConstants.ILS_SATURATE)
+            else if ((stateFlags & ImageListDrawState.ILS_SATURATE) == ImageListDrawState.ILS_SATURATE)
             {
                 saturateColorOrAlpha = Color.FromArgb(0, (int)saturateColorOrAlpha.R, (int)saturateColorOrAlpha.G, (int)saturateColorOrAlpha.B);
                 pimldp.Frame = saturateColorOrAlpha.ToArgb();
@@ -192,7 +196,7 @@ namespace FileList.Models.ImageList
             if (this.iImageList == null)
             {
                 pimldp.himl = this.hIml;
-                Win32.Win32Methods.ImageList_DrawIndirect(ref pimldp);
+                comctl32.ImageList_DrawIndirect(ref pimldp);
             }
             else
                 this.iImageList.Draw(ref pimldp);
@@ -214,17 +218,17 @@ namespace FileList.Models.ImageList
             if (this.isXpOrAbove())
             {
                 Guid riid = new Guid("46EB5926-582E-4017-9FDF-E8998DAA0950");
-                Win32.Win32Methods.SHGetImageList((int)this.size, ref riid, ref this.iImageList);
-                Win32.Win32Methods.SHGetImageListHandle((int)this.size, ref riid, ref this.hIml);
+                shell32.SHGetImageList((int)this.size, ref riid, ref this.iImageList);
+                shell32.SHGetImageListHandle((int)this.size, ref riid, ref this.hIml);
             }
             else
             {
-                Win32.SHGetFileInfoConstants fileInfoConstants = Win32.SHGetFileInfoConstants.SHGFI_SYSICONINDEX | Win32.SHGetFileInfoConstants.SHGFI_USEFILEATTRIBUTES;
-                if (this.size == Win32.SysImageListSize.smallIcons)
-                    fileInfoConstants |= Win32.SHGetFileInfoConstants.SHGFI_SMALLICON;
-                Win32.SHFILEINFO psfi = new Win32.SHFILEINFO();
+                SHGetFileInfo fileInfoConstants = SHGetFileInfo.SHGFI_SYSICONINDEX | SHGetFileInfo.SHGFI_USEFILEATTRIBUTES;
+                if (this.size == SysImageListSize.smallIcons)
+                    fileInfoConstants |= SHGetFileInfo.SHGFI_SMALLICON;
+                SHFILEINFO psfi = new SHFILEINFO();
                 uint cbFileInfo = (uint)Marshal.SizeOf(psfi.GetType());
-                this.hIml = Win32.Win32Methods.SHGetFileInfo(".txt", Win32.FileAttributeConstants.FILE_ATTRIBUTE_NORMAL, ref psfi, cbFileInfo, (uint)fileInfoConstants);
+                this.hIml = shell32.SHGetFileInfo(".txt", FileAttribute.FILE_ATTRIBUTE_NORMAL, ref psfi, cbFileInfo, (uint)fileInfoConstants);
                 Debug.Assert(this.hIml != IntPtr.Zero, "Failed to create Image List");
             }
         }
@@ -234,7 +238,7 @@ namespace FileList.Models.ImageList
             this.create();
         }
 
-        internal SysImageList(Win32.SysImageListSize size)
+        internal SysImageList(SysImageListSize size)
         {
             this.size = size;
             this.create();

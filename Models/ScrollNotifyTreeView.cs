@@ -1,6 +1,7 @@
-﻿using FileList.Models.Win32;
-using System;
+﻿using System;
 using System.Windows.Forms;
+using Win32.Constants;
+using Win32.Libraries;
 
 namespace FileList.Models
 {
@@ -15,14 +16,14 @@ namespace FileList.Models
 
         public bool VerticleScrollVisible()
         {
-            long style = Win32Methods.GetWindowLongPtr(this.Handle, Win32GWL.GWL_STYLE).ToInt64();
-            return ((style & Win32WindowStyles.WS_VSCROLL) != 0);
+            long style = user32.GetWindowLongPtr(this.Handle, GwlCodes.GWL_STYLE).ToInt64();
+            return ((style & WindowStyles.WS_VSCROLL) != 0);
         }
 
         public bool HorizontalScrollVisible()
         {
-            long style = Win32Methods.GetWindowLongPtr(this.Handle, Win32GWL.GWL_STYLE).ToInt64();
-            return ((style & Win32WindowStyles.WS_HSCROLL) != 0);
+            long style = user32.GetWindowLongPtr(this.Handle, GwlCodes.GWL_STYLE).ToInt64();
+            return ((style & WindowStyles.WS_HSCROLL) != 0);
         }
 
         public TreeNode GetBottomVisibleNode()
@@ -51,7 +52,7 @@ namespace FileList.Models
         {
             switch (m.Msg)
             {
-                case Win32Messages.WM_VSCROLL:
+                case MessageCodes.WM_VSCROLL:
                     this.OnScrolled((Direction)m.WParam.ToInt32());
                     break;
                 default:
@@ -72,7 +73,7 @@ namespace FileList.Models
         {
             base.CreateHandle();
             // Explorer Theme
-            Win32Methods.SetWindowTheme(this.Handle, "explorer", null);
+            uxtheme.SetWindowTheme(this.Handle, "explorer", null);
         }
     }
 

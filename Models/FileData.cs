@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Common.Helpers;
 
 namespace FileList
 {
@@ -254,7 +255,7 @@ namespace FileList
             }
             catch (Exception ex)
             {
-                Extensions.WriteToConsole("LoadExtendedProperties exception: {0}", ex.Message);
+                IoHelper.WriteToConsole("LoadExtendedProperties exception: {0}", ex.Message);
                 //throw ex;
             }
             finally
@@ -275,7 +276,7 @@ namespace FileList
             }
             catch (Exception ex)
             {
-                Extensions.WriteToConsole("LoadExtendedPropertiesLight exception: {0}", ex.Message);
+                IoHelper.WriteToConsole("LoadExtendedPropertiesLight exception: {0}", ex.Message);
             }
         }
 
@@ -297,7 +298,7 @@ namespace FileList
             }
             catch (Exception ex)
             {
-                Extensions.WriteToConsole("LoadFilePropertyNames exception: {0}", ex.Message);
+                IoHelper.WriteToConsole("LoadFilePropertyNames exception: {0}", ex.Message);
             }
         }
 
