@@ -241,7 +241,7 @@ namespace FileList
                     Folder folder = this._shell.NameSpace(System.IO.Path.GetDirectoryName(this.Path));
                     FolderItem name = folder.ParseName(System.IO.Path.GetFileName(this.Path));
                     
-                    for (int iColumn = -1; iColumn < 100; iColumn++) //(int)short.MaxValue
+                    for (int iColumn = -1; iColumn < 1000; iColumn++) //(int)short.MaxValue
                     {
                         string detailsOf = folder.GetDetailsOf(null, iColumn);
                         if (string.IsNullOrEmpty(detailsOf))

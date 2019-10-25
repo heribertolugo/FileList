@@ -416,10 +416,8 @@ namespace FileList.Models
             this.treeView1.Nodes.Clear();
             this.treeView1.Nodes.AddRange(nodes);
             this.treeView1.EndUpdate();
-            //this.SetNodeVisibility(this.treeView1, this.SortedNodes);
             this.ScrollTreeToTop();
             this.SetTriggerNodes();
-            //this.treeView1.ExpandAll();
         }
 
         private void TreeView1_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -594,7 +592,7 @@ namespace FileList.Models
                 List<string> list = this.fileTypesCheckedListBox.CheckedItems.Cast<FileExtensionCount>().Select(f => f.Extension).ToList();
                 if (checkedExt != null)
                 {
-                    string str = this.fileTypesCheckedListBox.Items[checkedExt.Index].ToString();
+                    string str = (this.fileTypesCheckedListBox.Items[checkedExt.Index] as FileExtensionCount).Extension;
                     if (checkedExt.NewValue == CheckState.Checked && !list.Contains(str))
                         list.Add(str);
                     else if (checkedExt.NewValue == CheckState.Unchecked && list.Contains(str))
@@ -751,7 +749,7 @@ namespace FileList.Models
             foreach (TreeNode node in temp)
                 this.SortedNodes.Add(node);
             this.treeView1.Nodes.Clear();
-            this.treeView1.TreeViewNodeSorter = comparer; // we shouldnt need sort anymore. we can depend on out SortedSet
+            this.treeView1.TreeViewNodeSorter = comparer; // we shouldnt need sort anymore. we can depend on our SortedSet
             this.treeView1.Nodes.AddRange(this.SortedNodes.Take(this.treeView1.VisibleCount*2).Select(n => 
                 {
                     TreeNode clone = (TreeNode)n.Clone();

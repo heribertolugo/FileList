@@ -34,3 +34,8 @@ https://www.codeproject.com/Articles/3582/Word-Control-for-NET
 
 excel documents
 https://www.codingame.com/playgrounds/9014/read-write-excel-file-with-oledb-in-c-without-interop
+
+media player
+https://www.codeproject.com/Articles/109639/nVLC
+https://github.com/ZeBobo5/Vlc.DotNet
+https://github.com/mfkl/libvlc-nuget
