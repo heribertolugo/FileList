@@ -160,9 +160,12 @@ namespace FileList.Logic
                 //thread.Join();
                 this._fileListControl.InvokeIfRequired(f => f.SearcherThreads += 1);
 
+                bucketCount++;
+
                 Extensions.WriteToConsole("Created thread");
-                if ((bucketCount = ConcurrentFileSearchMinion.ThreadBucketCount()) >= maxThreads)
-                    break;
+                if (bucketCount >= maxThreads || (bucketCount = ConcurrentFileSearchMinion.ThreadBucketCount()) >= maxThreads)
+                //if ((bucketCount = ConcurrentFileSearchMinion.ThreadBucketCount()) >= maxThreads)
+                        break;
             }
         }
 
@@ -235,12 +238,12 @@ namespace FileList.Logic
             [STAThread]
             public void Start()
             {
-                if (ConcurrentFileSearchMinion.IsCancelled())
-                    return;
+                if (!ConcurrentFileSearchMinion.IsCancelled())
+                {
+                    this.AddDirectories(this._root, ConcurrentFileSearch.Directories);
+                    this.GetFiles(this._root, this._files);
+                }
 
-                this.AddDirectories(this._root, ConcurrentFileSearch.Directories);
-
-                this.GetFiles(this._root, this._files);
                 this.RmoveFromThreadBucket();
                 this.OnFinished(new ConcurrentFileSearchEventArgs(null));
             }
@@ -331,7 +334,11 @@ namespace FileList.Logic
                 {
                     this._fileSearch = new FileSearch(root, false, Models.Win32.Win32Methods.GetIShellDispatch5());
 
-                    while (this._fileSearch.GetNext() != null)
+                    // access thread unsafe ConcurrentFileSearchMinion._isCancelled
+                    // its ok because its not a big deal to get incorrect value right away
+                    // if thread access exception is thrown, it is because value is changing.
+                    // we catch the error, forcing us to quit.
+                    while (this._fileSearch.GetNext() != null && !ConcurrentFileSearchMinion._isCancelled)
                     {
                         Extensions.WriteToConsole("thread id #{0} found file {1}", this.ID, this._fileSearch.Current.Value.Path);
                         this.AttachFileData(this._fileSearch.Current.Value, this._fileListControl);

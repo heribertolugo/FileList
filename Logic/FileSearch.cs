@@ -18,8 +18,7 @@ namespace FileList.Logic
         {
             this._root = root;
             this._fileEnumerator = this.Search(this._root, searchSubdirectories).GetEnumerator();
-            this._shell = shell ?? new ShellClass(); // Models.Win32.Win32Methods.GetIShellDispatch5();
-            //this._shell = obj ?? new ShellClass();/*(Shell)*/
+            this._shell = shell ?? new ShellClass(); 
         }
 
         public FileData? GetNext()
@@ -36,6 +35,7 @@ namespace FileList.Logic
             }
         }
 
+        private int NameSpaceAttempts = 0;
         private static object shellLock = new object();
         [STAThread]
         private IEnumerable<FileData> Search(string path, bool searchSubdirectories = true)
@@ -45,15 +45,30 @@ namespace FileList.Logic
 
             try
             {
-                objFolder = shell.NameSpace(path);
+                objFolder = shell.NameSpace(path);                
             }
-            catch (Exception ex) // file would be inaccessable to shellclass
+            catch (Exception ex)
             {
+                // file would be inaccessable to shellclass, usually because of access permissions
+                // but sometimes, ShellClass seems to get out of sync.
+                // in which case it will throw  The object invoked has disconnected from its clients exception
+                // in this scenario, we want to attempt 1 more time to collect extended properties, with a new ShellClass
+                
                 //throw;
             }
 
             if (objFolder == null)
             {
+                if (this.NameSpaceAttempts < 1)
+                {
+                    this.NameSpaceAttempts++;
+                    this._shell = new ShellClass();
+                    foreach (FileData f in this.Search(path, searchSubdirectories))
+                        yield return f;
+                    Marshal.ReleaseComObject(objFolder);
+                    yield break;
+                }
+
                 IEnumerable<FileData> files = System.Linq.Enumerable.Empty<FileData>();
                 try
                 {
@@ -68,6 +83,7 @@ namespace FileList.Logic
 
                 foreach (FileData file in files)
                     yield return file;
+                Marshal.ReleaseComObject(objFolder);
                 yield break;
             }
 
@@ -142,7 +158,7 @@ namespace FileList.Logic
             }
             try
             {
-                //Marshal.ReleaseComObject(objFolder);
+                Marshal.ReleaseComObject(objFolder);
             }
             catch (Exception ex1)
             {
