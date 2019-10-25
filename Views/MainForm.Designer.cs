@@ -37,7 +37,7 @@ namespace FileList.Views
             this.label2 = new System.Windows.Forms.Label();
             this.browseButton = new System.Windows.Forms.Button();
             this.searchButton = new System.Windows.Forms.Button();
-            this.splitContainer1 = new GripSplitContainer();
+            this.splitContainer1 = new FileList.Models.GripSplitContainer();
             this.fileListControl1 = new FileList.Models.FileListControl();
             this.viewerTabControl = new System.Windows.Forms.TabControl();
             this.imageTabPage = new System.Windows.Forms.TabPage();
@@ -152,6 +152,7 @@ namespace FileList.Views
             this.fileListControl1.FileTypeListSorted = false;
             this.fileListControl1.Location = new System.Drawing.Point(0, 0);
             this.fileListControl1.Name = "fileListControl1";
+            this.fileListControl1.SearcherThreads = 1;
             this.fileListControl1.Size = new System.Drawing.Size(783, 734);
             this.fileListControl1.TabIndex = 0;
             this.fileListControl1.TreeImageList = null;

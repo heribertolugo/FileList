@@ -2,12 +2,12 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace FileList.Models.Win32
+namespace Win32.Models
 {
     [Guid("46EB5926-582E-4017-9FDF-E8998DAA0950")]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     [ComImport]
-    internal interface IImageList
+    public interface IImageList
     {
         [MethodImpl(MethodImplOptions.PreserveSig)]
         int Add(IntPtr hbmImage, IntPtr hbmMask, ref int pi);

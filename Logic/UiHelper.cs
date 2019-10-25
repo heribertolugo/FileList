@@ -189,7 +189,7 @@ namespace FileList.Logic
                     UiHelper.DisplayBrowsablePreview(new FileData?(), contentsListView);
                     UiHelper.DisplayImagePreview((string)null, imageViewerPanel, ImageLayout.None);
                     UiHelper.DisplayTextPreview((string)null, textViewerTextBox);
-                    UiHelper.DisplayApplicationPreview(path, (TextBoxBase)textViewerTextBox);
+                    UiHelper.DisplayApplicationPreview((string)null, (TextBoxBase)textViewerTextBox);
                     tabControl.SelectedTab = documentTabPage;
                     break;
                 case FileType.Image:
@@ -218,8 +218,14 @@ namespace FileList.Logic
             tabControl.SelectedTab = documentTabPage;
         }
 
+        static Thread textThread = null;
+        static CancellationTokenSource textThreadCancel;
         private static void DisplayApplicationPreview(string path, TextBoxBase textBox)
         {
+            if (textThread != null && textThreadCancel != null)
+            {
+                textThreadCancel.Cancel();
+            }
             if (path == null)
             {
                 textBox.Text = (string)null;
@@ -228,13 +234,58 @@ namespace FileList.Logic
             {
                 try
                 {
-                    textBox.Text = File.ReadAllText(path);
+                    textBox.Tag = path;
+
+                    textThread = new Thread((object s) =>
+                    {
+                        TextBoxBase box = textBox;
+                        CancellationTokenSource token = (CancellationTokenSource)s;
+
+                        box.Invoke((MethodInvoker)delegate
+                        {
+                            box.Clear();
+                            box.Focus();
+                            box.SelectionStart = box.Text.Length;
+                            box.Select();
+                        });
+
+                        string p = box.Tag as string;
+
+                        using (StreamReader reader = new StreamReader(p, UiHelper.GetFileEncoding(p)))
+                        {
+                            string intkar = string.Empty;
+                            try
+                            {
+                                while ((intkar = reader.ReadLine()) != null)
+                                {
+                                    token.Token.ThrowIfCancellationRequested();
+                                    box.Invoke((MethodInvoker)delegate
+                                    {
+                                        box.AppendText(intkar);
+                                    });
+                                }
+                            }
+                            catch (Exception) { 
+                                //box.Invoke((MethodInvoker)delegate{ box.Clear(); }); 
+                            }
+                        }
+                    });
+
+                    textThread.IsBackground = true;
+                    textThreadCancel = new CancellationTokenSource();
+
+                    textThread.Start(textThreadCancel);
                 }
                 catch (Exception ex)
                 {
                     textBox.Text = (string)null;
                 }
             }
+        }
+
+        private static System.Text.Encoding GetFileEncoding(string path)
+        {
+            return System.Text.Encoding.UTF8;
         }
 
         private static void DisplayImagePreview(string path, Control control, ImageLayout imageLayout)
@@ -267,6 +318,11 @@ namespace FileList.Logic
             {
                 try
                 {
+                    if (textThread != null && textThreadCancel != null)
+                    {
+                        textThreadCancel.Cancel();
+                    }
+                    textBox.Clear();
                     textBox.LoadFile(path, Path.GetExtension(path).ToLower().Equals(".rtf") ? RichTextBoxStreamType.RichText : RichTextBoxStreamType.PlainText);
                 }
                 catch (Exception ex)

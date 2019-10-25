@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{81A0CDFD-F069-4BE5-8F60-277B70C9C57C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Win32</RootNamespace>
+    <AssemblyName>w32</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Constants\ClassStyles.cs" />
+    <Compile Include="Constants\FileAttribute.cs" />
+    <Compile Include="Constants\FormatMessageFlags.cs" />
+    <Compile Include="Constants\GwlCodes.cs" />
+    <Compile Include="Constants\HRESULT.cs" />
+    <Compile Include="Constants\ImageListDrawItem.cs" />
+    <Compile Include="Constants\ImageListDrawState.cs" />
+    <Compile Include="Constants\MessageCodes.cs" />
+    <Compile Include="Constants\Misc.cs" />
+    <Compile Include="Constants\MousePositionCodes.cs" />
+    <Compile Include="Constants\MSHCTX.cs" />
+    <Compile Include="Constants\MSHLFLAGS.cs" />
+    <Compile Include="Constants\ShellIconFlags.cs" />
+    <Compile Include="Constants\ShellIconState.cs" />
+    <Compile Include="Constants\SHGetFileInfo.cs" />
+    <Compile Include="Constants\STREAM_SEEK.cs" />
+    <Compile Include="Constants\SysImageListSize.cs" />
+    <Compile Include="Constants\WindowStyles.cs" />
+    <Compile Include="Libraries\comctl32.cs" />
+    <Compile Include="Libraries\dwmapi.cs" />
+    <Compile Include="Libraries\Gdi32.cs" />
+    <Compile Include="Libraries\kernal32.cs" />
+    <Compile Include="Libraries\ole32.cs" />
+    <Compile Include="Libraries\shell32.cs" />
+    <Compile Include="Libraries\shlwapi.cs" />
+    <Compile Include="Libraries\user32.cs" />
+    <Compile Include="Libraries\uxtheme.cs" />
+    <Compile Include="Models\IImageList.cs" />
+    <Compile Include="Models\IMAGEINFO.cs" />
+    <Compile Include="Models\IMAGELISTDRAWPARAMS.cs" />
+    <Compile Include="Models\MARGINS.cs" />
+    <Compile Include="Models\POINT.cs" />
+    <Compile Include="Models\RECT.cs" />
+    <Compile Include="Models\SHFILEINFO.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Shell32">
+      <Guid>{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{43df2658-688f-4dbb-bc72-26c5e7d418a1}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

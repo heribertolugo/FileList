@@ -15,9 +15,12 @@ namespace FileList.Models
 
             Rectangle splitter = this.SplitterRectangle;
             int count = 0;
-            Rectangle grip = new Rectangle(splitter.X, splitter.Y, splitter.Width-1 , 2);
+            Rectangle grip = new Rectangle(splitter.X, splitter.Y, splitter.Width-1 , 2); 
             SolidBrush gripBrush = new SolidBrush(Color.Gray);
             SolidBrush gripBrushHighlight = new SolidBrush(Color.White);
+            Brush systemBrush = SystemBrushes.ScrollBar;
+
+            e.Graphics.FillRectangle(systemBrush, splitter);
 
             while (grip.Y < (splitter.Height - 6))
             {
@@ -34,6 +37,9 @@ namespace FileList.Models
                 grip.Y += 4;
                 count++;
             }
+
+            gripBrush.Dispose();
+            gripBrushHighlight.Dispose();
         }
 
         protected override void OnPaintBackground(PaintEventArgs e)
