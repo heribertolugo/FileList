@@ -1,13 +1,12 @@
-﻿
-using FileList.Models;
-using FileList.Views;
+﻿using Common.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
-namespace FileList.Logic
+namespace Common.Helpers
 {
-    public static class Misc
+    public class FileStorageSize
     {
         private static ICollection<string> ByteVariants = new string[] { "byte", "bytes", "bt", "bts" };
         private static ICollection<string> KilobyteVariants = new string[] { "kilobyte", "kilobytes", "kb", "kbs" };
@@ -15,19 +14,19 @@ namespace FileList.Logic
         private static ICollection<string> GigabyteVariants = new string[] { "gigabyte", "gigabytes", "gb", "gbs" };
         private static ICollection<string> TerabyteVariants = new string[] { "terabyte", "terabytes", "tb", "tbs" };
 
-        public static float ConvertStorageValueToKb(float value, StorageSize storageSize)
+        public static float ConvertStorageValueToKb(float value, StorageSizeType storageSize)
         {
             int multiplier = 1024;
             int sizeFactor;
             switch (storageSize)
             {
-                case StorageSize.Kb:
+                case StorageSizeType.Kb:
                     sizeFactor = 0;
                     break;
-                case StorageSize.Mb:
+                case StorageSizeType.Mb:
                     sizeFactor = 1;
                     break;
-                case StorageSize.Gb:
+                case StorageSizeType.Gb:
                     sizeFactor = 2;
                     break;
                 default:
@@ -94,55 +93,40 @@ namespace FileList.Logic
             if (!float.TryParse(values[0], out storageSize))
                 return 0.0f;
 
-            StorageSize storageType;
+            StorageSizeType storageType;
 
             // we ran into plural.. make singular and try to parse
             if (values[1].Length == 3)
                 values[1] = values[1].Substring(0, 2);
-            if (Misc.TryParseEnum<StorageSize>(values[1], true, out storageType))
-                return Misc.ConvertStorageValueToKb(storageSize, storageType);
+            if (Common.Helpers.EnumHelpers.TryParseEnum<StorageSizeType>(values[1], true, out storageType))
+                return FileStorageSize.ConvertStorageValueToKb(storageSize, storageType);
             // if our parse was not successful, try other means
-            if (Misc.KilobyteVariants.Contains(values[1].ToLowerInvariant()))
-                storageType = StorageSize.Kb;
-            else if (Misc.MegabyteVariants.Contains(values[1].ToLowerInvariant()))
-                storageType = StorageSize.Mb;
-            else if (Misc.GigabyteVariants.Contains(values[1].ToLowerInvariant()))
-                storageType = StorageSize.Gb;
-            else if (Misc.TerabyteVariants.Contains(values[1].ToLowerInvariant()))
+            if (FileStorageSize.KilobyteVariants.Contains(values[1].ToLowerInvariant()))
+                storageType = StorageSizeType.Kb;
+            else if (FileStorageSize.MegabyteVariants.Contains(values[1].ToLowerInvariant()))
+                storageType = StorageSizeType.Mb;
+            else if (FileStorageSize.GigabyteVariants.Contains(values[1].ToLowerInvariant()))
+                storageType = StorageSizeType.Gb;
+            else if (FileStorageSize.TerabyteVariants.Contains(values[1].ToLowerInvariant()))
             {
                 storageSize /= (float)multiplier;
-                storageType = StorageSize.Gb;
+                storageType = StorageSizeType.Gb;
             }
             else
             {
-                if (!Misc.ByteVariants.Contains(values[1].ToLowerInvariant()))
+                if (!FileStorageSize.ByteVariants.Contains(values[1].ToLowerInvariant()))
                     return 0.0f;
                 storageSize /= (float)multiplier;
-                storageType = StorageSize.Kb;
+                storageType = StorageSizeType.Kb;
             }
             try
             {
-                return Misc.ConvertStorageValueToKb(storageSize, storageType);
+                return FileStorageSize.ConvertStorageValueToKb(storageSize, storageType);
             }
             catch (Exception ex)
             {
                 return 0.0f;
             }
         }
-
-        public static bool TryParseEnum<TEnum>(string value, bool ignoreCase, out TEnum result) where TEnum : struct, IConvertible
-        {
-            try
-            {
-                result = (TEnum)Enum.Parse(typeof(TEnum), value, ignoreCase);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                result = default(TEnum);
-                return false;
-            }
-        }
     }
 }
-

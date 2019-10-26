@@ -22,5 +22,10 @@ namespace Common.Models
         /// Control which is used to preview file
         /// </summary>
         Control Viewer { get; }
+
+        /// <summary>
+        /// The system type for the file
+        /// </summary>
+        FileType FileType { get; }
     }
 }

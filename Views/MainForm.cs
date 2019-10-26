@@ -1,4 +1,5 @@
 ﻿using Common.Extensions;
+using Common.Models;
 using FileList.Logic;
 using FileList.Models;
 using System;
@@ -172,7 +173,7 @@ namespace FileList.Views
                 return;
             ImageLayout imageLayout = control.BackgroundImage.Width <= control.Width && control.BackgroundImage.Height <= control.Height ? (control.BackgroundImage.Width > control.Width / 4 && control.BackgroundImage.Height >= control.Height / 4 ? ImageLayout.Zoom : ImageLayout.Center) : ImageLayout.Zoom;
             control.BackgroundImageLayout = imageLayout;
-            CheckBox checkBox = ((IEnumerable<Control>)buttonContainer.Controls[0].Controls.Find(string.Format("{0}Button", (object)Enum.GetName(typeof(ImageLayout), (object)imageLayout)), true)).FirstOrDefault<Control>() as CheckBox;
+            CheckBox checkBox = buttonContainer.Controls[0].Controls.Find(string.Format("{0}Button", Enum.GetName(typeof(ImageLayout), imageLayout)), true).FirstOrDefault() as CheckBox;
             if (this.previousButton != null)
                 this.previousButton.CheckState = CheckState.Unchecked;
             checkBox.CheckState = CheckState.Checked;

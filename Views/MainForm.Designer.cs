@@ -37,7 +37,7 @@ namespace FileList.Views
             this.label2 = new System.Windows.Forms.Label();
             this.browseButton = new System.Windows.Forms.Button();
             this.searchButton = new System.Windows.Forms.Button();
-            this.splitContainer1 = new FileList.Models.GripSplitContainer();
+            this.splitContainer1 = new Common.Models.GripSplitContainer();
             this.fileListControl1 = new FileList.Models.FileListControl();
             this.viewerTabControl = new System.Windows.Forms.TabControl();
             this.imageTabPage = new System.Windows.Forms.TabPage();
@@ -364,7 +364,7 @@ namespace FileList.Views
         private System.Windows.Forms.TextBox rootPathTextBox;
         private System.Windows.Forms.Panel browsePanel;
         private System.Windows.Forms.Button searchButton;
-        private GripSplitContainer splitContainer1;
+        private Common.Models.GripSplitContainer splitContainer1;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button browseButton;
         private System.Windows.Forms.Panel imageViewerPanel;

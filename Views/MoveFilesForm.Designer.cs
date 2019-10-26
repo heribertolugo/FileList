@@ -49,7 +49,7 @@
             this.cancelButton = new System.Windows.Forms.Button();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.splitContainer2 = new Models.GripSplitContainer();
+            this.splitContainer2 = new Common.Models.GripSplitContainer();
             this.progressInfoControl1 = new FileList.Models.ProgressInfoControl();
             this.panel3.SuspendLayout();
             this.panel5.SuspendLayout();
@@ -339,7 +339,7 @@
         private System.Windows.Forms.Label label1;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
-        private Models.GripSplitContainer splitContainer2;
+        private Common.Models.GripSplitContainer splitContainer2;
         private System.Windows.Forms.CheckBox overwriteCheckBox;
         private Models.ProgressInfoControl progressInfoControl1;
     }

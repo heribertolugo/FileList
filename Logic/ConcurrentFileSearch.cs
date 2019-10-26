@@ -1,5 +1,6 @@
 ﻿using Common.Extensions;
 using Common.Helpers;
+using Common.Models;
 using FileList.Models;
 using System;
 using System.Collections.Generic;
@@ -72,18 +73,18 @@ namespace FileList.Logic
                         c.TreeImageList = new ImageList();
                     ImageList treeImageList = c.TreeImageList;
                     if (!treeImageList.Images.ContainsKey(UiHelper.DirectoryKey))
-                        treeImageList.Images.Add(UiHelper.DirectoryKey, iconConverter.GetImage(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), FileToIconConverter.IconSize.Small).ToBitmap());
+                        treeImageList.Images.Add(UiHelper.DirectoryKey, iconConverter.GetImage(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), IconSize.Small).ToBitmap());
                     if (!treeImageList.Images.ContainsKey(UiHelper.ZipExtension))
-                        treeImageList.Images.Add(UiHelper.ZipExtension, iconConverter.GetImage(UiHelper.ZipExtension, FileToIconConverter.IconSize.Small).ToBitmap());
+                        treeImageList.Images.Add(UiHelper.ZipExtension, iconConverter.GetImage(UiHelper.ZipExtension, IconSize.Small).ToBitmap());
                     if (!treeImageList.Images.ContainsKey(UiHelper.NoneFileExtension))
-                        treeImageList.Images.Add(UiHelper.NoneFileExtension, iconConverter.GetImage(UiHelper.NoneFileExtension, FileToIconConverter.IconSize.Small).ToBitmap());
+                        treeImageList.Images.Add(UiHelper.NoneFileExtension, iconConverter.GetImage(UiHelper.NoneFileExtension, IconSize.Small).ToBitmap());
 
                     foreach (FileData file in files)
                     {
                         ImageList.ImageCollection images = treeImageList.Images;
                         if (!images.ContainsKey(file.Extension))
                         {
-                            Bitmap icon = iconConverter.GetImage(file.Path, FileToIconConverter.IconSize.Small).ToBitmap();
+                            Bitmap icon = iconConverter.GetImage(file.Path, IconSize.Small).ToBitmap();
                             images.Add(file.Extension, icon);
                         }
 
@@ -396,16 +397,16 @@ namespace FileList.Logic
                         c.TreeImageList = new ImageList();
                     ImageList treeImageList = c.TreeImageList;
                     if (!treeImageList.Images.ContainsKey(UiHelper.DirectoryKey))
-                        treeImageList.Images.Add(UiHelper.DirectoryKey, iconConverter.GetImage(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), FileToIconConverter.IconSize.Small).ToBitmap());
+                        treeImageList.Images.Add(UiHelper.DirectoryKey, iconConverter.GetImage(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), IconSize.Small).ToBitmap());
                     if (!treeImageList.Images.ContainsKey(UiHelper.ZipExtension))
-                        treeImageList.Images.Add(UiHelper.ZipExtension, iconConverter.GetImage(UiHelper.ZipExtension, FileToIconConverter.IconSize.Small).ToBitmap());
+                        treeImageList.Images.Add(UiHelper.ZipExtension, iconConverter.GetImage(UiHelper.ZipExtension, IconSize.Small).ToBitmap());
                     if (!treeImageList.Images.ContainsKey(UiHelper.NoneFileExtension))
-                        treeImageList.Images.Add(UiHelper.NoneFileExtension, iconConverter.GetImage(UiHelper.NoneFileExtension, FileToIconConverter.IconSize.Small).ToBitmap());
+                        treeImageList.Images.Add(UiHelper.NoneFileExtension, iconConverter.GetImage(UiHelper.NoneFileExtension, IconSize.Small).ToBitmap());
 
                     ImageList.ImageCollection images = treeImageList.Images;
                     if (!images.ContainsKey(file.Extension))
                     {
-                        Bitmap icon = iconConverter.GetImage(file.Path, FileToIconConverter.IconSize.Small).ToBitmap();
+                        Bitmap icon = iconConverter.GetImage(file.Path, IconSize.Small).ToBitmap();
                         images.Add(file.Extension, icon);
                     }
 

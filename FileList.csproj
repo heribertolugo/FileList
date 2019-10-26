@@ -65,10 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Logic\ConcurrentFileSearch.cs" />
-    <Compile Include="Logic\Extensions.cs" />
     <Compile Include="Logic\FileSearch.cs" />
-    <Compile Include="Logic\FileToIconConverter.cs" />
-    <Compile Include="Logic\Misc.cs" />
     <Compile Include="Logic\Mover.cs" />
     <Compile Include="Logic\NotepadHelper.cs" />
     <Compile Include="Logic\UiHelper.cs" />
@@ -76,22 +73,12 @@
     <Compile Include="Models\ConcurrentQueue.cs" />
     <Compile Include="Models\Direction.cs" />
     <Compile Include="Models\FileSearchWorkerArgs.cs" />
-    <Compile Include="Models\GripSplitContainer.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Models\ScrollNotifyTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Models\DateFilter.cs" />
-    <Compile Include="Models\DropForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Models\DropForm.Designer.cs">
-      <DependentUpon>DropForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Models\Enums.cs" />
     <Compile Include="Models\EnumToUi.cs" />
-    <Compile Include="Models\FileData.cs" />
     <Compile Include="Models\FileDataGroup.cs" />
     <Compile Include="Models\FileDataSortStack.cs" />
     <Compile Include="Models\FileListControl.cs">
@@ -100,10 +87,7 @@
     <Compile Include="Models\FileListControl.Designer.cs">
       <DependentUpon>FileListControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Models\FileType.cs" />
-    <Compile Include="Models\ImageList.cs" />
     <Compile Include="Models\IMultiComparer.cs" />
-    <Compile Include="Models\IMultiValueConverter.cs" />
     <Compile Include="Models\NodeComparers.cs" />
     <Compile Include="Models\ProgressInfoControl.cs">
       <SubType>UserControl</SubType>

@@ -1,4 +1,5 @@
-﻿using FileList.Logic;
+﻿using Common.Models;
+using FileList.Logic;
 using FileList.Models;
 using FileList.Properties;
 using System;
@@ -16,9 +17,9 @@ namespace FileList.Views
         public event EventHandler<FilterSelectedEventArgs> OnFilterSelectedHandler;
 
         private static readonly FilterType DefaultUiFilterType = FilterType.None;
-        private static readonly StorageSize DefaultUiStorageSize = StorageSize.None;
+        private static readonly StorageSizeType DefaultUiStorageSize = StorageSizeType.None;
         private static EnumToUi<FilterType>[] UiFilterTypes = null;
-        private static EnumToUi<StorageSize>[] UiStorageSizes = null;
+        private static EnumToUi<StorageSizeType>[] UiStorageSizes = null;
         private bool _dataSourcesSet = false;
 
         public FileFilterForm()
@@ -155,14 +156,14 @@ namespace FileList.Views
             }
             if (FileFilterForm.UiStorageSizes == null)
             {
-                FileFilterForm.UiStorageSizes = Enum.GetValues(typeof(StorageSize)).Cast<StorageSize>().Select(s => new EnumToUi<StorageSize>(s)).ToArray();
+                FileFilterForm.UiStorageSizes = Enum.GetValues(typeof(StorageSizeType)).Cast<StorageSizeType>().Select(s => new EnumToUi<StorageSizeType>(s)).ToArray();
                 //FileFilterForm.DefaultUiStorageSize = StorageSize.None;
             }
             this.sizeFilterComboBox.DataSource = FileFilterForm.UiFilterTypes.Select(n => new EnumToUi<FilterType>(n.Value)).ToArray();
             this.dateModifiedComboBox.DataSource = FileFilterForm.UiFilterTypes.Select(n => new EnumToUi<FilterType>(n.Value)).ToArray();
             this.dateCreatedcomboBox.DataSource = FileFilterForm.UiFilterTypes.Select(n => new EnumToUi<FilterType>(n.Value)).ToArray();
-            this.sizeType1ComboBox.DataSource = FileFilterForm.UiStorageSizes.Select(n => new EnumToUi<StorageSize>(n.Value)).ToArray();
-            this.sizeType2ComboBox.DataSource = FileFilterForm.UiStorageSizes.Select(n => new EnumToUi<StorageSize>(n.Value)).ToArray();
+            this.sizeType1ComboBox.DataSource = FileFilterForm.UiStorageSizes.Select(n => new EnumToUi<StorageSizeType>(n.Value)).ToArray();
+            this.sizeType2ComboBox.DataSource = FileFilterForm.UiStorageSizes.Select(n => new EnumToUi<StorageSizeType>(n.Value)).ToArray();
             this.sizeFilterComboBox.ValueMember = "Value";
             this.sizeFilterComboBox.DisplayMember = "Friendly";
             this.dateModifiedComboBox.ValueMember = "Value";
@@ -182,20 +183,20 @@ namespace FileList.Views
                 return;
 
             FilterType filterType = (FilterType)this.sizeFilterComboBox.SelectedValue;
-            StorageSize storageType1 = (StorageSize)this.sizeType1ComboBox.SelectedValue;
-            StorageSize? storageType2 = (StorageSize)this.sizeType2ComboBox.SelectedValue;
+            StorageSizeType storageType1 = (StorageSizeType)this.sizeType1ComboBox.SelectedValue;
+            StorageSizeType? storageType2 = (StorageSizeType)this.sizeType2ComboBox.SelectedValue;
             float sizeValue1 = (float)this.sizeAmount1NumericUpDown.Value;
             float? sizeValue2 = (float)this.sizeAmount2NumericUpDown.Value;
             Panel value2Panel = this.sizeValue2Panel;
 
             value2Panel.Visible = (filterType == FilterType.Between);
 
-            if (filterType == FilterType.None || storageType1 == StorageSize.None)
+            if (filterType == FilterType.None || storageType1 == StorageSizeType.None)
             {
                 filterType = FilterType.None;
                 sizeValue1 = 0;
                 sizeValue2 = null;
-                storageType1 = StorageSize.None;
+                storageType1 = StorageSizeType.None;
                 storageType2 = null;
             }else if (filterType != FilterType.Between)
             {
@@ -204,10 +205,10 @@ namespace FileList.Views
             }
 
             this.SizeFilter = new SizeFilter(filterType, sizeValue1, storageType1, sizeValue2, storageType2);
-            this.OnFilterSelected(new FilterSelectedEventArgs(Filter.Size, filterType, 
-                                    Misc.ConvertStorageValueToKb(sizeValue1, storageType1)
-                                    , Misc.ConvertStorageValueToKb(sizeValue2.HasValue ? sizeValue2.Value : 0.0f
-                                    , storageType2.HasValue ? storageType2.Value : StorageSize.None)));
+            this.OnFilterSelected(new FilterSelectedEventArgs(Filter.Size, filterType,
+                                    Common.Helpers.FileStorageSize.ConvertStorageValueToKb(sizeValue1, storageType1)
+                                    , Common.Helpers.FileStorageSize.ConvertStorageValueToKb(sizeValue2.HasValue ? sizeValue2.Value : 0.0f
+                                    , storageType2.HasValue ? storageType2.Value : StorageSizeType.None)));
         }
 
         private void HandleDateFilterValueChanged(Filter filter, FilterType filterType, DateTimePicker dateTime1, Panel dateTime2Panel)

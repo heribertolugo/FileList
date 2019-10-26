@@ -17,12 +17,4 @@
         GreaterThan,
         Equals,
     }
-
-    public enum StorageSize
-    {
-        None,
-        Kb,
-        Mb,
-        Gb,
-    }
 }

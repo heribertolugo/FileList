@@ -1,5 +1,4 @@
-﻿using Common.Extensions;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using Win32.Constants;
 
@@ -85,7 +84,7 @@ namespace Win32.Libraries
             Guid shellId = Marshal.GenerateGuidForType(typeof(Shell32.IShellDispatch5));
             try
             {
-                    IntPtr ptr = mystream.ToIntPtr();
+                    IntPtr ptr = (IntPtr)GCHandle.Alloc(mystream);
 
                 mystream.Seek(0, 0, ptr);
                 HRESULT o = CoUnmarshalInterface(mystream, ref shellId, out localObject);
@@ -108,7 +107,7 @@ namespace Win32.Libraries
             Guid guid = Marshal.GenerateGuidForType(typeof(T));
             mystream = shlwapi.SHCreateMemStream(null, 0);
 
-                IntPtr ptr = mystream.ToIntPtr();
+                IntPtr ptr = (IntPtr)GCHandle.Alloc(mystream);
             mystream.Seek(0, 0, ptr);
 
             HRESULT result = CoMarshalInterface(mystream, ref guid, obj, MSHCTX.MSHCTX_INPROC, new IntPtr(), MSHLFLAGS.MSHLFLAGS_NORMAL);

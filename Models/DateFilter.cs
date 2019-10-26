@@ -57,7 +57,7 @@ namespace FileList.Models
 
             if (this.FilterType != FilterType.None)
             {
-                builder.Append(Enum.GetName(typeof(FilterType), this.FilterType));
+                builder.Append(Common.Helpers.EnumHelpers.GetFriendly<FilterType>(this.FilterType, false));
 
                 if (this.DateTime1.HasValue)
                     builder.Append($" {this.DateTime1.Value.ToString("MM/dd/yy mm:hh tt")}");

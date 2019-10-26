@@ -1,4 +1,4 @@
-﻿using FileList.Logic;
+﻿using Common.Helpers;
 using Shell32;
 using System;
 using System.Collections;
@@ -6,9 +6,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using Common.Helpers;
 
-namespace FileList
+namespace Common.Models
 {
     public struct FileData : ICloneable
     {
@@ -34,7 +33,7 @@ namespace FileList
         {
             if (FileData._filePropertyNamesLock == null)
                 FileData._filePropertyNamesLock = new object();
-
+            
             //Extensions.WriteToConsole("requesting filePropertyNames lock @ 36");
             //lock (FileData._filePropertyNamesLock)
             //{
@@ -217,12 +216,12 @@ namespace FileList
             {
                 fileSIze = this.ExtendedProperties.Where(p => p.Key.ToUpperInvariant().Equals("LENGTH")).Select(p => p.Value).FirstOrDefault(p => !string.IsNullOrWhiteSpace(p));
                 if (!string.IsNullOrEmpty(fileSIze))
-                    return Misc.ConvertStorageValueToKb(fileSIze);
+                    return FileStorageSize.ConvertStorageValueToKb(fileSIze);
             }
 
             if (string.IsNullOrEmpty(fileSIze))
                 return null;
-            return Misc.ConvertStorageValueToKb(fileSIze);
+            return FileStorageSize.ConvertStorageValueToKb(fileSIze);
         }
 
         private DateTime? GetDateFromExtendedProperties(string propertyName)
@@ -241,7 +240,7 @@ namespace FileList
                 {
                     Folder folder = this._shell.NameSpace(System.IO.Path.GetDirectoryName(this.Path));
                     FolderItem name = folder.ParseName(System.IO.Path.GetFileName(this.Path));
-                    
+
                     for (int iColumn = -1; iColumn < 1000; iColumn++) //(int)short.MaxValue
                     {
                         string detailsOf = folder.GetDetailsOf(null, iColumn);
@@ -315,7 +314,7 @@ namespace FileList
     public class FileTypeExtendedProperties
     {
         Dictionary<string, HashSet<string>> _properties;
-        public FileTypeExtendedProperties() 
+        public FileTypeExtendedProperties()
         {
             this._properties = new Dictionary<string, HashSet<string>>();
         }
@@ -326,7 +325,7 @@ namespace FileList
             {
                 if (!this._properties.ContainsKey(extension))
                     this._properties.Add(extension, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
-                return this._properties[extension];                
+                return this._properties[extension];
             }
         }
     }
@@ -377,7 +376,7 @@ namespace FileList
 
         public class FileExtensionPropertyEnumerator : IEnumerator<FileProperty>
         {
-            private IEnumerator<KeyValuePair<string,string>> enumerator;
+            private IEnumerator<KeyValuePair<string, string>> enumerator;
             public FileExtensionPropertyEnumerator(FileExtendedProperties properties)
             {
                 this.enumerator = properties._properties.GetEnumerator();
@@ -424,5 +423,4 @@ namespace FileList
         public string Name { get; private set; }
         public string Value { get; private set; }
     }
-
 }

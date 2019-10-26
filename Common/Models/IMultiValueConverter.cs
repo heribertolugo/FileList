@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace FileList.Models
+namespace Common.Models
 {
     public interface IMultiValueConverter
     {

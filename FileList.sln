@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Win32", "Win32\Win32.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{43DF2658-688F-4DBB-BC72-26C5E7D418A1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FilePreview", "FilePreview\FilePreview.csproj", "{3E728666-F6A6-412F-BAF0-BAFF823BDD02}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{43DF2658-688F-4DBB-BC72-26C5E7D418A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{43DF2658-688F-4DBB-BC72-26C5E7D418A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{43DF2658-688F-4DBB-BC72-26C5E7D418A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E728666-F6A6-412F-BAF0-BAFF823BDD02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E728666-F6A6-412F-BAF0-BAFF823BDD02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E728666-F6A6-412F-BAF0-BAFF823BDD02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E728666-F6A6-412F-BAF0-BAFF823BDD02}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,4 @@
-﻿namespace FileList.Models
+﻿namespace Common.Models
 {
     partial class DropForm
     {

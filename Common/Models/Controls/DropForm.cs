@@ -1,17 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Windows.Forms;
 using Win32.Constants;
 using Win32.Libraries;
 using Win32.Models;
 
-namespace FileList.Models
+namespace Common.Models
 {
     public partial class DropForm : Form
     {

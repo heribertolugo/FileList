@@ -1,15 +1,13 @@
-﻿using System;
+﻿using Common.Helpers;
+using System;
 using System.Diagnostics;
 using System.Drawing;
-using FileList.Models;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Win32.Models;
 using Win32.Constants;
 using Win32.Libraries;
-using Common.Helpers;
+using Win32.Models;
 
-namespace FileList.Models.ImageList
+namespace Common.Models.ImageList
 {
     public class SysImageList : IDisposable
     {
@@ -238,7 +236,7 @@ namespace FileList.Models.ImageList
             this.create();
         }
 
-        internal SysImageList(SysImageListSize size)
+        public SysImageList(SysImageListSize size)
         {
             this.size = size;
             this.create();

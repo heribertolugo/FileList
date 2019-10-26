@@ -14,7 +14,7 @@ namespace FileList.Models
                 throw new ArgumentException();
             this._value = enm;
             this._friendly = string.Empty;
-            this._friendly = this.GetFriendly(enm);
+            this._friendly = Common.Helpers.EnumHelpers.GetFriendly<T>(enm);
         }
 
         public T Value
@@ -42,30 +42,6 @@ namespace FileList.Models
         public override string ToString()
         {
             return this._friendly;
-        }
-
-        /// <summary>
-        /// Turns a camel or pascal enum name to a human readable space seperated string 
-        /// </summary>
-        /// <param name="enm"></param>
-        /// <param name="titleCase">whether to keep every first letter in every word capitalized or not</param>
-        /// <returns></returns>
-        private string GetFriendly(T enm, bool titleCase = true)
-        {
-            if (!enm.GetType().IsEnum)
-                return null;
-            string name = Enum.GetName(typeof(T), enm);
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int index = 0; index < name.Length; ++index)
-            {
-                if ((index - 1) > -1 && char.IsUpper(name[index]) && char.IsLower(name[index - 1]))
-                    stringBuilder.Append(" ");
-                char kar = name[index];
-                if (!titleCase && index > 0)
-                    kar = char.ToLower(kar);
-                stringBuilder.Append(kar);
-            }
-            return stringBuilder.ToString();
         }
 
         public override bool Equals(object obj)

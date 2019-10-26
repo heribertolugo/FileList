@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Common.Models;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace FileList.Models

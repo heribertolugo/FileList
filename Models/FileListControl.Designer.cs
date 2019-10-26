@@ -29,7 +29,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FileListControl));
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.splitContainer1 = new FileList.Models.GripSplitContainer();
+            this.splitContainer1 = new Common.Models.GripSplitContainer();
             this.fileTypesCheckedListBox = new System.Windows.Forms.CheckedListBox();
             this.treeView1 = new FileList.Models.ScrollNotifyTreeView();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -444,6 +444,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ToolTip toolTip1;
-        private GripSplitContainer splitContainer1;
+        private Common.Models.GripSplitContainer splitContainer1;
     }
 }

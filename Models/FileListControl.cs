@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using Win32.Constants;
 using Win32.Libraries;
 using Common.Extensions;
+using Common.Models;
 
 namespace FileList.Models
 {
@@ -603,25 +604,25 @@ namespace FileList.Models
                 // check that file is within size filter, if size filter is used
                 // validate the data then send to CheckIsFileSizeWithinFilter()
                 if (Enum.IsDefined(typeof(FilterType), this.filterForm.SizeFilter.FilterType) && this.filterForm.SizeFilter.FilterType != FilterType.None
-                    && Enum.IsDefined(typeof(StorageSize), this.filterForm.SizeFilter.StorageSize1) && this.filterForm.SizeFilter.StorageSize1 != StorageSize.None)
+                    && Enum.IsDefined(typeof(StorageSizeType), this.filterForm.SizeFilter.StorageSize1) && this.filterForm.SizeFilter.StorageSize1 != StorageSizeType.None)
                 {
                     SizeFilter sizeFilter = this.filterForm.SizeFilter;
                     // we'll send these values to CheckIsFileSizeWithinFilter()
-                    KeyValuePair<float, StorageSize> fileSize = new KeyValuePair<float, StorageSize>(file.SizeInKilobytes.HasValue ? file.SizeInKilobytes.Value : 0, StorageSize.Kb);
+                    KeyValuePair<float, StorageSizeType> fileSize = new KeyValuePair<float, StorageSizeType>(file.SizeInKilobytes.HasValue ? file.SizeInKilobytes.Value : 0, StorageSizeType.Kb);
                     FilterType filterType = sizeFilter.FilterType;
-                    KeyValuePair<float, StorageSize> filter1 = new KeyValuePair<float, StorageSize>(sizeFilter.Value1, sizeFilter.StorageSize1);
-                    KeyValuePair<float, StorageSize>? filter2 = null;
+                    KeyValuePair<float, StorageSizeType> filter1 = new KeyValuePair<float, StorageSizeType>(sizeFilter.Value1, sizeFilter.StorageSize1);
+                    KeyValuePair<float, StorageSizeType>? filter2 = null;
 
                     // we need a second value and second storage type in order to do a between comparison
                     if (sizeFilter.FilterType == FilterType.Between
-                        && (!sizeFilter.Value2.HasValue || !sizeFilter.StorageSize2.HasValue || sizeFilter.StorageSize2.Value == StorageSize.None))
+                        && (!sizeFilter.Value2.HasValue || !sizeFilter.StorageSize2.HasValue || sizeFilter.StorageSize2.Value == StorageSizeType.None))
                     {
                         filterType = FilterType.None;
                     }
                     else if (sizeFilter.FilterType == FilterType.Between
-                            && sizeFilter.Value2.HasValue && sizeFilter.StorageSize2.HasValue && sizeFilter.StorageSize2.Value != StorageSize.None)
+                            && sizeFilter.Value2.HasValue && sizeFilter.StorageSize2.HasValue && sizeFilter.StorageSize2.Value != StorageSizeType.None)
                     {
-                        filter2 = new KeyValuePair<float, StorageSize>(sizeFilter.Value2.Value, sizeFilter.StorageSize2.Value);
+                        filter2 = new KeyValuePair<float, StorageSizeType>(sizeFilter.Value2.Value, sizeFilter.StorageSize2.Value);
                     }
 
                     if (filterType != FilterType.None)
@@ -762,13 +763,13 @@ namespace FileList.Models
         #region Filters
         private static bool CheckIsFileSizeWithinFilter(
           FilterType filterType,
-          KeyValuePair<float, StorageSize> filter1,
-          KeyValuePair<float, StorageSize>? filter2,
-          KeyValuePair<float, StorageSize> fileSize)
+          KeyValuePair<float, StorageSizeType> filter1,
+          KeyValuePair<float, StorageSizeType>? filter2,
+          KeyValuePair<float, StorageSizeType> fileSize)
         {
-            float kb1 = Logic.Misc.ConvertStorageValueToKb(filter1.Key, filter1.Value);
-            float kb2 = filter2.HasValue ? Logic.Misc.ConvertStorageValueToKb(filter2.Value.Key, filter2.Value.Value) : 0.0f;
-            float fileKb = Logic.Misc.ConvertStorageValueToKb(fileSize.Key, fileSize.Value);
+            float kb1 = Common.Helpers.FileStorageSize.ConvertStorageValueToKb(filter1.Key, filter1.Value);
+            float kb2 = filter2.HasValue ? Common.Helpers.FileStorageSize.ConvertStorageValueToKb(filter2.Value.Key, filter2.Value.Value) : 0.0f;
+            float fileKb = Common.Helpers.FileStorageSize.ConvertStorageValueToKb(fileSize.Key, fileSize.Value);
             switch (filterType)
             {
                 case FilterType.Between:

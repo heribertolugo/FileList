@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.progressPanel = new System.Windows.Forms.Panel();
-            this.splitContainer1 = new Models.GripSplitContainer();
+            this.splitContainer1 = new Common.Models.GripSplitContainer();
             this.itemsMovedListBox = new System.Windows.Forms.ListBox();
             this.itemsMovedTextBox = new System.Windows.Forms.TextBox();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
@@ -156,7 +156,7 @@
 
 
         private System.Windows.Forms.Panel progressPanel;
-        private Models.GripSplitContainer splitContainer1;
+        private Common.Models.GripSplitContainer splitContainer1;
         private System.Windows.Forms.ListBox itemsMovedListBox;
         private System.Windows.Forms.TextBox itemsMovedTextBox;
         private System.Windows.Forms.ProgressBar progressBar1;

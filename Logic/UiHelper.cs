@@ -1,4 +1,6 @@
 ﻿using Common.Extensions;
+using Common.Helpers;
+using Common.Models;
 using FileList.Models;
 using Microsoft.Win32;
 using System;
@@ -385,7 +387,7 @@ namespace FileList.Logic
                         }
                         catch (ArgumentException ex)
                         {
-                            bitmap1 = fileToIconConverter.GetImage(key.Equals(string.Empty) ? keyValuePair.Key : key, FileToIconConverter.IconSize.ExtraLarge).ToBitmap();
+                            bitmap1 = fileToIconConverter.GetImage(key.Equals(string.Empty) ? keyValuePair.Key : key, IconSize.ExtraLarge).ToBitmap();
                         }
                         MemoryStream memoryStream = new MemoryStream();
                         bitmap1.Save((Stream)memoryStream, ImageFormat.Bmp);
