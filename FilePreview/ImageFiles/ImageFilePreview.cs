@@ -20,7 +20,7 @@ namespace FilePreview.ImageFiles
         {
             get
             {
-                return new string[] { ".gif", ".jpg", ".png", ".ico", ".bmp" };
+                return new string[] { ".gif", ".jpg", ".jpeg", ".png", ".ico", ".bmp" };
             }
         }
 
@@ -42,6 +42,11 @@ namespace FilePreview.ImageFiles
             {
                 return false;
             }
+        }
+
+        public bool Load(FileData path)
+        {
+            return this.Load(path.Path);
         }
     }
 }

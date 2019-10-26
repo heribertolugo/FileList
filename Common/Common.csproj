@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Extensions\CollectionsExtensions.cs" />
     <Compile Include="Extensions\DrawingExtensions.cs" />
+    <Compile Include="Extensions\FileDataExtensions.cs" />
     <Compile Include="Extensions\IntPtrExtensions.cs" />
     <Compile Include="Extensions\IoExtensions.cs" />
     <Compile Include="Extensions\MultiThreading.cs" />
@@ -54,6 +55,7 @@
     <Compile Include="Helpers\FileStorageSize.cs" />
     <Compile Include="Helpers\FileToIconConverter.cs" />
     <Compile Include="Helpers\IoHelper.cs" />
+    <Compile Include="Models\Constants.cs" />
     <Compile Include="Models\Controls\DropForm.cs">
       <SubType>Form</SubType>
     </Compile>

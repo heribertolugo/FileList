@@ -207,6 +207,10 @@
       <Project>{43df2658-688f-4dbb-bc72-26c5e7d418a1}</Project>
       <Name>Common</Name>
     </ProjectReference>
+    <ProjectReference Include="FilePreview\FilePreview.csproj">
+      <Project>{3e728666-f6a6-412f-baf0-baff823bdd02}</Project>
+      <Name>FilePreview</Name>
+    </ProjectReference>
     <ProjectReference Include="Win32\Win32.csproj">
       <Project>{81a0cdfd-f069-4be5-8f60-277b70c9c57c}</Project>
       <Name>Win32</Name>

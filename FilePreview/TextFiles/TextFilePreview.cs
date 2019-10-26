@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Common.Models;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace FilePreview.TextFiles
@@ -46,7 +45,7 @@ namespace FilePreview.TextFiles
                 else
                 {
                     viewer.Clear();
-                    viewer.LoadFile(path, System.IO.Path.GetExtension(path).ToLower().Equals(".rtf") ? RichTextBoxStreamType.RichText : RichTextBoxStreamType.PlainText);
+                    viewer.LoadFile(path, System.IO.Path.GetExtension(path).ToLower().Equals(Common.Models.Constants.ZipExtension) ? RichTextBoxStreamType.RichText : RichTextBoxStreamType.PlainText);
                 }
                 success = true;
             }
@@ -56,6 +55,11 @@ namespace FilePreview.TextFiles
             }
 
             return success;
+        }
+
+        public bool Load(FileData path)
+        {
+            return this.Load(path.Path);
         }
     }
 }

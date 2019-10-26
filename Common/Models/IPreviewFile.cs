@@ -15,6 +15,12 @@ namespace Common.Models
         /// <returns></returns>
         bool Load(string path);
         /// <summary>
+        /// Loads a file for preview given the provided path. Returns true if load was successful.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        bool Load(FileData path);
+        /// <summary>
         /// List of compatible file extensions
         /// </summary>
         IEnumerable<string> Extensions { get; }
