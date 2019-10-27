@@ -189,7 +189,7 @@ namespace Common.Helpers
         private static bool isImage(string fileName)
         {
             string lower = Path.GetExtension(fileName).ToLower();
-            if (lower == "")
+            if (lower == string.Empty)
                 return false;
             return FileToIconConverter.imageFilter.IndexOf(lower) != -1 && File.Exists(fileName);
         }
@@ -197,14 +197,14 @@ namespace Common.Helpers
         private static bool isExecutable(string fileName)
         {
             string lower = Path.GetExtension(fileName).ToLower();
-            if (lower == "")
+            if (lower == string.Empty)
                 return false;
             return FileToIconConverter.exeFilter.IndexOf(lower) != -1 && File.Exists(fileName);
         }
 
         private static bool isFolder(string path)
         {
-            return path.EndsWith("\\") || Directory.Exists(path);
+            return path.EndsWith(Constants.DirectoryKey) || Directory.Exists(path);
         }
 
         private static string returnKey(string fileName, IconSize size)
@@ -384,7 +384,7 @@ namespace Common.Helpers
                 defaultsize = (int)(float)(double)values[1];
             if (values[0] is string)
                 return (object)this.GetImage(values[0] as string, defaultsize);
-            return (object)this.GetImage("", defaultsize);
+            return (object)this.GetImage(string.Empty, defaultsize);
         }
 
         public object[] ConvertBack(

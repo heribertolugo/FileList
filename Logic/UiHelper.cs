@@ -148,7 +148,8 @@ namespace FileList.Logic
 
         public static bool DisplayPreview(FileData fileData, FilePreview.Previewers previewers, Control tabControl)
         {
-            IPreviewFile previewFile = previewers.GetPreviewer(fileData.GetFileType());
+            FileType fileType = fileData.GetFileType();
+            IPreviewFile previewFile = previewers.GetPreviewer(fileType == FileType.Application? FileType.Unknown : fileType);
 
             tabControl.Controls.Clear();
             if (previewFile == null)
@@ -157,76 +158,6 @@ namespace FileList.Logic
             previewFile.Viewer.Dock = DockStyle.Fill;
             previewFile.Load(fileData);
             return true;
-        }
-
-        static Thread textThread = null;
-        static CancellationTokenSource textThreadCancel;
-        private static void DisplayApplicationPreview(string path, TextBoxBase textBox)
-        {
-            if (textThread != null && textThreadCancel != null)
-            {
-                textThreadCancel.Cancel();
-            }
-            if (path == null)
-            {
-                textBox.Text = (string)null;
-            }
-            else
-            {
-                try
-                {
-                    textBox.Tag = path;
-
-                    textThread = new Thread((object s) =>
-                    {
-                        TextBoxBase box = textBox;
-                        CancellationTokenSource token = (CancellationTokenSource)s;
-
-                        box.Invoke((MethodInvoker)delegate
-                        {
-                            box.Clear();
-                            box.Focus();
-                            box.SelectionStart = box.Text.Length;
-                            box.Select();
-                        });
-
-                        string p = box.Tag as string;
-
-                        using (StreamReader reader = new StreamReader(p, UiHelper.GetFileEncoding(p)))
-                        {
-                            string intkar = string.Empty;
-                            try
-                            {
-                                while ((intkar = reader.ReadLine()) != null)
-                                {
-                                    token.Token.ThrowIfCancellationRequested();
-                                    box.Invoke((MethodInvoker)delegate
-                                    {
-                                        box.AppendText(intkar);
-                                    });
-                                }
-                            }
-                            catch (Exception) { 
-                                //box.Invoke((MethodInvoker)delegate{ box.Clear(); }); 
-                            }
-                        }
-                    });
-
-                    textThread.IsBackground = true;
-                    textThreadCancel = new CancellationTokenSource();
-
-                    textThread.Start(textThreadCancel);
-                }
-                catch (Exception ex)
-                {
-                    textBox.Text = (string)null;
-                }
-            }
-        }
-
-        private static System.Text.Encoding GetFileEncoding(string path)
-        {
-            return System.Text.Encoding.UTF8;
         }
 
         public static IEnumerable<string> GetZipContents(string zipPath)
