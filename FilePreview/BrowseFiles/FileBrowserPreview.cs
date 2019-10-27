@@ -4,7 +4,6 @@ using Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Forms;
 
@@ -31,87 +30,112 @@ namespace FilePreview.BrowseFiles
 
         public bool Load(string path)
         {
-            return FileBrowserPreview.DisplayBrowsablePreview(string.IsNullOrWhiteSpace(path) ? null : (FileData?)(new FileData(path)), this.Viewer as ListView);
+            try
+            {
+                return FileBrowserPreview.DisplayBrowsablePreview(string.IsNullOrWhiteSpace(path) ? null : (FileData?)(new FileData(path)), this.Viewer as ListView);
+            } catch (Exception) { }
+            return false;
         }
 
         public bool Load(FileData path)
         {
-            return FileBrowserPreview.DisplayBrowsablePreview((FileData?)path, this.Viewer as ListView);
+            try
+            {
+               return FileBrowserPreview.DisplayBrowsablePreview((FileData?)path, this.Viewer as ListView);
+            } catch(Exception ex) { }
+            return false;
         }
 
+
         private static bool DisplayBrowsablePreview(FileData? fileData, ListView listView)
-        {
-            FileToIconConverter fileToIconConverter = new FileToIconConverter();
+        {            
+            listView.Items.Clear();
+
             if (!fileData.HasValue)
+                return false;
+
+            string path = fileData.Value.Path;
+            
+            if (listView.LargeImageList == null)
+                listView.LargeImageList = new System.Windows.Forms.ImageList();
+            else
+                listView.LargeImageList.Images.Clear();
+            listView.LargeImageList.ImageSize = new Size(48, 48);
+
+            if (Directory.Exists(path))
             {
-                listView.Items.Clear();
+                foreach (string file in Directory.GetFiles(path))
+                {
+                    try
+                    {
+                        string key = FileBrowserPreview.AddImage(file, listView.LargeImageList, listView.LargeImageList.ImageSize);  
+                        FileBrowserPreview.AddItem(listView, file, key);
+                    }
+                    catch (Exception) { }
+                }
+                foreach (string directory in Directory.GetDirectories(path))
+                {
+                    try
+                    {
+                        string key = FileBrowserPreview.AddImage(directory + Constants.DirectoryKey, listView.LargeImageList, listView.LargeImageList.ImageSize); 
+                        FileBrowserPreview.AddItem(listView, directory + Constants.DirectoryKey, key);
+                    }
+                    catch (Exception) { }
+                }
             }
             else
             {
-                try
+                foreach (FileData zipContent in fileData.Value.ZipContents)
                 {
-                    string path = fileData.Value.Path;
-                    Dictionary<string, bool> dictionary = new Dictionary<string, bool>();
-                    if (Directory.Exists(path))
+                    try
                     {
-                        foreach (string file in Directory.GetFiles(path))
-                            dictionary.Add(file, true);
-                        foreach (string directory in Directory.GetDirectories(path))
-                            dictionary.Add(directory + Constants.DirectoryKey, false);
+                        string key = FileBrowserPreview.AddImage(zipContent.Path, listView.LargeImageList, listView.LargeImageList.ImageSize); 
+                        FileBrowserPreview.AddItem(listView, zipContent.Path, key);
                     }
-                    else
-                    {
-                        foreach (FileData zipContent in fileData.Value.ZipContents)
-                        {
-                            try
-                            {
-                                dictionary.Add(zipContent.Path, true);
-                            }
-                            catch (Exception ex)
-                            {
-                            }
-                        }
-                    }
-                    listView.Items.Clear();
-                    if (listView.LargeImageList == null)
-                        listView.LargeImageList = new ImageList();
-                    Size size = new Size();
-                    foreach (KeyValuePair<string, bool> keyValuePair in dictionary)
-                    {
-                        string key = !Path.GetFileName(keyValuePair.Key).Equals(string.Empty) || !keyValuePair.Key.EndsWith(Constants.DirectoryKey) ? Path.GetExtension(keyValuePair.Key) : Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + Constants.DirectoryKey;
-                        ListViewItem listViewItem = new ListViewItem(keyValuePair.Key, key.Equals(string.Empty) ? Constants.NoneFileExtension : key);
-                        listView.Items.Add(listViewItem);
-                        Bitmap bitmap1;
-                        try
-                        {
-                            Size newSize = size.Equals((object)new Size()) ? new Size(48, 48) : size;
-                            Bitmap bitmap2 = new Bitmap(keyValuePair.Key);
-                            bitmap1 = new Bitmap((Image)bitmap2, newSize);
-                            bitmap2.Dispose();
-                            key = keyValuePair.Key;
-                            listViewItem.ImageKey = key;
-                        }
-                        catch (ArgumentException ex)
-                        {
-                            bitmap1 = fileToIconConverter.GetImage(key.Equals(string.Empty) ? keyValuePair.Key : key, IconSize.ExtraLarge).ToBitmap();
-                        }
-                        MemoryStream memoryStream = new MemoryStream();
-                        bitmap1.Save((Stream)memoryStream, ImageFormat.Bmp);
-                        Convert.ToBase64String(memoryStream.ToArray());
-                        if (!listView.LargeImageList.Images.ContainsKey(key))
-                            listView.LargeImageList.Images.Add(key.Equals(string.Empty) ? Constants.NoneFileExtension : key, (Image)bitmap1);
-                        size = bitmap1.Size;
-                    }
-                    listView.LargeImageList.ImageSize = size;
-                }
-                catch (Exception ex)
-                {
-                    listView.Items.Clear();
-                    return false;
+                    catch (Exception) { }
                 }
             }
 
             return true;
+        }
+
+        private static string AddImage(string path, ImageList imageList, Size imageSize)
+        {
+            Bitmap bitmap1;
+            string key = null;
+            try
+            {
+                Bitmap bitmap2 = new Bitmap(path);
+                bitmap1 = new Bitmap(bitmap2, imageSize);
+                bitmap2.Dispose();
+
+                if (!imageList.Images.ContainsKey(path))
+                    imageList.Images.Add(path, bitmap1);
+                
+                key = path;
+            }
+            catch (ArgumentException ex)
+            {
+                FileToIconConverter fileToIconConverter = new FileToIconConverter();
+                key = FileBrowserPreview.GetKey(path);
+                bitmap1 = fileToIconConverter.GetImage(path, IconSize.ExtraLarge).ToBitmap();
+
+                if (!imageList.Images.ContainsKey(key))
+                    imageList.Images.Add(key, bitmap1);
+            }
+
+            return key;
+        }
+
+        private static void AddItem(ListView listView, string fileName, string imageKey)
+        {
+            ListViewItem listViewItem = new ListViewItem(fileName, imageKey.Equals(string.Empty) ? Constants.NoneFileExtension : imageKey);
+            listView.Items.Add(listViewItem);
+        }
+
+        private static string GetKey(string fileName)
+        {
+            return !Path.GetFileName(fileName).Equals(string.Empty) || !fileName.EndsWith(Constants.DirectoryKey) ? Path.GetExtension(fileName) : Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + Constants.DirectoryKey;
         }
     }
 }

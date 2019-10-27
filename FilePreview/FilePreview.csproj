@@ -55,6 +55,7 @@
     <Compile Include="Previewers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TextFiles\TextFilePreview.cs" />
+    <Compile Include="UnknownFiles\UnknownPreview.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">

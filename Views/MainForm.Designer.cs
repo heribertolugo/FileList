@@ -39,14 +39,7 @@ namespace FileList.Views
             this.searchButton = new System.Windows.Forms.Button();
             this.splitContainer1 = new Common.Models.GripSplitContainer();
             this.fileListControl1 = new FileList.Models.FileListControl();
-            this.viewerTabControl = new System.Windows.Forms.TabControl();
-            this.imageTabPage = new System.Windows.Forms.TabPage();
-            this.imageViewerPanel = new System.Windows.Forms.Panel();
-            this.imageDisplayStylePanel = new System.Windows.Forms.Panel();
-            this.documentTabPage = new System.Windows.Forms.TabPage();
-            this.textViewerTextBox = new System.Windows.Forms.RichTextBox();
-            this.contentTabPage = new System.Windows.Forms.TabPage();
-            this.contentsListView = new System.Windows.Forms.ListView();
+            this.viewerPanel = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.moveSelectedButton = new System.Windows.Forms.Button();
             this.deleteButton = new System.Windows.Forms.Button();
@@ -62,10 +55,7 @@ namespace FileList.Views
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            this.viewerTabControl.SuspendLayout();
-            this.imageTabPage.SuspendLayout();
-            this.documentTabPage.SuspendLayout();
-            this.contentTabPage.SuspendLayout();
+            this.viewerPanel.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -139,7 +129,7 @@ namespace FileList.Views
             // 
             // splitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.viewerTabControl);
+            this.splitContainer1.Panel2.Controls.Add(this.viewerPanel);
             this.splitContainer1.Panel2.Controls.Add(this.panel2);
             this.splitContainer1.Size = new System.Drawing.Size(1410, 734);
             this.splitContainer1.SplitterDistance = 783;
@@ -158,92 +148,13 @@ namespace FileList.Views
             this.fileListControl1.TreeImageList = null;
             this.fileListControl1.OnFileDataSelected += new System.EventHandler<FileList.Models.FileDataSelectedEventArgs>(this.FileListControl1_OnFileDataSelected);
             // 
-            // viewerTabControl
+            // viewerPanel
             // 
-            this.viewerTabControl.Controls.Add(this.imageTabPage);
-            this.viewerTabControl.Controls.Add(this.documentTabPage);
-            this.viewerTabControl.Controls.Add(this.contentTabPage);
-            this.viewerTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.viewerTabControl.Location = new System.Drawing.Point(0, 105);
-            this.viewerTabControl.Name = "viewerTabControl";
-            this.viewerTabControl.SelectedIndex = 0;
-            this.viewerTabControl.Size = new System.Drawing.Size(623, 629);
-            this.viewerTabControl.TabIndex = 3;
-            // 
-            // imageTabPage
-            // 
-            this.imageTabPage.Controls.Add(this.imageViewerPanel);
-            this.imageTabPage.Controls.Add(this.imageDisplayStylePanel);
-            this.imageTabPage.Location = new System.Drawing.Point(4, 22);
-            this.imageTabPage.Name = "imageTabPage";
-            this.imageTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.imageTabPage.Size = new System.Drawing.Size(615, 603);
-            this.imageTabPage.TabIndex = 0;
-            this.imageTabPage.Text = "Image";
-            this.imageTabPage.UseVisualStyleBackColor = true;
-            // 
-            // imageViewerPanel
-            // 
-            this.imageViewerPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.imageViewerPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.imageViewerPanel.Location = new System.Drawing.Point(3, 44);
-            this.imageViewerPanel.Name = "imageViewerPanel";
-            this.imageViewerPanel.Size = new System.Drawing.Size(609, 556);
-            this.imageViewerPanel.TabIndex = 2;
-            // 
-            // imageDisplayStylePanel
-            // 
-            this.imageDisplayStylePanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.imageDisplayStylePanel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.imageDisplayStylePanel.Location = new System.Drawing.Point(3, 3);
-            this.imageDisplayStylePanel.Margin = new System.Windows.Forms.Padding(0);
-            this.imageDisplayStylePanel.Name = "imageDisplayStylePanel";
-            this.imageDisplayStylePanel.Padding = new System.Windows.Forms.Padding(3);
-            this.imageDisplayStylePanel.Size = new System.Drawing.Size(609, 41);
-            this.imageDisplayStylePanel.TabIndex = 3;
-            // 
-            // documentTabPage
-            // 
-            this.documentTabPage.Controls.Add(this.textViewerTextBox);
-            this.documentTabPage.Location = new System.Drawing.Point(4, 22);
-            this.documentTabPage.Name = "documentTabPage";
-            this.documentTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.documentTabPage.Size = new System.Drawing.Size(615, 603);
-            this.documentTabPage.TabIndex = 1;
-            this.documentTabPage.Text = "Text";
-            this.documentTabPage.UseVisualStyleBackColor = true;
-            // 
-            // textViewerTextBox
-            // 
-            this.textViewerTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textViewerTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textViewerTextBox.Location = new System.Drawing.Point(3, 3);
-            this.textViewerTextBox.Name = "textViewerTextBox";
-            this.textViewerTextBox.ReadOnly = true;
-            this.textViewerTextBox.Size = new System.Drawing.Size(609, 597);
-            this.textViewerTextBox.TabIndex = 0;
-            this.textViewerTextBox.Text = "";
-            // 
-            // contentTabPage
-            // 
-            this.contentTabPage.Controls.Add(this.contentsListView);
-            this.contentTabPage.Location = new System.Drawing.Point(4, 22);
-            this.contentTabPage.Name = "contentTabPage";
-            this.contentTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.contentTabPage.Size = new System.Drawing.Size(615, 603);
-            this.contentTabPage.TabIndex = 2;
-            this.contentTabPage.Text = "Content";
-            this.contentTabPage.UseVisualStyleBackColor = true;
-            // 
-            // contentsListView
-            // 
-            this.contentsListView.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.contentsListView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.contentsListView.Location = new System.Drawing.Point(3, 3);
-            this.contentsListView.Name = "contentsListView";
-            this.contentsListView.Size = new System.Drawing.Size(609, 597);
-            this.contentsListView.TabIndex = 0;
-            this.contentsListView.UseCompatibleStateImageBehavior = false;
+            this.viewerPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.viewerPanel.Location = new System.Drawing.Point(0, 105);
+            this.viewerPanel.Name = "viewerPanel";
+            this.viewerPanel.Size = new System.Drawing.Size(623, 629);
+            this.viewerPanel.TabIndex = 3;
             // 
             // panel2
             // 
@@ -349,10 +260,7 @@ namespace FileList.Views
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
-            this.viewerTabControl.ResumeLayout(false);
-            this.imageTabPage.ResumeLayout(false);
-            this.documentTabPage.ResumeLayout(false);
-            this.contentTabPage.ResumeLayout(false);
+            this.viewerPanel.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             this.ResumeLayout(false);
@@ -367,24 +275,17 @@ namespace FileList.Views
         private Common.Models.GripSplitContainer splitContainer1;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Button browseButton;
-        private System.Windows.Forms.Panel imageViewerPanel;
         private System.Windows.Forms.Button openLocationButton;
         private System.Windows.Forms.TextBox filePropertiesTextBox;
         private System.Windows.Forms.Button openFileButton;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
-        private System.Windows.Forms.TabControl viewerTabControl;
-        private System.Windows.Forms.TabPage imageTabPage;
-        private System.Windows.Forms.TabPage documentTabPage;
-        private System.Windows.Forms.RichTextBox textViewerTextBox;
+        private System.Windows.Forms.Panel viewerPanel;
         private System.Windows.Forms.Button deleteButton;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.ImageList treeIconsImageList;
         private System.Windows.Forms.ToolTip toolTip1;
-        private System.Windows.Forms.TabPage contentTabPage;
-        private System.Windows.Forms.ListView contentsListView;
         private System.Windows.Forms.Button moveSelectedButton;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Panel imageDisplayStylePanel;
         private Models.FileListControl fileListControl1;
     }
 }

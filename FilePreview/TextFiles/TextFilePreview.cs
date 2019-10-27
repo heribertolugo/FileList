@@ -1,6 +1,7 @@
 ﻿using Common.Models;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace FilePreview.TextFiles
@@ -10,6 +11,9 @@ namespace FilePreview.TextFiles
         public TextFilePreview()
         {
             this.Viewer = new RichTextBox() { ReadOnly = true };
+            this.Viewer.BackColor = Color.Black;
+            this.Viewer.ForeColor = Color.Black;
+            this.Viewer.BackColor = Color.White;
         }
 
         public IEnumerable<string> Extensions

@@ -24,6 +24,7 @@ namespace FileList.Logic
         public static readonly string NoneFileExtension = ".none";
         private static BackgroundWorker worker;
         private static CancellationTokenSource cancellationToken;
+        private static Action<ConcurrentFileSearchEventArgs> _searchFinishedCallback;
 
         public static void OpenFileSelectedNode(TreeView treeView)
         {
@@ -41,7 +42,6 @@ namespace FileList.Logic
             UiHelper.OpenLocation(tag.HasValue ? tag.Value.Directory : treeView.SelectedNode.Text);
         }
 
-        private static Action<ConcurrentFileSearchEventArgs> _searchFinishedCallback;
         public static void Search(string path, FileListControl fileListControl, Action<ConcurrentFileSearchEventArgs> searchFinishedCallback)
         {
             if (UiHelper.worker == null)
@@ -146,79 +146,17 @@ namespace FileList.Logic
             (search as FileSearch)?.GetNext();
         }
 
-        public static void DisplayPreview(
-          FileData fileData,
-          TabControl tabControl,
-          ListView contentsListView,
-          Control imageViewerPanel,
-          RichTextBox textViewerTextBox,
-          TabPage documentTabPage,
-          TabPage contentTabPage,
-          TabPage imageTabPage,
-          ImageLayout imageLayout)
+        public static bool DisplayPreview(FileData fileData, FilePreview.Previewers previewers, Control tabControl)
         {
-            string path = fileData.Path;
-            switch (UiHelper.GetFileType(path))
-            {
-                case FileType.Unknown:
-                    UiHelper.DisplayBrowsablePreview(new FileData?(), contentsListView);
-                    UiHelper.DisplayImagePreview((string)null, imageViewerPanel, ImageLayout.None);
-                    UiHelper.DisplayTextPreview((string)null, textViewerTextBox);
-                    UiHelper.DisplayApplicationPreview(path, textViewerTextBox);
-                    tabControl.SelectedTab = documentTabPage;
-                    break;
-                case FileType.Text:
-                    UiHelper.DisplayBrowsablePreview(new FileData?(), contentsListView);
-                    UiHelper.DisplayImagePreview((string)null, imageViewerPanel, ImageLayout.None);
-                    UiHelper.DisplayTextPreview(path, textViewerTextBox);
-                    tabControl.SelectedTab = documentTabPage;
-                    break;
-                case FileType.Media:
-                    UiHelper.DisplayBrowsablePreview(new FileData?(), contentsListView);
-                    UiHelper.DisplayImagePreview((string)null, imageViewerPanel, ImageLayout.None);
-                    UiHelper.DisplayTextPreview((string)null, textViewerTextBox);
-                    UiHelper.DisplayApplicationPreview(path, (TextBoxBase)textViewerTextBox);
-                    tabControl.SelectedTab = documentTabPage;
-                    break;
-                case FileType.Browsable:
-                case FileType.Folder:
-                case FileType.Zip:
-                    UiHelper.DisplayBrowsablePreview(new FileData?(fileData), contentsListView);
-                    UiHelper.DisplayImagePreview((string)null, imageViewerPanel, ImageLayout.None);
-                    UiHelper.DisplayTextPreview((string)null, textViewerTextBox);
-                    tabControl.SelectedTab = contentTabPage;
-                    break;
-                case FileType.Application:
-                    UiHelper.DisplayBrowsablePreview(new FileData?(), contentsListView);
-                    UiHelper.DisplayImagePreview((string)null, imageViewerPanel, ImageLayout.None);
-                    UiHelper.DisplayTextPreview((string)null, textViewerTextBox);
-                    UiHelper.DisplayApplicationPreview((string)null, (TextBoxBase)textViewerTextBox);
-                    tabControl.SelectedTab = documentTabPage;
-                    break;
-                case FileType.Image:
-                    UiHelper.DisplayBrowsablePreview(new FileData?(), contentsListView);
-                    UiHelper.DisplayImagePreview(path, imageViewerPanel, imageLayout);
-                    UiHelper.DisplayTextPreview((string)null, textViewerTextBox);
-                    tabControl.SelectedTab = imageTabPage;
-                    break;
-            }
-        }
+            IPreviewFile previewFile = previewers.GetPreviewer(fileData.GetFileType());
 
-        public static void ResetPreviews(
-          TabControl tabControl,
-          ListView contentsListView,
-          Control imageViewerPanel,
-          RichTextBox textViewerTextBox,
-          TabPage documentTabPage,
-          TabPage contentTabPage,
-          TabPage imageTabPage,
-          ImageLayout imageLayout)
-        {
-            UiHelper.DisplayBrowsablePreview(new FileData?(), contentsListView);
-            UiHelper.DisplayImagePreview((string)null, imageViewerPanel, ImageLayout.None);
-            UiHelper.DisplayTextPreview((string)null, textViewerTextBox);
-            UiHelper.DisplayApplicationPreview((string)null, (TextBoxBase)textViewerTextBox);
-            tabControl.SelectedTab = documentTabPage;
+            tabControl.Controls.Clear();
+            if (previewFile == null)
+                return false;
+            tabControl.Controls.Add(previewFile.Viewer);
+            previewFile.Viewer.Dock = DockStyle.Fill;
+            previewFile.Load(fileData);
+            return true;
         }
 
         static Thread textThread = null;
@@ -289,120 +227,6 @@ namespace FileList.Logic
         private static System.Text.Encoding GetFileEncoding(string path)
         {
             return System.Text.Encoding.UTF8;
-        }
-
-        private static void DisplayImagePreview(string path, Control control, ImageLayout imageLayout)
-        {
-            if (path == null)
-            {
-                control.BackgroundImage = null;
-            }
-            else
-            {
-                try
-                {
-                    control.BackgroundImage = new Bitmap(path);
-                    control.BackgroundImageLayout = imageLayout;
-                }
-                catch (Exception ex)
-                {
-                    control.BackgroundImage = null;
-                }
-            }
-        }
-
-        private static void DisplayTextPreview(string path, RichTextBox textBox)
-        {
-            if (path == null)
-            {
-                textBox.Text = (string)null;
-            }
-            else
-            {
-                try
-                {
-                    if (textThread != null && textThreadCancel != null)
-                    {
-                        textThreadCancel.Cancel();
-                    }
-                    textBox.Clear();
-                    textBox.LoadFile(path, Path.GetExtension(path).ToLower().Equals(".rtf") ? RichTextBoxStreamType.RichText : RichTextBoxStreamType.PlainText);
-                }
-                catch (Exception ex)
-                {
-                    textBox.Text = (string)null;
-                }
-            }
-        }
-
-        private static void DisplayBrowsablePreview(FileData? fileData, ListView listView)
-        {
-            FileToIconConverter fileToIconConverter = new FileToIconConverter();
-            if (!fileData.HasValue)
-            {
-                listView.Items.Clear();
-            }
-            else
-            {
-                try
-                {
-                    string path = fileData.Value.Path;
-                    Dictionary<string, bool> dictionary = new Dictionary<string, bool>();
-                    if (Directory.Exists(path))
-                    {
-                        foreach (string file in Directory.GetFiles(path))
-                            dictionary.Add(file, true);
-                        foreach (string directory in Directory.GetDirectories(path))
-                            dictionary.Add(directory + "\\", false);
-                    }
-                    else
-                    {
-                        try
-                        {
-                            foreach (FileData zipContent in fileData.Value.ZipContents)
-                                dictionary.Add(zipContent.Path, true);
-                        }
-                        catch (Exception ex)
-                        {
-                        }
-                    }
-                    listView.Items.Clear();
-                    if (listView.LargeImageList == null)
-                        listView.LargeImageList = new ImageList();
-                    Size size = new Size();
-                    foreach (KeyValuePair<string, bool> keyValuePair in dictionary)
-                    {
-                        string key = !Path.GetFileName(keyValuePair.Key).Equals(string.Empty) || !keyValuePair.Key.EndsWith(UiHelper.DirectoryKey) ? Path.GetExtension(keyValuePair.Key) : Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + UiHelper.DirectoryKey;
-                        ListViewItem listViewItem = new ListViewItem(keyValuePair.Key, key.Equals(string.Empty) ? UiHelper.NoneFileExtension : key);
-                        listView.Items.Add(listViewItem);
-                        Bitmap bitmap1;
-                        try
-                        {
-                            Size newSize = size.Equals((object)new Size()) ? new Size(48, 48) : size;
-                            Bitmap bitmap2 = new Bitmap(keyValuePair.Key);
-                            bitmap1 = new Bitmap((Image)bitmap2, newSize);
-                            bitmap2.Dispose();
-                            key = keyValuePair.Key;
-                            listViewItem.ImageKey = key;
-                        }
-                        catch (ArgumentException ex)
-                        {
-                            bitmap1 = fileToIconConverter.GetImage(key.Equals(string.Empty) ? keyValuePair.Key : key, IconSize.ExtraLarge).ToBitmap();
-                        }
-                        MemoryStream memoryStream = new MemoryStream();
-                        bitmap1.Save((Stream)memoryStream, ImageFormat.Bmp);
-                        Convert.ToBase64String(memoryStream.ToArray());
-                        if (!listView.LargeImageList.Images.ContainsKey(key))
-                            listView.LargeImageList.Images.Add(key.Equals(string.Empty) ? UiHelper.NoneFileExtension : key, (Image)bitmap1);
-                        size = bitmap1.Size;
-                    }
-                    listView.LargeImageList.ImageSize = size;
-                }
-                catch (Exception ex)
-                {
-                    listView.Items.Clear();
-                }
-            }
         }
 
         public static IEnumerable<string> GetZipContents(string zipPath)

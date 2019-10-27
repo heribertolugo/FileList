@@ -14,12 +14,10 @@ namespace FileList.Views
 {
     public partial class MainForm : Form
     {
-        private CheckBox previousButton = null;
-
+        private FilePreview.Previewers previewers = null;
         public MainForm()
         {
             InitializeComponent();
-            this.CreateImageLayoutButtons();
             if (Common.Helpers.IoHelper.IsAdministrator())
                 this.Text = string.Format("{0} - Administrator", this.Text);
         }
@@ -28,68 +26,7 @@ namespace FileList.Views
         {
             this.Height = 100;
             this.Width = 730;
-            this.HideTabPageHeaders(this.viewerTabControl);
-            this.textViewerTextBox.BackColor = Color.Black;
-            this.textViewerTextBox.ForeColor = Color.Black;
-            this.textViewerTextBox.BackColor = Color.White;
         }
-
-        private void CreateImageLayoutButtons()
-        {
-            TableLayoutPanel tableLayoutPanel = new TableLayoutPanel();
-            int column = 0;
-            tableLayoutPanel.Dock = DockStyle.Fill;
-            tableLayoutPanel.RowCount = 1;
-            tableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100f));
-
-            foreach (ImageLayout imageLayout in Enum.GetValues(typeof(ImageLayout)))
-            {
-                CheckBox layoutButton = new CheckBox();
-                layoutButton.Text = Enum.GetName(typeof(ImageLayout), imageLayout);
-                layoutButton.Dock = DockStyle.Fill;
-                layoutButton.FlatStyle = FlatStyle.Flat;
-                layoutButton.Tag = imageLayout;
-                layoutButton.Appearance = Appearance.Button;
-                layoutButton.TextAlign = ContentAlignment.MiddleCenter;
-                layoutButton.FlatAppearance.CheckedBackColor = Color.FromKnownColor(KnownColor.DarkGray);
-                layoutButton.Name = this.Name = string.Format("{0}Button", layoutButton.Text);
-                layoutButton.Click += new EventHandler(this.ImageLayoutButton_Click);
-                ++tableLayoutPanel.ColumnCount;
-                tableLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-                tableLayoutPanel.Controls.Add(layoutButton, column, 0);
-                ++column;
-            }
-            this.imageDisplayStylePanel.Controls.Add(tableLayoutPanel);
-
-            for (int index = 0; index < tableLayoutPanel.ColumnStyles.Count; ++index)
-                tableLayoutPanel.ColumnStyles[index] = new ColumnStyle(SizeType.Percent, 100f / (float)column);
-        }
-
-        private void ImageLayoutButton_Click(object sender, EventArgs e)
-        {
-            CheckBox checkBox = sender as CheckBox;
-            if (checkBox == this.previousButton)
-            {
-                checkBox.Checked = !this.previousButton.Checked;
-            }
-            else
-            {
-                if (this.previousButton != null)
-                    this.previousButton.CheckState = CheckState.Unchecked;
-                if (checkBox == null)
-                    return;
-                this.previousButton = checkBox;
-                this.imageViewerPanel.BackgroundImageLayout = (ImageLayout)checkBox.Tag;
-            }
-        }
-
-        private void HideTabPageHeaders(TabControl tabControl)
-        {
-            tabControl.Appearance = TabAppearance.FlatButtons;
-            tabControl.ItemSize = new Size(0, 1);
-            tabControl.SizeMode = TabSizeMode.Fixed;
-        }
-
         private void BrowseButton_Click(object sender, EventArgs e)
         {
             if (this.saveFileDialog1.ShowDialog() != DialogResult.OK)
@@ -110,7 +47,7 @@ namespace FileList.Views
 
         public void Reset()
         {
-            UiHelper.ResetPreviews(this.viewerTabControl, this.contentsListView, (Control)this.imageViewerPanel, this.textViewerTextBox, this.documentTabPage, this.contentTabPage, this.imageTabPage, this.previousButton == null ? ImageLayout.None : (ImageLayout)this.previousButton.Tag);
+            this.viewerPanel.Controls.Clear();
             this.fileListControl1.Clear();
             this.filePropertiesTextBox.Text = string.Empty;
         }
@@ -167,19 +104,6 @@ namespace FileList.Views
             });
         }
 
-        public void SmartImageLayout(Control control, Control buttonContainer)
-        {
-            if (control.BackgroundImage == null)
-                return;
-            ImageLayout imageLayout = control.BackgroundImage.Width <= control.Width && control.BackgroundImage.Height <= control.Height ? (control.BackgroundImage.Width > control.Width / 4 && control.BackgroundImage.Height >= control.Height / 4 ? ImageLayout.Zoom : ImageLayout.Center) : ImageLayout.Zoom;
-            control.BackgroundImageLayout = imageLayout;
-            CheckBox checkBox = buttonContainer.Controls[0].Controls.Find(string.Format("{0}Button", Enum.GetName(typeof(ImageLayout), imageLayout)), true).FirstOrDefault() as CheckBox;
-            if (this.previousButton != null)
-                this.previousButton.CheckState = CheckState.Unchecked;
-            checkBox.CheckState = CheckState.Checked;
-            this.previousButton = checkBox;
-        }
-
         private void OpenFileButton_Click(object sender, EventArgs e)
         {
             UiHelper.OpenItem(this.fileListControl1.SelectedPath);
@@ -228,7 +152,12 @@ namespace FileList.Views
         private void FileListControl1_OnFileDataSelected(object sender, FileDataSelectedEventArgs e)
         {
             string selectedPath = this.fileListControl1.SelectedPath;
-            UiHelper.DisplayPreview(!e.IsRootPath ? e.FileData[0] : new FileData(selectedPath), this.viewerTabControl, this.contentsListView, (Control)this.imageViewerPanel, this.textViewerTextBox, this.documentTabPage, this.contentTabPage, this.imageTabPage, this.previousButton == null ? ImageLayout.None : (ImageLayout)this.previousButton.Tag);
+
+            if (previewers == null)
+                previewers = new FilePreview.Previewers();
+
+            UiHelper.DisplayPreview(!e.IsRootPath ? e.FileData[0] : new FileData(selectedPath), previewers, this.viewerPanel);
+
             if (!e.IsRootPath)
             {
                 this.filePropertiesTextBox.Text = string.Join(Environment.NewLine, e.FileData[0].ExtendedProperties.Select(k => string.Format("{0}: {1}", k.Key, k.Value)).ToArray());
@@ -250,7 +179,6 @@ namespace FileList.Views
                         )
                     , selectedPath, directories.Length, string.Join(Environment.NewLine, directories));
             }
-            this.SmartImageLayout((Control)this.imageViewerPanel, (Control)this.imageDisplayStylePanel);
         }
 
         private void FileListControl1_OnOpenFileDataClicked(object sender, FileDataSelectedEventArgs e)
