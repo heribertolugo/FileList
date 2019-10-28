@@ -9,7 +9,7 @@ namespace Win32.Libraries
         #region shlwapi.dll
         [DllImport("shlwapi.dll")]
         public static extern System.Runtime.InteropServices.ComTypes.IStream SHCreateMemStream(
-            object pInit,
+            byte[] pInit,//
             uint cbInit
         );
         #endregion

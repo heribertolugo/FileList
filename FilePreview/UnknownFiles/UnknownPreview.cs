@@ -27,14 +27,21 @@ namespace FilePreview.UnknownFiles
             get { return FileType.Unknown; }
         }
 
-        public bool Load(string path)
+        public bool LoadFile(string path)
         {
             return this.DisplayApplicationPreview(path, this.Viewer as TextBoxBase);
         }
 
-        public bool Load(FileData path)
+        public bool LoadFile(FileData path)
         {
             return this.DisplayApplicationPreview(path.Path, this.Viewer as TextBoxBase);
+        }
+
+        public void Clear()
+        {
+            if (this.textThread != null && this.textThreadCancel != null && !this.textThreadCancel.IsCancellationRequested)
+                this.textThreadCancel.Cancel();
+            (this.Viewer as RichTextBox).Clear();
         }
 
 
@@ -111,6 +118,33 @@ namespace FilePreview.UnknownFiles
         private static System.Text.Encoding GetFileEncoding(string path)
         {
             return System.Text.Encoding.UTF8;
+        }
+
+        private bool _disposed = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this._disposed)
+            {
+                if (disposing)
+                {
+                    this.Clear();
+                    this.Viewer.Dispose();
+                }
+
+                this._disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~UnknownPreview()
+        {
+            this.Dispose(false);
         }
     }
 }

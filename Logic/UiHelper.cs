@@ -146,18 +146,21 @@ namespace FileList.Logic
             (search as FileSearch)?.GetNext();
         }
 
-        public static bool DisplayPreview(FileData fileData, FilePreview.Previewers previewers, Control tabControl)
+        public static bool DisplayPreview(FileData fileData, FilePreview.Previewers previewers, Control control)
         {
             FileType fileType = fileData.GetFileType();
             IPreviewFile previewFile = previewers.GetPreviewer(fileType == FileType.Application? FileType.Unknown : fileType);
 
-            tabControl.Controls.Clear();
+            if ((control.Tag as IPreviewFile) != null)
+                (control.Tag as IPreviewFile).Clear();
+
+            control.Controls.Clear();
             if (previewFile == null)
                 return false;
-            tabControl.Controls.Add(previewFile.Viewer);
+            control.Controls.Add(previewFile.Viewer);
             previewFile.Viewer.Dock = DockStyle.Fill;
-            previewFile.Load(fileData);
-            return true;
+            control.Tag = previewFile;
+            return previewFile.LoadFile(fileData);
         }
 
         public static IEnumerable<string> GetZipContents(string zipPath)

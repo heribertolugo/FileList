@@ -28,6 +28,11 @@ namespace FilePreview.ImageFiles
             return success;
         }
 
+        public void Clear()
+        {
+            this.imageViewerPanel.BackgroundImage = null;
+        }
+
         private static bool DisplayImagePreview(string path, Control control, ImageLayout imageLayout)
         {
             if (path == null)

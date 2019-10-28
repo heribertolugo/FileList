@@ -35,7 +35,7 @@ namespace FilePreview.TextFiles
             private set;
         }
 
-        public bool Load(string path)
+        public bool LoadFile(string path)
         {
             bool success = false;
             try
@@ -61,9 +61,40 @@ namespace FilePreview.TextFiles
             return success;
         }
 
-        public bool Load(FileData path)
+        public bool LoadFile(FileData path)
         {
-            return this.Load(path.Path);
+            return this.LoadFile(path.Path);
+        }
+
+        public void Clear()
+        {
+            (this.Viewer as RichTextBox).Clear();
+        }
+
+        private bool _disposed = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this._disposed)
+            {
+                if (disposing)
+                {
+                    this.Viewer.Dispose();
+                }
+
+                this._disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~TextFilePreview()
+        {
+            this.Dispose(false);
         }
     }
 }

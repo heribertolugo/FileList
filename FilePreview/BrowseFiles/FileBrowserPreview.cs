@@ -5,16 +5,19 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace FilePreview.BrowseFiles
 {
     public class FileBrowserPreview : Common.Models.IPreviewFile
     {
+
         public FileBrowserPreview()
         {
-            this.Viewer = new System.Windows.Forms.ListView();
+            this.Viewer = new FileBrowserControl();
         }
+
 
         public IEnumerable<string> Extensions
         {
@@ -28,114 +31,59 @@ namespace FilePreview.BrowseFiles
             get { return FileType.Browsable | FileType.Folder | FileType.Zip; }
         }
 
-        public bool Load(string path)
+        public bool LoadFile(string path)
         {
             try
             {
-                return FileBrowserPreview.DisplayBrowsablePreview(string.IsNullOrWhiteSpace(path) ? null : (FileData?)(new FileData(path)), this.Viewer as ListView);
-            } catch (Exception) { }
+                this.Clear();
+                return (this.Viewer as FileBrowserControl).DisplayBrowsablePreview(string.IsNullOrWhiteSpace(path) ? null : (FileData?)(new FileData(path)));
+            }
+            catch (Exception) { }
             return false;
         }
 
-        public bool Load(FileData path)
+        public bool LoadFile(FileData path)
         {
             try
             {
-               return FileBrowserPreview.DisplayBrowsablePreview((FileData?)path, this.Viewer as ListView);
-            } catch(Exception ex) { }
+                this.Clear();
+                return (this.Viewer as FileBrowserControl).DisplayBrowsablePreview((FileData?)path);
+            }
+            catch (Exception ex) { }
             return false;
         }
 
-
-        private static bool DisplayBrowsablePreview(FileData? fileData, ListView listView)
-        {            
-            listView.Items.Clear();
-
-            if (!fileData.HasValue)
-                return false;
-
-            string path = fileData.Value.Path;
-            
-            if (listView.LargeImageList == null)
-                listView.LargeImageList = new System.Windows.Forms.ImageList();
-            else
-                listView.LargeImageList.Images.Clear();
-            listView.LargeImageList.ImageSize = new Size(48, 48);
-
-            if (Directory.Exists(path))
-            {
-                foreach (string file in Directory.GetFiles(path))
-                {
-                    try
-                    {
-                        string key = FileBrowserPreview.AddImage(file, listView.LargeImageList, listView.LargeImageList.ImageSize);  
-                        FileBrowserPreview.AddItem(listView, file, key);
-                    }
-                    catch (Exception) { }
-                }
-                foreach (string directory in Directory.GetDirectories(path))
-                {
-                    try
-                    {
-                        string key = FileBrowserPreview.AddImage(directory + Constants.DirectoryKey, listView.LargeImageList, listView.LargeImageList.ImageSize); 
-                        FileBrowserPreview.AddItem(listView, directory + Constants.DirectoryKey, key);
-                    }
-                    catch (Exception) { }
-                }
-            }
-            else
-            {
-                foreach (FileData zipContent in fileData.Value.ZipContents)
-                {
-                    try
-                    {
-                        string key = FileBrowserPreview.AddImage(zipContent.Path, listView.LargeImageList, listView.LargeImageList.ImageSize); 
-                        FileBrowserPreview.AddItem(listView, zipContent.Path, key);
-                    }
-                    catch (Exception) { }
-                }
-            }
-
-            return true;
+        public void Clear()
+        {
+            (this.Viewer as FileBrowserControl).Clear();
         }
 
-        private static string AddImage(string path, ImageList imageList, Size imageSize)
+
+
+        private bool _disposed = false;
+
+        protected virtual void Dispose(bool disposing)
         {
-            Bitmap bitmap1;
-            string key = null;
-            try
+            if (!this._disposed)
             {
-                Bitmap bitmap2 = new Bitmap(path);
-                bitmap1 = new Bitmap(bitmap2, imageSize);
-                bitmap2.Dispose();
+                if (disposing)
+                {
+                    this.Viewer.Dispose();
+                }
 
-                if (!imageList.Images.ContainsKey(path))
-                    imageList.Images.Add(path, bitmap1);
-                
-                key = path;
+                this._disposed = true;
             }
-            catch (ArgumentException ex)
-            {
-                FileToIconConverter fileToIconConverter = new FileToIconConverter();
-                key = FileBrowserPreview.GetKey(path);
-                bitmap1 = fileToIconConverter.GetImage(path, IconSize.ExtraLarge).ToBitmap();
-
-                if (!imageList.Images.ContainsKey(key))
-                    imageList.Images.Add(key, bitmap1);
-            }
-
-            return key;
         }
 
-        private static void AddItem(ListView listView, string fileName, string imageKey)
+        public void Dispose()
         {
-            ListViewItem listViewItem = new ListViewItem(fileName, imageKey.Equals(string.Empty) ? Constants.NoneFileExtension : imageKey);
-            listView.Items.Add(listViewItem);
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        private static string GetKey(string fileName)
+        ~FileBrowserPreview()
         {
-            return !Path.GetFileName(fileName).Equals(string.Empty) || !fileName.EndsWith(Constants.DirectoryKey) ? Path.GetExtension(fileName) : Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + Constants.DirectoryKey;
+            this.Dispose(false);
         }
     }
 }

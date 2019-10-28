@@ -31,7 +31,7 @@ namespace FilePreview.ImageFiles
             get { return FileType.Image; }
         }
 
-        public bool Load(string path)
+        public bool LoadFile(string path)
         {
             try
             {
@@ -44,9 +44,40 @@ namespace FilePreview.ImageFiles
             }
         }
 
-        public bool Load(FileData path)
+        public bool LoadFile(FileData path)
         {
-            return this.Load(path.Path);
+            return this.LoadFile(path.Path);
+        }
+
+        public void Clear()
+        {
+            (this.Viewer as ImagePreviewControl).Clear();
+        }
+
+        private bool _disposed = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this._disposed)
+            {
+                if (disposing)
+                {
+                    this.Viewer.Dispose();
+                }
+
+                this._disposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~ImageFilePreview()
+        {
+            this.Dispose(false);
         }
     }
 }

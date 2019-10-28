@@ -37,8 +37,11 @@ namespace FileList.Views
             this.label2 = new System.Windows.Forms.Label();
             this.browseButton = new System.Windows.Forms.Button();
             this.searchButton = new System.Windows.Forms.Button();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.treeIconsImageList = new System.Windows.Forms.ImageList(this.components);
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.splitContainer1 = new Common.Models.GripSplitContainer();
-            this.fileListControl1 = new FileList.Models.FileListControl();
             this.viewerPanel = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.moveSelectedButton = new System.Windows.Forms.Button();
@@ -46,16 +49,12 @@ namespace FileList.Views
             this.openLocationButton = new System.Windows.Forms.Button();
             this.filePropertiesTextBox = new System.Windows.Forms.TextBox();
             this.openFileButton = new System.Windows.Forms.Button();
-            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.treeIconsImageList = new System.Windows.Forms.ImageList(this.components);
-            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.fileListControl1 = new FileList.Models.FileListControl();
             this.browsePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            this.viewerPanel.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -117,6 +116,19 @@ namespace FileList.Views
             this.searchButton.UseVisualStyleBackColor = true;
             this.searchButton.Click += new System.EventHandler(this.SearchButton_Click);
             // 
+            // saveFileDialog1
+            // 
+            this.saveFileDialog1.AddExtension = false;
+            this.saveFileDialog1.FileName = "Folder.";
+            this.saveFileDialog1.OverwritePrompt = false;
+            this.saveFileDialog1.Title = "Select Folder";
+            // 
+            // treeIconsImageList
+            // 
+            this.treeIconsImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.treeIconsImageList.ImageSize = new System.Drawing.Size(16, 16);
+            this.treeIconsImageList.TransparentColor = System.Drawing.Color.Transparent;
+            // 
             // splitContainer1
             // 
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -136,23 +148,12 @@ namespace FileList.Views
             this.splitContainer1.TabIndex = 2;
             this.splitContainer1.Visible = false;
             // 
-            // fileListControl1
-            // 
-            this.fileListControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.fileListControl1.FileTypeListSorted = false;
-            this.fileListControl1.Location = new System.Drawing.Point(0, 0);
-            this.fileListControl1.Name = "fileListControl1";
-            this.fileListControl1.SearcherThreads = 1;
-            this.fileListControl1.Size = new System.Drawing.Size(783, 734);
-            this.fileListControl1.TabIndex = 0;
-            this.fileListControl1.TreeImageList = null;
-            this.fileListControl1.OnFileDataSelected += new System.EventHandler<FileList.Models.FileDataSelectedEventArgs>(this.FileListControl1_OnFileDataSelected);
-            // 
             // viewerPanel
             // 
             this.viewerPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.viewerPanel.Location = new System.Drawing.Point(0, 105);
             this.viewerPanel.Name = "viewerPanel";
+            this.viewerPanel.Padding = new System.Windows.Forms.Padding(3);
             this.viewerPanel.Size = new System.Drawing.Size(623, 629);
             this.viewerPanel.TabIndex = 3;
             // 
@@ -230,18 +231,17 @@ namespace FileList.Views
             this.openFileButton.UseVisualStyleBackColor = true;
             this.openFileButton.Click += new System.EventHandler(this.OpenFileButton_Click);
             // 
-            // saveFileDialog1
+            // fileListControl1
             // 
-            this.saveFileDialog1.AddExtension = false;
-            this.saveFileDialog1.FileName = "Folder.";
-            this.saveFileDialog1.OverwritePrompt = false;
-            this.saveFileDialog1.Title = "Select Folder";
-            // 
-            // treeIconsImageList
-            // 
-            this.treeIconsImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
-            this.treeIconsImageList.ImageSize = new System.Drawing.Size(16, 16);
-            this.treeIconsImageList.TransparentColor = System.Drawing.Color.Transparent;
+            this.fileListControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.fileListControl1.FileTypeListSorted = false;
+            this.fileListControl1.Location = new System.Drawing.Point(0, 0);
+            this.fileListControl1.Name = "fileListControl1";
+            this.fileListControl1.SearcherThreads = 1;
+            this.fileListControl1.Size = new System.Drawing.Size(783, 734);
+            this.fileListControl1.TabIndex = 0;
+            this.fileListControl1.TreeImageList = null;
+            this.fileListControl1.OnFileDataSelected += new System.EventHandler<FileList.Models.FileDataSelectedEventArgs>(this.FileListControl1_OnFileDataSelected);
             // 
             // MainForm
             // 
@@ -260,7 +260,6 @@ namespace FileList.Views
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
-            this.viewerPanel.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             this.ResumeLayout(false);

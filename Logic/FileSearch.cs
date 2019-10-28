@@ -25,7 +25,7 @@ namespace FileList.Logic
 
         public FileData? GetNext()
         {
-            this._current = this._fileEnumerator.MoveNext() ? new FileData?((FileData)this._fileEnumerator.Current) : new FileData?();
+            this._current = this._fileEnumerator.MoveNext() ? new FileData?((FileData)this._fileEnumerator.Current) : null;
             return this._current;
         }
 
@@ -67,7 +67,7 @@ namespace FileList.Logic
                     this._shell = new ShellClass();
                     foreach (FileData f in this.Search(path, searchSubdirectories))
                         yield return f;
-                    Marshal.ReleaseComObject(objFolder);
+                    //Marshal.ReleaseComObject(objFolder);
                     yield break;
                 }
 
@@ -85,7 +85,7 @@ namespace FileList.Logic
 
                 foreach (FileData file in files)
                     yield return file;
-                Marshal.ReleaseComObject(objFolder);
+                //Marshal.ReleaseComObject(objFolder);
                 yield break;
             }
 
