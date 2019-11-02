@@ -12,6 +12,7 @@ namespace FileList.Views
 {
     public partial class MainForm : Form
     {
+        private Common.Models.Controls.FolderBrowserDialog dialog;
         private FilePreview.Previewers previewers = null;
         public MainForm()
         {
@@ -24,12 +25,13 @@ namespace FileList.Views
         {
             this.Height = 100;
             this.Width = 730;
+            this.dialog = new Common.Models.Controls.FolderBrowserDialog(this);
         }
         private void BrowseButton_Click(object sender, EventArgs e)
         {
-            if (this.saveFileDialog1.ShowDialog() != DialogResult.OK)
+            if (this.dialog.ShowDialog() != DialogResult.OK)
                 return;
-            this.rootPathTextBox.Text = Path.GetDirectoryName(this.saveFileDialog1.FileName.Replace("Folder.", ""));
+            this.rootPathTextBox.Text = this.dialog.DirectoryPath;
             this.Reset();
             if (!this.splitContainer1.Visible)
                 return;

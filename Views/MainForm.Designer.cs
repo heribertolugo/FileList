@@ -37,19 +37,18 @@ namespace FileList.Views
             this.label2 = new System.Windows.Forms.Label();
             this.browseButton = new System.Windows.Forms.Button();
             this.searchButton = new System.Windows.Forms.Button();
-            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.treeIconsImageList = new System.Windows.Forms.ImageList(this.components);
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.splitContainer1 = new Common.Models.GripSplitContainer();
-            this.viewerPanel = new System.Windows.Forms.Panel();
-            this.panel2 = new System.Windows.Forms.Panel();
             this.moveSelectedButton = new System.Windows.Forms.Button();
             this.deleteButton = new System.Windows.Forms.Button();
             this.openLocationButton = new System.Windows.Forms.Button();
-            this.filePropertiesTextBox = new System.Windows.Forms.TextBox();
             this.openFileButton = new System.Windows.Forms.Button();
+            this.splitContainer1 = new Common.Models.GripSplitContainer();
             this.fileListControl1 = new FileList.Models.FileListControl();
+            this.viewerPanel = new System.Windows.Forms.Panel();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.filePropertiesTextBox = new System.Windows.Forms.TextBox();
             this.browsePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -116,59 +115,11 @@ namespace FileList.Views
             this.searchButton.UseVisualStyleBackColor = true;
             this.searchButton.Click += new System.EventHandler(this.SearchButton_Click);
             // 
-            // saveFileDialog1
-            // 
-            this.saveFileDialog1.AddExtension = false;
-            this.saveFileDialog1.FileName = "Folder.";
-            this.saveFileDialog1.OverwritePrompt = false;
-            this.saveFileDialog1.Title = "Select Folder";
-            // 
             // treeIconsImageList
             // 
             this.treeIconsImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
             this.treeIconsImageList.ImageSize = new System.Drawing.Size(16, 16);
             this.treeIconsImageList.TransparentColor = System.Drawing.Color.Transparent;
-            // 
-            // splitContainer1
-            // 
-            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 56);
-            this.splitContainer1.Name = "splitContainer1";
-            // 
-            // splitContainer1.Panel1
-            // 
-            this.splitContainer1.Panel1.Controls.Add(this.fileListControl1);
-            // 
-            // splitContainer1.Panel2
-            // 
-            this.splitContainer1.Panel2.Controls.Add(this.viewerPanel);
-            this.splitContainer1.Panel2.Controls.Add(this.panel2);
-            this.splitContainer1.Size = new System.Drawing.Size(1410, 734);
-            this.splitContainer1.SplitterDistance = 783;
-            this.splitContainer1.TabIndex = 2;
-            this.splitContainer1.Visible = false;
-            // 
-            // viewerPanel
-            // 
-            this.viewerPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.viewerPanel.Location = new System.Drawing.Point(0, 105);
-            this.viewerPanel.Name = "viewerPanel";
-            this.viewerPanel.Padding = new System.Windows.Forms.Padding(3);
-            this.viewerPanel.Size = new System.Drawing.Size(623, 629);
-            this.viewerPanel.TabIndex = 3;
-            // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.moveSelectedButton);
-            this.panel2.Controls.Add(this.deleteButton);
-            this.panel2.Controls.Add(this.openLocationButton);
-            this.panel2.Controls.Add(this.filePropertiesTextBox);
-            this.panel2.Controls.Add(this.openFileButton);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel2.Location = new System.Drawing.Point(0, 0);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(623, 105);
-            this.panel2.TabIndex = 1;
             // 
             // moveSelectedButton
             // 
@@ -207,18 +158,6 @@ namespace FileList.Views
             this.openLocationButton.UseVisualStyleBackColor = true;
             this.openLocationButton.Click += new System.EventHandler(this.OpenLocationButton_Click);
             // 
-            // filePropertiesTextBox
-            // 
-            this.filePropertiesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.filePropertiesTextBox.Location = new System.Drawing.Point(88, 6);
-            this.filePropertiesTextBox.Multiline = true;
-            this.filePropertiesTextBox.Name = "filePropertiesTextBox";
-            this.filePropertiesTextBox.ReadOnly = true;
-            this.filePropertiesTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.filePropertiesTextBox.Size = new System.Drawing.Size(369, 96);
-            this.filePropertiesTextBox.TabIndex = 2;
-            // 
             // openFileButton
             // 
             this.openFileButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
@@ -231,6 +170,25 @@ namespace FileList.Views
             this.openFileButton.UseVisualStyleBackColor = true;
             this.openFileButton.Click += new System.EventHandler(this.OpenFileButton_Click);
             // 
+            // splitContainer1
+            // 
+            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.Location = new System.Drawing.Point(0, 56);
+            this.splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.fileListControl1);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.viewerPanel);
+            this.splitContainer1.Panel2.Controls.Add(this.panel2);
+            this.splitContainer1.Size = new System.Drawing.Size(1410, 734);
+            this.splitContainer1.SplitterDistance = 783;
+            this.splitContainer1.TabIndex = 2;
+            this.splitContainer1.Visible = false;
+            // 
             // fileListControl1
             // 
             this.fileListControl1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -242,6 +200,40 @@ namespace FileList.Views
             this.fileListControl1.TabIndex = 0;
             this.fileListControl1.TreeImageList = null;
             this.fileListControl1.OnFileDataSelected += new System.EventHandler<FileList.Models.FileDataSelectedEventArgs>(this.FileListControl1_OnFileDataSelected);
+            // 
+            // viewerPanel
+            // 
+            this.viewerPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.viewerPanel.Location = new System.Drawing.Point(0, 105);
+            this.viewerPanel.Name = "viewerPanel";
+            this.viewerPanel.Padding = new System.Windows.Forms.Padding(3);
+            this.viewerPanel.Size = new System.Drawing.Size(623, 629);
+            this.viewerPanel.TabIndex = 3;
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.moveSelectedButton);
+            this.panel2.Controls.Add(this.deleteButton);
+            this.panel2.Controls.Add(this.openLocationButton);
+            this.panel2.Controls.Add(this.filePropertiesTextBox);
+            this.panel2.Controls.Add(this.openFileButton);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel2.Location = new System.Drawing.Point(0, 0);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(623, 105);
+            this.panel2.TabIndex = 1;
+            // 
+            // filePropertiesTextBox
+            // 
+            this.filePropertiesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.filePropertiesTextBox.Location = new System.Drawing.Point(88, 6);
+            this.filePropertiesTextBox.Multiline = true;
+            this.filePropertiesTextBox.Name = "filePropertiesTextBox";
+            this.filePropertiesTextBox.ReadOnly = true;
+            this.filePropertiesTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.filePropertiesTextBox.Size = new System.Drawing.Size(369, 96);
+            this.filePropertiesTextBox.TabIndex = 2;
             // 
             // MainForm
             // 
@@ -277,7 +269,6 @@ namespace FileList.Views
         private System.Windows.Forms.Button openLocationButton;
         private System.Windows.Forms.TextBox filePropertiesTextBox;
         private System.Windows.Forms.Button openFileButton;
-        private System.Windows.Forms.SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.Panel viewerPanel;
         private System.Windows.Forms.Button deleteButton;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;

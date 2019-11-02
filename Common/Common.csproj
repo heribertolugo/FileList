@@ -63,6 +63,7 @@
     <Compile Include="Models\Controls\DropForm.Designer.cs">
       <DependentUpon>DropForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\Controls\FolderBrowserDialog.cs" />
     <Compile Include="Models\Controls\GripSplitContainer.cs">
       <SubType>Component</SubType>
     </Compile>

@@ -12,6 +12,7 @@ namespace FileList.Views
     public partial class MoveFilesForm : Form
     {
         private string[] FilePaths;
+        private Common.Models.Controls.FolderBrowserDialog folderBrowser;
 
         public MoveFilesForm()
         {
@@ -95,6 +96,7 @@ namespace FileList.Views
 
         private void MoveFilesForm_Load(object sender, EventArgs e)
         {
+            this.folderBrowser = new Common.Models.Controls.FolderBrowserDialog(this);
         }
 
         private void CheckBox1_CheckedChanged(object sender, EventArgs e)
@@ -107,9 +109,9 @@ namespace FileList.Views
 
         private void BrowseButton_Click(object sender, EventArgs e)
         {
-            if (this.saveFileDialog1.ShowDialog() != DialogResult.OK)
+            if (this.folderBrowser.ShowDialog() != DialogResult.OK)
                 return;
-            this.destinationTextBox.Text = this.saveFileDialog1.FileName.Replace(".Folder", "");
+            this.destinationTextBox.Text = this.folderBrowser.DirectoryPath;
         }
 
         private void CancelButton_Click(object sender, EventArgs e)
