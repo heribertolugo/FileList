@@ -3,8 +3,6 @@ using Common.Models;
 using FileList.Logic;
 using FileList.Models;
 using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;

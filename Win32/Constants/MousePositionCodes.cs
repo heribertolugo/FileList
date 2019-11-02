@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Win32.Constants
+﻿namespace Win32.Constants
 {
     /// <summary>
     /// WM_NCHITTEST and MOUSEHOOKSTRUCT Mouse Position Codes

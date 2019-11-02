@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Win32.Models
+﻿namespace Win32.Models
 {
     public struct MARGINS
     {

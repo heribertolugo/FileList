@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using Win32.Constants;
 
 namespace Win32.Models
 {

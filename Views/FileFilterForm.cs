@@ -1,13 +1,7 @@
 ﻿using Common.Models;
-using FileList.Logic;
 using FileList.Models;
-using FileList.Properties;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace FileList.Views

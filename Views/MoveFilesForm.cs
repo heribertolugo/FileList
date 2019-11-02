@@ -1,14 +1,11 @@
 ﻿using FileList.Logic;
-using FileList.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using System.Windows.Forms.Layout;
 
 namespace FileList.Views
 {

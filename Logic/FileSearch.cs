@@ -1,6 +1,5 @@
 ﻿using Common.Helpers;
 using Common.Models;
-using Common.Models.ZipExtractor;
 using Shell32;
 using System;
 using System.Collections;

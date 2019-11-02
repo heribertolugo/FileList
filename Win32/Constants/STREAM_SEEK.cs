@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Win32.Constants
+﻿namespace Win32.Constants
 {
     public enum STREAM_SEEK
     {
