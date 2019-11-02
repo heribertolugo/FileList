@@ -10,9 +10,9 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-//using System.IO.Packaging;
 using System.Threading;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace FileList.Logic
 {
@@ -148,8 +148,33 @@ namespace FileList.Logic
 
         public static bool DisplayPreview(FileData fileData, FilePreview.Previewers previewers, Control control)
         {
+            bool isZip = !fileData.Extension.Equals(UiHelper.ZipExtension) && Common.Models.ZipExtractor.SevenZipFormat.ZipExtensions.Contains(fileData.Extension);
+            if (isZip)
+                return UiHelper.DisplayZipPreview(fileData, previewers, control);
+            else
+                return UiHelper.DisplayFilePreview(fileData, previewers, control);
+        }
+
+        private static bool DisplayZipPreview(FileData fileData, FilePreview.Previewers previewers, Control control)
+        {
+            IPreviewFile previewFile = previewers.GetPreviewer(fileData.Extension);
+
+            if ((control.Tag as IPreviewFile) != null)
+                (control.Tag as IPreviewFile).Clear();
+
+            control.Controls.Clear();
+            if (previewFile == null)
+                return false;
+            control.Controls.Add(previewFile.Viewer);
+            previewFile.Viewer.Dock = DockStyle.Fill;
+            control.Tag = previewFile;
+            return previewFile.LoadFile(fileData.Path);
+        }
+
+        private static bool DisplayFilePreview(FileData fileData, FilePreview.Previewers previewers, Control control)
+        {
             FileType fileType = fileData.GetFileType();
-            IPreviewFile previewFile = previewers.GetPreviewer(fileType == FileType.Application? FileType.Unknown : fileType);
+            IPreviewFile previewFile = previewers.GetPreviewer(fileType == FileType.Application ? FileType.Unknown : fileType);
 
             if ((control.Tag as IPreviewFile) != null)
                 (control.Tag as IPreviewFile).Clear();

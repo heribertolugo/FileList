@@ -73,6 +73,9 @@
     <Compile Include="Models\IMultiValueConverter.cs" />
     <Compile Include="Models\IPreviewFile.cs" />
     <Compile Include="Models\StorageSizeType.cs" />
+    <Compile Include="Models\ZipExtractor\SevenZipInterface.cs" />
+    <Compile Include="Models\ZipExtractor\SevenZipLoader.cs" />
+    <Compile Include="Models\ZipExtractor\ZipFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -91,6 +94,11 @@
       <Project>{81a0cdfd-f069-4be5-8f60-277b70c9c57c}</Project>
       <Name>Win32</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="7z.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

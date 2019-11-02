@@ -1,25 +1,26 @@
 ﻿using Common.Extensions;
 using Common.Helpers;
 using Common.Models;
+using Common.Models.ZipExtractor;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 
 namespace FilePreview.BrowseFiles
 {
-    public partial class FileBrowserControl : UserControl
+    public partial class ZipBrowserControl : UserControl
     {
         private static readonly string UpDirectoryKey = "$Up_One_Directory_Key";
         private List<FileBrowserControlItem> _itemGroups;
         private int _itemGroupIndex;
         private Thread thread;
         private CancellationTokenSource cancellation;
+        private ZipFile _zipFile;
 
-        public FileBrowserControl()
+        public ZipBrowserControl()
         {
             InitializeComponent();
             this._itemGroups = new List<FileBrowserControlItem>();
@@ -32,6 +33,7 @@ namespace FilePreview.BrowseFiles
             ListViewHitTestInfo info = view.HitTest(e.X, e.Y);
             ListViewItem item = info.Item;
 
+
             if (this.cancellation != null)
                 this.cancellation.Cancel();
 
@@ -41,7 +43,7 @@ namespace FilePreview.BrowseFiles
 
                 args.View.InvokeIfRequired(v =>
                 {
-                    if (item != null && item.Name.Equals(FileBrowserControl.UpDirectoryKey))
+                    if (item != null && item.Name.Equals(ZipBrowserControl.UpDirectoryKey))
                     {
                         this._itemGroupIndex--;
                         v.Items.Clear();
@@ -68,35 +70,21 @@ namespace FilePreview.BrowseFiles
 
                             args.TextBox.InvokeIfRequired(t => t.Text = this._itemGroups[this._itemGroupIndex].Name);
 
-                            ListViewItem updir = new ListViewItem("Up Directory", FileBrowserControl.UpDirectoryKey);
-                            updir.Name = FileBrowserControl.UpDirectoryKey;
+                            ListViewItem updir = new ListViewItem("Up Directory", ZipBrowserControl.UpDirectoryKey);
+                            updir.Name = ZipBrowserControl.UpDirectoryKey;
                             v.Items.Add(updir);
                             this._itemGroups[this._itemGroupIndex].Items.Add(updir);
 
-                            foreach (string file in System.IO.Directory.EnumerateFiles(item.Name))
+                            foreach (ZipFile.ZipFileItem zipItem in ((ZipFile.ZipFileItem)args.ZipItem).Children)
                             {
                                 try
                                 {
-                                    if (args.Token.IsCancellationRequested)
-                                        break;
-                                    string key = FileBrowserControl.AddImage(file, v.LargeImageList, v.LargeImageList.ImageSize);
-                                    FileBrowserControl.AddItem(v, file, key);
-                                    this._itemGroups[this._itemGroupIndex].Items.Add(v.Items[file]);
+                                    args.Token.ThrowIfCancellationRequested();
+                                    string key = ZipBrowserControl.AddImage(zipItem.Path, v.LargeImageList, v.LargeImageList.ImageSize);
+                                    ZipBrowserControl.AddItem(v, zipItem, key);
+                                    this._itemGroups[this._itemGroupIndex].Items.Add(v.Items[zipItem.Path]);
                                 }
-                                catch (Exception ex) { }
-                            }
-
-                            foreach (string directory in System.IO.Directory.EnumerateDirectories(item.Name))
-                            {
-                                try
-                                {
-                                    if (args.Token.IsCancellationRequested)
-                                        break;
-                                    string key = FileBrowserControl.AddImage(directory + Constants.DirectoryKey, v.LargeImageList, v.LargeImageList.ImageSize);
-                                    FileBrowserControl.AddItem(v, directory + Constants.DirectoryKey, key);
-                                    this._itemGroups[this._itemGroupIndex].Items.Add(v.Items[directory + Constants.DirectoryKey]);
-                                }
-                                catch (Exception ex) { }
+                                catch (Exception) { }
                             }
 
                         }
@@ -117,13 +105,14 @@ namespace FilePreview.BrowseFiles
                         if (args.Token.IsCancellationRequested)
                             return;
                         view.SelectedItems.Clear();
-                        new System.Diagnostics.Process()
-                        {
-                            StartInfo = {
-                            FileName = "explorer",
-                            Arguments = ("\"" + item.Name + "\"")
-                        }
-                        }.Start();
+                        // **** DECOMPRESS AND OPEN?????? ****
+                        //new System.Diagnostics.Process()
+                        //{
+                        //    StartInfo = {
+                        //    FileName = "explorer",
+                        //    Arguments = ("\"" + item.Name + "\"")
+                        //}
+                        //}.Start();
                     }
                 });
 
@@ -132,7 +121,7 @@ namespace FilePreview.BrowseFiles
             this.thread.IsBackground = true;
             this.cancellation = new CancellationTokenSource();
 
-            this.thread.Start(new ThreadArgs("", this.cancellation.Token, this.listView1, this.currentDirectoryTextBox));
+            this.thread.Start(new ThreadArgs((ZipFile.ZipFileItem)item.Tag, this.cancellation.Token, this.listView1, this.currentDirectoryTextBox));
         }
 
 
@@ -142,19 +131,17 @@ namespace FilePreview.BrowseFiles
             {
                 if (this.cancellation != null)
                     this.cancellation.Cancel();
-            }
-            catch (Exception ex) { }
+            }catch(Exception ex) { }
             this.listView1.Items.Clear();
             this._itemGroupIndex = 0;
             this._itemGroups.Clear();
         }
 
-        internal bool DisplayBrowsablePreview(FileData? fileData)
+        internal bool DisplayBrowsablePreview(string path)
         {
-            if (!fileData.HasValue)
+            if (string.IsNullOrWhiteSpace(path))
                 return false;
 
-            string path = fileData.Value.Path;
             ListView listView = this.listView1;
 
             if (this._itemGroups.Count <= this._itemGroupIndex)
@@ -163,24 +150,35 @@ namespace FilePreview.BrowseFiles
             if (this.cancellation != null)
                 this.cancellation.Cancel();
 
+            if (this._zipFile != null)
+                this._zipFile.Dispose();
+
+            this._zipFile = new ZipFile(path);
+
             this.thread = new Thread((object s) =>
             {
                 ThreadArgs args = (ThreadArgs)s;
+                ZipFile zip = (ZipFile)args.ZipItem;
 
                 args.View.InvokeIfRequired(v =>
                 {
-                    args.TextBox.InvokeIfRequired(t => t.Text = args.Path);
+                    args.TextBox.InvokeIfRequired(t => t.Text = zip.Path);
 
-                    this.DisplayBrowsablePreview(args);
+                    if (args.View.LargeImageList == null)
+                    {
+                        args.View.LargeImageList = new System.Windows.Forms.ImageList();
+                        args.View.LargeImageList.ImageSize = new Size(48, 48);
+                        args.View.LargeImageList.Images.Add(ZipBrowserControl.UpDirectoryKey, Properties.Resources.upDirectory);
+                    }
 
-                    foreach (FileData zipContent in fileData.Value.ZipContents)
+                    foreach (ZipFile.ZipFileItem zipItem in zip.Contents())
                     {
                         try
                         {
                             args.Token.ThrowIfCancellationRequested();
-                            string key = FileBrowserControl.AddImage(zipContent.Path, v.LargeImageList, v.LargeImageList.ImageSize);
-                            FileBrowserControl.AddItem(v, zipContent.Path, key);
-                            this._itemGroups[this._itemGroupIndex].Items.Add(v.Items[zipContent.Path]);
+                            string key = ZipBrowserControl.AddImage(zipItem.Path, v.LargeImageList, v.LargeImageList.ImageSize);
+                            ZipBrowserControl.AddItem(v, zipItem, key);
+                            this._itemGroups[this._itemGroupIndex].Items.Add(v.Items[zipItem.Path]);
                         }
                         catch (Exception) { }
                     }
@@ -189,53 +187,12 @@ namespace FilePreview.BrowseFiles
 
             this.thread.IsBackground = true;
             this.cancellation = new CancellationTokenSource();
-
-            this.thread.Start(new ThreadArgs(path, this.cancellation.Token, listView, this.currentDirectoryTextBox));
+            
+            this.thread.Start(new ThreadArgs(this._zipFile, this.cancellation.Token, listView, this.currentDirectoryTextBox));
 
             return true;
         }
 
-
-        private void DisplayBrowsablePreview(ThreadArgs args)
-        {
-            if (this._itemGroups.Count <= this._itemGroupIndex)
-                this._itemGroups.Add(new FileBrowserControlItem(args.Path));
-
-            if (args.View.LargeImageList == null)
-            {
-                args.View.LargeImageList = new System.Windows.Forms.ImageList();
-                args.View.LargeImageList.ImageSize = new Size(48, 48);
-                args.View.LargeImageList.Images.Add(FileBrowserControl.UpDirectoryKey, Properties.Resources.upDirectory);
-            }
-            //else
-            //    listView.LargeImageList.Images.Clear();
-
-            if (Directory.Exists(args.Path))
-            {
-                foreach (string file in Directory.GetFiles(args.Path))
-                {
-                    try
-                    {
-                        args.Token.ThrowIfCancellationRequested();
-                        string key = FileBrowserControl.AddImage(file, args.View.LargeImageList, args.View.LargeImageList.ImageSize);
-                        FileBrowserControl.AddItem(args.View, file, key);
-                        this._itemGroups[this._itemGroupIndex].Items.Add(args.View.Items[file]);
-                    }
-                    catch (Exception) { }
-                }
-                foreach (string directory in Directory.GetDirectories(args.Path))
-                {
-                    try
-                    {
-                        args.Token.ThrowIfCancellationRequested();
-                        string key = FileBrowserControl.AddImage(directory + Constants.DirectoryKey, args.View.LargeImageList, args.View.LargeImageList.ImageSize);
-                        FileBrowserControl.AddItem(args.View, directory + Constants.DirectoryKey, key);
-                        this._itemGroups[this._itemGroupIndex].Items.Add(args.View.Items[directory + Constants.DirectoryKey]);
-                    }
-                    catch (Exception) { }
-                }
-            }
-        }
 
         private static string AddImage(string path, ImageList imageList, Size imageSize)
         {
@@ -255,8 +212,10 @@ namespace FilePreview.BrowseFiles
             catch (ArgumentException ex)
             {
                 FileToIconConverter fileToIconConverter = new FileToIconConverter();
-                key = FileBrowserControl.GetKey(path);
-                bitmap1 = fileToIconConverter.GetImage(path, IconSize.ExtraLarge).ToBitmap();
+                key = ZipBrowserControl.GetKey(path);
+                // because we are in zip file, we cant pass the folder inside the zip to get image
+                // so we pass appdata folder to get a folder image. some files dont have extension, so pass .none as extension
+                bitmap1 = fileToIconConverter.GetImage(string.IsNullOrWhiteSpace(System.IO.Path.GetFileName(path)) ? Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) : (path.Contains(".") ? path : ".none"), IconSize.ExtraLarge).ToBitmap(); 
 
                 if (!imageList.Images.ContainsKey(key))
                     imageList.Images.Add(key, bitmap1);
@@ -265,10 +224,11 @@ namespace FilePreview.BrowseFiles
             return key;
         }
 
-        private static void AddItem(ListView listView, string fileName, string imageKey)
+        private static void AddItem(ListView listView, ZipFile.ZipFileItem file, string imageKey)
         {
-            ListViewItem listViewItem = new ListViewItem(fileName, imageKey.Equals(string.Empty) ? Constants.NoneFileExtension : imageKey);
-            listViewItem.Name = fileName;
+            ListViewItem listViewItem = new ListViewItem(file.Path, imageKey.Equals(string.Empty) ? Constants.NoneFileExtension : imageKey);
+            listViewItem.Name = file.Path;
+            listViewItem.Tag = file;
             listView.Items.Add(listViewItem);
         }
 
@@ -298,15 +258,15 @@ namespace FilePreview.BrowseFiles
 
         private struct ThreadArgs
         {
-            public ThreadArgs(string path, CancellationToken token, ListView view, TextBox textBox)
+            public ThreadArgs(object zipItem, CancellationToken token, ListView view, TextBox textBox)
             {
-                this.Path = path;
+                this.ZipItem = zipItem;
                 this.Token = token;
                 this.View = view;
                 this.TextBox = textBox;
             }
 
-            public string Path { get; private set; }
+            public object ZipItem { get; private set; }
             public CancellationToken Token { get; private set; }
             public ListView View { get; private set; }
             public TextBox TextBox { get; private set; }

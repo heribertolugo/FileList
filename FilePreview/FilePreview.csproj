@@ -88,6 +88,13 @@
     </Compile>
     <Compile Include="TextFiles\TextFilePreview.cs" />
     <Compile Include="UnknownFiles\UnknownPreview.cs" />
+    <Compile Include="ZipFiles\ZipBrowserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ZipFiles\ZipBrowserControl.Designer.cs">
+      <DependentUpon>ZipBrowserControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ZipFiles\ZipBrowserPreview.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">
@@ -108,6 +115,9 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ZipFiles\ZipBrowserControl.resx">
+      <DependentUpon>ZipBrowserControl.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

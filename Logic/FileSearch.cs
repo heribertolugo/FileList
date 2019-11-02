@@ -1,5 +1,6 @@
 ﻿using Common.Helpers;
 using Common.Models;
+using Common.Models.ZipExtractor;
 using Shell32;
 using System;
 using System.Collections;
@@ -53,7 +54,7 @@ namespace FileList.Logic
             {
                 // file would be inaccessable to shellclass, usually because of access permissions
                 // but sometimes, ShellClass seems to get out of sync.
-                // in which case it will throw  The object invoked has disconnected from its clients exception
+                // in which case it will throw "The object invoked has disconnected from its clients" exception
                 // in this scenario, we want to attempt 1 more time to collect extended properties, with a new ShellClass
                 
                 //throw;
@@ -67,7 +68,7 @@ namespace FileList.Logic
                     this._shell = new ShellClass();
                     foreach (FileData f in this.Search(path, searchSubdirectories))
                         yield return f;
-                    //Marshal.ReleaseComObject(objFolder);
+
                     yield break;
                 }
 
@@ -85,7 +86,7 @@ namespace FileList.Logic
 
                 foreach (FileData file in files)
                     yield return file;
-                //Marshal.ReleaseComObject(objFolder);
+
                 yield break;
             }
 
@@ -106,6 +107,7 @@ namespace FileList.Logic
                 //}
 
                 FileData? fileData = null;
+
                 if (!item.IsFolder)
                 {
                     try
