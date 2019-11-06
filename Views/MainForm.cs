@@ -116,7 +116,7 @@ namespace FileList.Views
 
         private void DeleteButton_Click(object sender, EventArgs e)
         {
-            UiHelper.DeleteItem(this.rootPathTextBox.Text, this.fileListControl1);
+            UiHelper.DeleteItem(this.fileListControl1.SelectedPath, this.fileListControl1);
         }
 
         private void MoveSelectedButton_Click(object sender, EventArgs e)
