@@ -26,6 +26,7 @@ namespace FileList.Views
                 this.AddPathsToListBox(path);
 
             this.messageLabel.Text = string.Format(DeleteFilesDialog.UiMessage, this.filesListBox.Items.Count);
+            this.StartPosition = FormStartPosition.CenterParent;
             this.ShowDialog();
             return this.Result;
         }
@@ -48,6 +49,7 @@ namespace FileList.Views
         private void okButton_Click(object sender, EventArgs e)
         {
             this.Result = DialogResult.OK;
+            this.DeletePaths(this.filesListBox.Items.Cast<string>());
             this.Close();
         }
 
@@ -69,7 +71,13 @@ namespace FileList.Views
 
         private void DeletePaths(IEnumerable<string> paths)
         {
-
+            foreach (string path in paths)
+            {
+                if (System.IO.Directory.Exists(path))
+                    System.IO.Directory.Delete(path, true);
+                if (System.IO.File.Exists(path))
+                    System.IO.File.Delete(path);
+            }
         }
     }
 }

@@ -109,25 +109,32 @@ namespace FileList.Logic
         {
             string[] files = fileListControl.SelectedPath == null ? null : new string[] { fileListControl.SelectedPath };
 
-            UiHelper.ShowDeleteFilesDialog(files);
+            UiHelper.HandleDeleteFilesDialog(files, fileListControl);
         }
 
         public static void DeleteChecked(FileListControl fileListControl)
         {
             string[] files = fileListControl.GetCheckedPaths();
 
-            UiHelper.ShowDeleteFilesDialog(files);
+            UiHelper.HandleDeleteFilesDialog(files, fileListControl);
         }
 
-        private static void ShowDeleteFilesDialog(string[] paths)
+        private static void HandleDeleteFilesDialog(string[] paths, FileListControl fileListControl)
         {
             if (paths == null || paths.Length < 1)
             {
                 MessageBox.Show("No files to delete", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
-            DeleteFilesDialog k = new DeleteFilesDialog();
-            Console.WriteLine(k.ShowDialog(paths));
+            DeleteFilesDialog d = new DeleteFilesDialog();
+
+            if (d.ShowDialog(paths) != DialogResult.OK)
+                return;
+
+            foreach(string path in paths)
+            {
+                fileListControl.RemoveByPath(path);
+            }
         }
 
         public static void OpenItem(string path)
