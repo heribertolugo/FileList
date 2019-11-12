@@ -26,7 +26,12 @@ namespace FileList.Views
             this.Height = 100;
             this.Width = 730;
             this.dialog = new Common.Models.Controls.FolderBrowserDialog(this);
+
+
+            //DeleteFilesDialog k = new DeleteFilesDialog();
+            //Console.WriteLine(k.ShowDialog(null));
         }
+
         private void BrowseButton_Click(object sender, EventArgs e)
         {
             if (this.dialog.ShowDialog() != DialogResult.OK)
@@ -116,7 +121,8 @@ namespace FileList.Views
 
         private void DeleteButton_Click(object sender, EventArgs e)
         {
-            UiHelper.DeleteItem(this.fileListControl1.SelectedPath, this.fileListControl1);
+            //UiHelper.DeleteItem(this.fileListControl1.SelectedPath, this.fileListControl1);
+            this.deleteFileContextMenu.Show((sender as Control), new System.Drawing.Point(0,0));
         }
 
         private void MoveSelectedButton_Click(object sender, EventArgs e)
@@ -208,6 +214,16 @@ namespace FileList.Views
 
             panel.Controls["searchButton"].Enabled = true;
             panel.EnabledChanged += browsePanel_EnabledChanged;
+        }
+
+        private void deleteSelectedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            UiHelper.DeleteSelected(this.fileListControl1);
+        }
+
+        private void deleteCheckedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            UiHelper.DeleteChecked(this.fileListControl1);
         }
     }
 }

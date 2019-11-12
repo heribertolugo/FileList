@@ -127,6 +127,12 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Views\DeleteFilesDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\DeleteFilesDialog.Designer.cs">
+      <DependentUpon>DeleteFilesDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Views\FileFilterForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -164,6 +170,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="Views\DeleteFilesDialog.resx">
+      <DependentUpon>DeleteFilesDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Views\FileFilterForm.resx">
       <DependentUpon>FileFilterForm.cs</DependentUpon>
     </EmbeddedResource>

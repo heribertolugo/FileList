@@ -49,12 +49,16 @@ namespace FileList.Views
             this.viewerPanel = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.filePropertiesTextBox = new System.Windows.Forms.TextBox();
+            this.deleteFileContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.deleteSelectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteCheckedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.browsePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.panel2.SuspendLayout();
+            this.deleteFileContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // rootPathTextBox
@@ -235,6 +239,28 @@ namespace FileList.Views
             this.filePropertiesTextBox.Size = new System.Drawing.Size(369, 96);
             this.filePropertiesTextBox.TabIndex = 2;
             // 
+            // deleteFileContextMenu
+            // 
+            this.deleteFileContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.deleteSelectedToolStripMenuItem,
+            this.deleteCheckedToolStripMenuItem});
+            this.deleteFileContextMenu.Name = "deleteFileContextMenu";
+            this.deleteFileContextMenu.Size = new System.Drawing.Size(181, 70);
+            // 
+            // deleteSelectedToolStripMenuItem
+            // 
+            this.deleteSelectedToolStripMenuItem.Name = "deleteSelectedToolStripMenuItem";
+            this.deleteSelectedToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteSelectedToolStripMenuItem.Text = "Delete Selected";
+            this.deleteSelectedToolStripMenuItem.Click += new System.EventHandler(this.deleteSelectedToolStripMenuItem_Click);
+            // 
+            // deleteCheckedToolStripMenuItem
+            // 
+            this.deleteCheckedToolStripMenuItem.Name = "deleteCheckedToolStripMenuItem";
+            this.deleteCheckedToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteCheckedToolStripMenuItem.Text = "Delete Checked";
+            this.deleteCheckedToolStripMenuItem.Click += new System.EventHandler(this.deleteCheckedToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -254,6 +280,7 @@ namespace FileList.Views
             this.splitContainer1.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
+            this.deleteFileContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -277,5 +304,8 @@ namespace FileList.Views
         private System.Windows.Forms.Button moveSelectedButton;
         private System.Windows.Forms.Label label2;
         private Models.FileListControl fileListControl1;
+        private System.Windows.Forms.ContextMenuStrip deleteFileContextMenu;
+        private System.Windows.Forms.ToolStripMenuItem deleteSelectedToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem deleteCheckedToolStripMenuItem;
     }
 }

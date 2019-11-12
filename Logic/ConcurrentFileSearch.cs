@@ -5,6 +5,7 @@ using FileList.Models;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using Win32.Libraries;
@@ -45,14 +46,16 @@ namespace FileList.Logic
             ole32.GetRegisteredInterfaceMarshalPtr<Shell32.IShellDispatch5>(shell); //.ToIntPtr();
             GC.KeepAlive(shell);
 
-            ConcurrentFileSearchMinion searcher = new ConcurrentFileSearchMinion(this._root, this.ConcurrentFileSearch_OnFinishedHandler, this._fileListControl);
-            Thread thread = new Thread((object s) =>
-            {
-                ((ConcurrentFileSearchMinion)s).Start();
-            });
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start(searcher);
-            this._fileListControl.InvokeIfRequired(f => f.SearcherThreads = 1);
+            //ConcurrentFileSearchMinion searcher = new ConcurrentFileSearchMinion(this._root, this.ConcurrentFileSearch_OnFinishedHandler, this._fileListControl);
+            //Thread thread = new Thread((object s) =>
+            //{
+            //    ((ConcurrentFileSearchMinion)s).Start();
+            //});
+            //thread.SetApartmentState(ApartmentState.STA);
+            //thread.Start(searcher);
+            ConcurrentFileSearch.Directories.Add(this._root);
+            this._fileListControl.InvokeIfRequired(f => f.SearcherThreads = 0);
+            this.SummonMinions(this.MaxThreads);
             //thread.Join();
         }
         private void AttachFileData(IEnumerable<FileData> files, FileListControl fileListControl, bool commitRequired)
@@ -103,21 +106,27 @@ namespace FileList.Logic
             });
         }
 
+        private static object SummonMinionLock = new object();
         private void ConcurrentFileSearch_OnFinishedHandler(object sender, ConcurrentFileSearchEventArgs e)
         {
+            bool minionsSummoned = false;
+            int minionCount =  System.Threading.Interlocked.Decrement(ref MinionCount);
             ConcurrentFileSearchMinion searchSta = (ConcurrentFileSearchMinion)sender;
             searchSta.OnFinishedHandler -= this.ConcurrentFileSearch_OnFinishedHandler;
 
-            if (!this._cancelToken.IsCancellationRequested)
-                this.SummonMinions(this.MaxThreads);
-            else
-                ConcurrentFileSearchMinion.Cancel();
+            //lock (SummonMinionLock)
+            //{
+                if (!this._cancelToken.IsCancellationRequested)
+                minionsSummoned = this.SummonMinions(this.MaxThreads);
+                else
+                    ConcurrentFileSearchMinion.Cancel();
 
             int bucketCount = ConcurrentFileSearchMinion.ThreadBucketCount();
             this._fileListControl.InvokeIfRequired(c => c.SearcherThreads = bucketCount);
-            IoHelper.WriteToConsole("threads {0}", bucketCount);
+            //minionCount = GetMinionCount();
+            IoHelper.WriteToConsole("threads {0} #{1}", minionCount, e.Id);
 
-            if ((ConcurrentFileSearch.Directories.Count == 0 || this._cancelToken.IsCancellationRequested) && ConcurrentFileSearchMinion.ThreadBucketCount() == 0)
+            if ((ConcurrentFileSearch.Directories.Count == 0 || this._cancelToken.IsCancellationRequested) && GetMinionCount() == 0 && !minionsSummoned) //ConcurrentFileSearchMinion.ThreadBucketCount() == 0
             {
                 DateTime endTime = DateTime.Now;
                 TimeSpan timeSpan = endTime.Subtract(startTime);
@@ -131,20 +140,29 @@ namespace FileList.Logic
                 ConcurrentFileSearch._fileData = new ConcurrentCollection<FileData>("ConcurrentFileSearch fileData");
                 GC.Collect();
             }
+            //}
         }
 
-        private void SummonMinions(int maxThreads)
+        private int GetMinionCount()
         {
+            return Interlocked.CompareExchange(ref MinionCount, MinionCount, 0);
+        }
+
+        private static volatile int MinionCount = 0;
+        private bool SummonMinions(int maxThreads)
+        {
+            bool summoned = false;
             string directory = null;
             int bucketCount = 0;
 
-            IoHelper.WriteToConsole("{0} directories to process", ConcurrentFileSearch.Directories.Count);
+            if ((bucketCount = GetMinionCount()) >= maxThreads) //ConcurrentFileSearchMinion.ThreadBucketCount()
+                return false;
 
-            if ((bucketCount = ConcurrentFileSearchMinion.ThreadBucketCount()) > maxThreads)
-                return;
+            IoHelper.WriteToConsole("{0} directories to process", ConcurrentFileSearch.Directories.Count);
 
             while ((directory = ConcurrentFileSearch.Directories.Take()) != null)
             {
+                System.Threading.Interlocked.Increment(ref MinionCount);
                 ConcurrentFileSearchMinion searcher = new ConcurrentFileSearchMinion(directory, this.ConcurrentFileSearch_OnFinishedHandler, this._fileListControl);
                 Thread thread = new Thread((object o) =>
                 {
@@ -158,16 +176,18 @@ namespace FileList.Logic
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.IsBackground = true;
                 thread.Start(searcher);
+                IoHelper.WriteToConsole("Created thread {0}", searcher.ID);
                 //thread.Join();
                 this._fileListControl.InvokeIfRequired(f => f.SearcherThreads += 1);
-
+                summoned = true;
                 bucketCount++;
 
-                IoHelper.WriteToConsole("Created thread");
-                if (bucketCount >= maxThreads || (bucketCount = ConcurrentFileSearchMinion.ThreadBucketCount()) >= maxThreads)
+                if (bucketCount >= maxThreads || (bucketCount = GetMinionCount()) >= maxThreads) //ConcurrentFileSearchMinion.ThreadBucketCount()
                 //if ((bucketCount = ConcurrentFileSearchMinion.ThreadBucketCount()) >= maxThreads)
                         break;
             }
+
+            return summoned;
         }
 
         private void OnFinished(ConcurrentFileSearchEventArgs args)
@@ -198,7 +218,7 @@ namespace FileList.Logic
             private FileSearch _fileSearch;
             private static int IdTracker;
             private static object IdLock;
-            private readonly int ID;
+            public readonly int ID;
             private string _root;
             private EventHandler<ConcurrentFileSearchEventArgs> _handler;
             private List<FileData> _files;
@@ -246,7 +266,7 @@ namespace FileList.Logic
                 }
 
                 this.RmoveFromThreadBucket();
-                this.OnFinished(new ConcurrentFileSearchEventArgs(null));
+                this.OnFinished(new ConcurrentFileSearchEventArgs(null, this.ID.ToString()));
             }
 
             private void RmoveFromThreadBucket()
@@ -420,11 +440,12 @@ namespace FileList.Logic
     {
         private IEnumerable<FileData> _files;
 
-        public ConcurrentFileSearchEventArgs(IEnumerable<FileData> files)
+        public ConcurrentFileSearchEventArgs(IEnumerable<FileData> files, string id)
         {
             this._files = files;
         }
 
         public IEnumerable<FileData> Files { get { return this._files; } private set { } }
+        public string Id { get; private set; }
     }
 }

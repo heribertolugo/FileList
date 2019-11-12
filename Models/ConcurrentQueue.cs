@@ -5,8 +5,8 @@ namespace FileList.Models
 {
     public class ConcurrentQueue<T>
     {
-        private List<T> _inComing;
-        private List<T> _outGoing;
+        private volatile List<T> _inComing;
+        private volatile List<T> _outGoing;
         private object _inComingLock;
         private object _outGoingLock;
 

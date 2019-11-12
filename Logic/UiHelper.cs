@@ -104,6 +104,16 @@ namespace FileList.Logic
             fileListControl.RemoveByPath(path);
         }
 
+        public static void DeleteSelected(FileListControl fileListControl)
+        {
+
+        }
+
+        public static void DeleteChecked(FileListControl fileListControl)
+        {
+
+        }
+
         public static void OpenItem(string path)
         {
             new Process()
