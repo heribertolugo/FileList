@@ -54,12 +54,12 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 15.38461F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 84.61539F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(575, 347);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(450, 189);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // cancelButton
             // 
-            this.cancelButton.Location = new System.Drawing.Point(497, 320);
+            this.cancelButton.Location = new System.Drawing.Point(372, 162);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 0;
@@ -70,7 +70,7 @@
             // okButton
             // 
             this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.okButton.Location = new System.Drawing.Point(416, 320);
+            this.okButton.Location = new System.Drawing.Point(291, 162);
             this.okButton.Name = "okButton";
             this.okButton.Size = new System.Drawing.Size(75, 23);
             this.okButton.TabIndex = 1;
@@ -85,23 +85,25 @@
             this.messageLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.messageLabel.Location = new System.Drawing.Point(3, 0);
             this.messageLabel.Name = "messageLabel";
-            this.messageLabel.Size = new System.Drawing.Size(569, 48);
+            this.messageLabel.Size = new System.Drawing.Size(444, 24);
             this.messageLabel.TabIndex = 2;
+            this.messageLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // filesListBox
             // 
             this.filesListBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.filesListBox.FormattingEnabled = true;
-            this.filesListBox.Location = new System.Drawing.Point(3, 51);
-            this.filesListBox.MinimumSize = new System.Drawing.Size(488, 263);
+            this.filesListBox.HorizontalScrollbar = true;
+            this.filesListBox.Location = new System.Drawing.Point(3, 27);
             this.filesListBox.Name = "filesListBox";
-            this.filesListBox.Size = new System.Drawing.Size(488, 263);
+            this.filesListBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
+            this.filesListBox.Size = new System.Drawing.Size(363, 129);
             this.filesListBox.TabIndex = 3;
             // 
             // iconPanel
             // 
             this.iconPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.iconPanel.Location = new System.Drawing.Point(497, 145);
+            this.iconPanel.Location = new System.Drawing.Point(372, 54);
             this.iconPanel.Name = "iconPanel";
             this.iconPanel.Size = new System.Drawing.Size(75, 75);
             this.iconPanel.TabIndex = 4;
@@ -111,7 +113,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(575, 347);
+            this.ClientSize = new System.Drawing.Size(450, 189);
             this.Controls.Add(this.tableLayoutPanel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -119,6 +121,7 @@
             this.Name = "DeleteFilesDialog";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "Confirm delete files";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.DeleteFilesDialog_FormClosed);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);

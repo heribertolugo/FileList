@@ -10,6 +10,7 @@ using System.IO;
 using System.Threading;
 using System.Windows.Forms;
 using System.Linq;
+using FileList.Views;
 
 namespace FileList.Logic
 {
@@ -106,12 +107,27 @@ namespace FileList.Logic
 
         public static void DeleteSelected(FileListControl fileListControl)
         {
+            string[] files = fileListControl.SelectedPath == null ? null : new string[] { fileListControl.SelectedPath };
 
+            UiHelper.ShowDeleteFilesDialog(files);
         }
 
         public static void DeleteChecked(FileListControl fileListControl)
         {
+            string[] files = fileListControl.GetCheckedPaths();
 
+            UiHelper.ShowDeleteFilesDialog(files);
+        }
+
+        private static void ShowDeleteFilesDialog(string[] paths)
+        {
+            if (paths == null || paths.Length < 1)
+            {
+                MessageBox.Show("No files to delete", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
+            }
+            DeleteFilesDialog k = new DeleteFilesDialog();
+            Console.WriteLine(k.ShowDialog(paths));
         }
 
         public static void OpenItem(string path)
@@ -154,8 +170,8 @@ namespace FileList.Logic
         }
 
         public static bool DisplayPreview(FileData fileData, FilePreview.Previewers previewers, Control control)
-        {
-            bool isZip = !fileData.Extension.Equals(UiHelper.ZipExtension) && Common.Models.ZipExtractor.SevenZipFormat.ZipExtensions.Contains(fileData.Extension);
+        { //!fileData.Extension.Equals(UiHelper.ZipExtension) && 
+            bool isZip = Common.Models.ZipExtractor.SevenZipFormat.ZipExtensions.Contains(fileData.Extension);
             if (isZip)
                 return UiHelper.DisplayZipPreview(fileData, previewers, control);
             else
@@ -193,23 +209,6 @@ namespace FileList.Logic
             previewFile.Viewer.Dock = DockStyle.Fill;
             control.Tag = previewFile;
             return previewFile.LoadFile(fileData);
-        }
-
-        public static IEnumerable<string> GetZipContents(string zipPath)
-        {
-            List<string> stringList = new List<string>();
-            //using (Package package = Package.Open(zipPath, FileMode.Open, FileAccess.Read))
-            //{
-            //    foreach (PackagePart part in package.GetParts())
-            //    {
-            //        if (part.Uri.IsFile)
-            //            stringList.Add(Path.GetFileName(part.Uri.LocalPath));
-            //        else
-            //            stringList.Add(Path.GetDirectoryName(part.Uri.LocalPath));
-            //    }
-            //}
-            throw new NotImplementedException();
-            return stringList;
         }
 
         public static FileType GetFileType(string fileName)

@@ -76,15 +76,19 @@ namespace Common.Models.ZipExtractor
                 case VarEnum.VT_FILETIME:
                     return DateTime.FromFileTime(longValue);
                 default:
+                    object obj = null;
                     GCHandle PropHandle = GCHandle.Alloc(this, GCHandleType.Pinned);
                     try
                     {
-                        return Marshal.GetObjectForNativeVariant(PropHandle.AddrOfPinnedObject());
+                        IntPtr addr = PropHandle.AddrOfPinnedObject();
+                        obj = Marshal.GetObjectForNativeVariant(addr);
                     }
+                    catch (Exception ex) { }
                     finally
                     {
                         PropHandle.Free();
                     }
+                    return obj;
             }
         }
     }

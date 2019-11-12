@@ -54,6 +54,8 @@ namespace FilePreview.BrowseFiles
                         {
                             if (args.Token.IsCancellationRequested)
                                 break;
+                            if (v.Items.Contains(itm))
+                                v.Items.Remove(itm);
                             v.Items.Add(itm);
                         }
 
@@ -131,6 +133,7 @@ namespace FilePreview.BrowseFiles
             {
                 if (this.cancellation != null)
                     this.cancellation.Cancel();
+                //this._zipFile.Dispose();
             }catch(Exception ex) { }
             this.listView1.Items.Clear();
             this._itemGroupIndex = 0;

@@ -37,6 +37,11 @@ namespace Common.Models.ZipExtractor
                 {
                     bool isFolder = this.GetProperty<bool>(this.Archive, ItemPropId.kpidIsFolder, counter);
                     string path = this.GetProperty<string>(this.Archive, ItemPropId.kpidPath, counter);
+                    if (string.IsNullOrEmpty(path))
+                    {
+                        counter++;
+                        continue;
+                    }
                     string fullPath = System.IO.Path.Combine(this._path, path);
                     string root = fullPath.Substring(0, fullPath.TrimEnd('\\').LastIndexOf('\\'));
                     bool isRoot = root.Equals(this._path);
@@ -60,11 +65,12 @@ namespace Common.Models.ZipExtractor
                             this._items.Add(root, new ZipFileItem(root, counter));
                         if (!this._items.ContainsKey(fullPath))
                             this._items.Add(fullPath, new ZipFileItem(fullPath, counter));
-                        else
-                            this._items[fullPath] = new ZipFileItem(fullPath, counter);
+                        //else
+                        //    this._items[fullPath] = new ZipFileItem(fullPath, counter);
                         newItem = this._items[fullPath];
 
-                        this._items[root].Children.Add(newItem);
+                        if (!this._items[root].Children.Contains(newItem))
+                            this._items[root].Children.Add(newItem);
                     }
                     else
                     {
@@ -91,6 +97,13 @@ namespace Common.Models.ZipExtractor
                     if (isRoot)
                         yield return newItem;
                 }
+
+                if (Archive != null)
+                    Archive.Close();
+                if (sevenZipFormat != null)
+                    sevenZipFormat.Dispose();
+                if (ArchiveStream != null)
+                    ArchiveStream.Dispose();
             }
             else
             {
@@ -107,7 +120,7 @@ namespace Common.Models.ZipExtractor
             string currentParent = this._path;
             int count = 0;
 
-            foreach(string parent in parents)
+            foreach (string parent in parents)
             {
                 string previousParent = currentParent;
                 currentParent += parent;
@@ -153,11 +166,17 @@ namespace Common.Models.ZipExtractor
 
         private T GetProperty<T>(IInArchive archive, ItemPropId propId, uint index)
         {
-            PropVariant Name = new PropVariant();
-            archive.GetProperty(index, propId, ref Name);
-            T value = (T)Name.GetObject();
-            Name.Clear();
-            return value;
+            try
+            {
+                PropVariant Name = new PropVariant();
+                archive.GetProperty(index, propId, ref Name);
+                T value = (T)Name.GetObject();
+                Name.Clear();
+                return value;
+            }
+            catch (Exception ex) { }
+
+            return default(T);
         }
 
         private InStreamWrapper OpenStream()
@@ -201,10 +220,11 @@ namespace Common.Models.ZipExtractor
             {
                 if (disposing)
                 {
-                    //this.Viewer.Dispose();
+                    
                 }
 
                 this._disposed = true;
+
             }
         }
 
@@ -221,7 +241,7 @@ namespace Common.Models.ZipExtractor
         #endregion
 
         #region ZipItem
-        public sealed class ZipFileItem
+        public sealed class ZipFileItem : IEquatable<ZipFileItem>
         {
             private Dictionary<ItemPropId, object> properties;
             string _fullPath;
@@ -310,6 +330,11 @@ namespace Common.Models.ZipExtractor
             public override string ToString()
             {
                 return this._fullPath;
+            }
+
+            public bool Equals(ZipFileItem other)
+            {
+                return string.Equals(this._fullPath, other._fullPath);
             }
         }
         #endregion
