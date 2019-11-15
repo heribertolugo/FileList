@@ -362,6 +362,18 @@ namespace FileList.Models
             //this.treeView1.EndUpdate();
             this.modifyFileTypesListBoxInternal = false;
         }
+
+        public void ShowNotification(string message)
+        {
+            this.notificayionLabel.Text = message;
+            this.notificayionLabel.Visible = true;
+        }
+
+        public void HideNotification()
+        {
+            this.notificayionLabel.Visible = false;
+        }
+
         #endregion
 
         #region Event Handlers

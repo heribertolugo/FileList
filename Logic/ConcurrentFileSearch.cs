@@ -95,6 +95,7 @@ namespace FileList.Logic
         {
             fileListControl.InvokeIfRequired(c =>
             {
+                c.HideNotification();
                 //c.ExpandTree();
                 c.ScrollTreeToTop();
                 c.FileTypeListSorted = true;
@@ -113,7 +114,7 @@ namespace FileList.Logic
             //lock (SummonMinionLock)
             //{
                 if (!this._cancelToken.IsCancellationRequested)
-                minionsSummoned = this.SummonMinions(this.MaxThreads);
+                    minionsSummoned = this.SummonMinions(this.MaxThreads);
                 else
                     ConcurrentFileSearchMinion.Cancel();
 
@@ -361,7 +362,16 @@ namespace FileList.Logic
 
                         // check our file filter to see if we want this file
                         if (this._validator.ValidateFile(this._fileSearch.Current.Value))
+                        {
+                            this._fileListControl.InvokeIfRequired(f => f.HideNotification());
                             this.AttachFileData(this._fileSearch.Current.Value, this._fileListControl);
+                        }
+                        else
+                        {
+                            string message = string.Format("skipping filtered file: {0}", this._fileSearch.Current.Value.Path);
+                            this._fileListControl.InvokeIfRequired(f => f.ShowNotification(message));
+                            IoHelper.WriteToConsole(message);
+                        }
                     }
 
                     IoHelper.WriteToConsole("this._fileSearch.GetNext() == null");

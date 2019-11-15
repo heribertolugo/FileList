@@ -58,7 +58,6 @@
             this.noneRadioButton.Dock = System.Windows.Forms.DockStyle.Left;
             this.noneRadioButton.FlatAppearance.BorderSize = 0;
             this.noneRadioButton.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.noneRadioButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.noneRadioButton.Location = new System.Drawing.Point(146, 3);
             this.noneRadioButton.Margin = new System.Windows.Forms.Padding(6, 3, 3, 3);
             this.noneRadioButton.MaximumSize = new System.Drawing.Size(72, 17);
@@ -77,7 +76,6 @@
             this.whiteListRadioButton.Dock = System.Windows.Forms.DockStyle.Left;
             this.whiteListRadioButton.FlatAppearance.BorderSize = 0;
             this.whiteListRadioButton.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.whiteListRadioButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.whiteListRadioButton.Location = new System.Drawing.Point(74, 3);
             this.whiteListRadioButton.Margin = new System.Windows.Forms.Padding(6, 3, 3, 3);
             this.whiteListRadioButton.MaximumSize = new System.Drawing.Size(72, 17);
@@ -95,7 +93,6 @@
             this.blackListRadioButton.Dock = System.Windows.Forms.DockStyle.Left;
             this.blackListRadioButton.FlatAppearance.BorderSize = 0;
             this.blackListRadioButton.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.blackListRadioButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.blackListRadioButton.Location = new System.Drawing.Point(3, 3);
             this.blackListRadioButton.MaximumSize = new System.Drawing.Size(71, 17);
             this.blackListRadioButton.MinimumSize = new System.Drawing.Size(71, 17);
