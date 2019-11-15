@@ -50,14 +50,13 @@ namespace FileList.Models
 
         protected override void DefWndProc(ref Message m)
         {
-            switch (m.Msg)
+            MessageCodes msg = m.Msg;
+
+            if (msg == MessageCodes.WM_VSCROLL)
             {
-                case MessageCodes.WM_VSCROLL:
-                    this.OnScrolled((Direction)m.WParam.ToInt32());
-                    break;
-                default:
-                    break;
+                this.OnScrolled((Direction)m.WParam.ToInt32());
             }
+         
             base.DefWndProc(ref m);
         }
 
@@ -86,5 +85,5 @@ namespace FileList.Models
 
         public Direction Direction { get; private set; }
     }
-    
+
 }

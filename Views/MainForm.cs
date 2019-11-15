@@ -14,6 +14,8 @@ namespace FileList.Views
     {
         private Common.Models.Controls.FolderBrowserDialog dialog;
         private FilePreview.Previewers previewers = null;
+        private Views.SearchOptionsForm searchOptionsForm = null;
+        private SearchOption searchOptions;
         public MainForm()
         {
             InitializeComponent();
@@ -26,8 +28,9 @@ namespace FileList.Views
             this.Height = 100;
             this.Width = 730;
             this.dialog = new Common.Models.Controls.FolderBrowserDialog(this);
+            this.searchOptionsForm = new SearchOptionsForm();
+            this.searchOptions = this.searchOptionsForm.SearchOption;// default(SearchOption);
         }
-
         private void BrowseButton_Click(object sender, EventArgs e)
         {
             if (this.dialog.ShowDialog() != DialogResult.OK)
@@ -43,7 +46,7 @@ namespace FileList.Views
 
         private void Search()
         {
-            UiHelper.Search(this.rootPathTextBox.Text, this.fileListControl1, this.ToggleEnabled);
+            UiHelper.Search(this.rootPathTextBox.Text, this.fileListControl1, this.ToggleEnabled, this.searchOptions);
         }
 
         public void Reset()
@@ -55,7 +58,7 @@ namespace FileList.Views
 
         private void SearchButton_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(this.rootPathTextBox.Text) || this.rootPathTextBox.Text.Equals(""))
+            if (string.IsNullOrEmpty(this.rootPathTextBox.Text) || this.rootPathTextBox.Text.Equals(string.Empty))
                 return;
 
             if (!Directory.Exists(this.rootPathTextBox.Text) && !File.Exists(this.rootPathTextBox.Text))
@@ -70,6 +73,8 @@ namespace FileList.Views
                     this.splitContainer1.Visible = true;
                     this.Height = 829;
                     this.Width = 1350;
+                    if (this.searchOptionsForm.Visible)
+                        this.searchOptionsForm.Hide();
                 }
 
                 this.ToggleEnabled(null);
@@ -229,6 +234,47 @@ namespace FileList.Views
         {
             this.deleteButton.Tag = false;
             UiHelper.DeleteChecked(this.fileListControl1);
+        }
+        
+        private void ProcessSearchOptionForm()
+        {
+            this.fileListControl1.SearcherThreads = this.searchOptionsForm.Threads;
+            this.searchOptions = this.searchOptionsForm.SearchOption;
+            this.searchOptionsForm.Hide();
+        }
+
+        private void searchOptionsButton_Click(object sender, EventArgs e)
+        {
+            this.BeginSearchOptionsFormListening = false;
+
+            if (this.searchOptionsForm.Visible)
+            {
+                this.ProcessSearchOptionForm();
+            }
+            else
+            {
+                Win32.MouseListenerLL.MouseAction += new EventHandler<Win32.MouseListenerEventArgs>(SearchOptionsFormlistener);
+                Win32.MouseListenerLL.Start();
+                this.searchOptionsForm.Show(sender as Control);
+            }
+        }
+
+        private bool BeginSearchOptionsFormListening;
+        private void SearchOptionsFormlistener(object sender, Win32.MouseListenerEventArgs e)
+        {
+            // if we have already hovered the form with mouse, close form as soon as mouse leaves
+            // or if we click anywhere outside form, close form
+            if ((this.BeginSearchOptionsFormListening && !this.searchOptionsForm.RectangleToScreen(this.searchOptionsForm.DisplayRectangle).Contains(e.Location))
+                || (e.ButtonClick != Win32.MouseButtonClick.None && !this.searchOptionsForm.RectangleToScreen(this.searchOptionsForm.DisplayRectangle).Contains(e.Location)))
+            {
+                Win32.MouseListenerLL.Stop();
+                this.ProcessSearchOptionForm();
+            }
+            // when we enter the form, allow form closing when mouse leaves form
+            else if (this.searchOptionsForm.RectangleToScreen(this.searchOptionsForm.DisplayRectangle).Contains(e.Location))
+            {
+                this.BeginSearchOptionsFormListening = true;
+            }
         }
     }
 }

@@ -75,7 +75,7 @@ namespace Common.Models
                 return false;
             int pfEnabled = 0;
             dwmapi.DwmIsCompositionEnabled(ref pfEnabled);
-            return pfEnabled == MousePositionCodes.HTCLIENT;
+            return pfEnabled == HitTestMousePositionCodes.HTCLIENT;
         }
 
         protected override CreateParams CreateParams
@@ -93,8 +93,8 @@ namespace Common.Models
         {
             if (m.Msg == MessageCodes.WM_NCPAINT && this.isAeroEnabled)
             {
-                int attrValue = MousePositionCodes.HTCAPTION;
-                dwmapi.DwmSetWindowAttribute(this.Handle, MousePositionCodes.HTCAPTION, ref attrValue, 4);
+                int attrValue = HitTestMousePositionCodes.HTCAPTION;
+                dwmapi.DwmSetWindowAttribute(this.Handle, HitTestMousePositionCodes.HTCAPTION, ref attrValue, 4);
                 MARGINS pMarInset = new MARGINS()
                 {
                     bottomHeight = 1,
@@ -105,9 +105,9 @@ namespace Common.Models
                 dwmapi.DwmExtendFrameIntoClientArea(this.Handle, ref pMarInset);
             }
             base.WndProc(ref m);
-            if (m.Msg != MessageCodes.WM_NCHITTEST || (int)m.Result != MousePositionCodes.HTCLIENT)
+            if (m.Msg != MessageCodes.WM_NCHITTEST || (int)m.Result != HitTestMousePositionCodes.HTCLIENT)
                 return;
-            m.Result = (IntPtr) MousePositionCodes.HTCAPTION;
+            m.Result = (IntPtr) HitTestMousePositionCodes.HTCAPTION.Value;
         }
         #endregion
     }

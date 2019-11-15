@@ -151,6 +151,18 @@
     <Compile Include="Views\MoveFilesForm.Designer.cs">
       <DependentUpon>MoveFilesForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Views\SearchOptionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\SearchOptionsForm.Designer.cs">
+      <DependentUpon>SearchOptionsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\WhiteBackListForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\WhiteBackListForm.Designer.cs">
+      <DependentUpon>WhiteBackListForm.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Models\FileListControl.resx">
       <DependentUpon>FileListControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -182,6 +194,12 @@
     <EmbeddedResource Include="Views\MoveFilesForm.resx">
       <DependentUpon>MoveFilesForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Views\SearchOptionsForm.resx">
+      <DependentUpon>SearchOptionsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\WhiteBackListForm.resx">
+      <DependentUpon>WhiteBackListForm.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -194,6 +212,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\cog32.png" />
     <None Include="Assets\createHresult.html" />
     <None Include="Assets\OnlineReferences.txt" />
     <Content Include="folder_search.ico" />

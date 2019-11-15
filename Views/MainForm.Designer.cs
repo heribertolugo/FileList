@@ -34,6 +34,7 @@ namespace FileList.Views
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.rootPathTextBox = new System.Windows.Forms.TextBox();
             this.browsePanel = new System.Windows.Forms.Panel();
+            this.searchOptionsButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.browseButton = new System.Windows.Forms.Button();
             this.searchButton = new System.Windows.Forms.Button();
@@ -73,6 +74,7 @@ namespace FileList.Views
             // 
             // browsePanel
             // 
+            this.browsePanel.Controls.Add(this.searchOptionsButton);
             this.browsePanel.Controls.Add(this.label2);
             this.browsePanel.Controls.Add(this.browseButton);
             this.browsePanel.Controls.Add(this.searchButton);
@@ -83,6 +85,18 @@ namespace FileList.Views
             this.browsePanel.Size = new System.Drawing.Size(1410, 56);
             this.browsePanel.TabIndex = 1;
             this.browsePanel.EnabledChanged += new System.EventHandler(this.browsePanel_EnabledChanged);
+            // 
+            // searchOptionsButton
+            // 
+            this.searchOptionsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.searchOptionsButton.BackgroundImage = global::FileList.Properties.Resources.cog32;
+            this.searchOptionsButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.searchOptionsButton.Location = new System.Drawing.Point(1368, 30);
+            this.searchOptionsButton.Name = "searchOptionsButton";
+            this.searchOptionsButton.Size = new System.Drawing.Size(27, 23);
+            this.searchOptionsButton.TabIndex = 4;
+            this.searchOptionsButton.UseVisualStyleBackColor = true;
+            this.searchOptionsButton.Click += new System.EventHandler(this.searchOptionsButton_Click);
             // 
             // label2
             // 
@@ -112,7 +126,7 @@ namespace FileList.Views
             this.searchButton.Enabled = false;
             this.searchButton.Location = new System.Drawing.Point(1321, 30);
             this.searchButton.Name = "searchButton";
-            this.searchButton.Size = new System.Drawing.Size(75, 23);
+            this.searchButton.Size = new System.Drawing.Size(49, 23);
             this.searchButton.TabIndex = 1;
             this.searchButton.Text = "Search";
             this.toolTip1.SetToolTip(this.searchButton, "Enumerates the files from the selected folder");
@@ -245,19 +259,19 @@ namespace FileList.Views
             this.deleteSelectedToolStripMenuItem,
             this.deleteCheckedToolStripMenuItem});
             this.deleteFileContextMenu.Name = "deleteFileContextMenu";
-            this.deleteFileContextMenu.Size = new System.Drawing.Size(181, 70);
+            this.deleteFileContextMenu.Size = new System.Drawing.Size(157, 48);
             // 
             // deleteSelectedToolStripMenuItem
             // 
             this.deleteSelectedToolStripMenuItem.Name = "deleteSelectedToolStripMenuItem";
-            this.deleteSelectedToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteSelectedToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.deleteSelectedToolStripMenuItem.Text = "Delete Selected";
             this.deleteSelectedToolStripMenuItem.Click += new System.EventHandler(this.deleteSelectedToolStripMenuItem_Click);
             // 
             // deleteCheckedToolStripMenuItem
             // 
             this.deleteCheckedToolStripMenuItem.Name = "deleteCheckedToolStripMenuItem";
-            this.deleteCheckedToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteCheckedToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.deleteCheckedToolStripMenuItem.Text = "Delete Checked";
             this.deleteCheckedToolStripMenuItem.Click += new System.EventHandler(this.deleteCheckedToolStripMenuItem_Click);
             // 
@@ -307,5 +321,6 @@ namespace FileList.Views
         private System.Windows.Forms.ContextMenuStrip deleteFileContextMenu;
         private System.Windows.Forms.ToolStripMenuItem deleteSelectedToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem deleteCheckedToolStripMenuItem;
+        private System.Windows.Forms.Button searchOptionsButton;
     }
 }

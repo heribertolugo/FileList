@@ -34,6 +34,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -50,7 +51,7 @@
     <Compile Include="Constants\ImageListDrawState.cs" />
     <Compile Include="Constants\MessageCodes.cs" />
     <Compile Include="Constants\SystemConsts.cs" />
-    <Compile Include="Constants\MousePositionCodes.cs" />
+    <Compile Include="Constants\HitTestMousePositionCodes.cs" />
     <Compile Include="Constants\MSHCTX.cs" />
     <Compile Include="Constants\MSHLFLAGS.cs" />
     <Compile Include="Constants\ScrollBarCommands.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="Constants\SHGetFileInfo.cs" />
     <Compile Include="Constants\STREAM_SEEK.cs" />
     <Compile Include="Constants\SysImageListSize.cs" />
+    <Compile Include="Constants\WindowHooks.cs" />
     <Compile Include="Constants\WindowStyles.cs" />
     <Compile Include="Libraries\comctl32.cs" />
     <Compile Include="Libraries\dwmapi.cs" />
@@ -69,13 +71,16 @@
     <Compile Include="Libraries\shlwapi.cs" />
     <Compile Include="Libraries\user32.cs" />
     <Compile Include="Libraries\uxtheme.cs" />
+    <Compile Include="Models\DWORD.cs" />
     <Compile Include="Models\IImageList.cs" />
     <Compile Include="Models\IMAGEINFO.cs" />
     <Compile Include="Models\IMAGELISTDRAWPARAMS.cs" />
     <Compile Include="Models\MARGINS.cs" />
+    <Compile Include="Models\MSLLHOOKSTRUCT.cs" />
     <Compile Include="Models\POINT.cs" />
     <Compile Include="Models\RECT.cs" />
     <Compile Include="Models\SHFILEINFO.cs" />
+    <Compile Include="MouseListenerLL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -21,6 +21,9 @@ namespace Win32.Libraries
 
         [DllImport("kernel32")]
         public static extern int GetLastError();
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern IntPtr GetModuleHandle(string lpModuleName);
         #endregion
     }
 }

@@ -575,7 +575,7 @@ namespace FileList.Models
         /// <param name="tree"></param>
         private static void ScrollTreeLeft(TreeView tree)
         {
-            user32.SendMessage(tree.Handle, MessageCodes.WM_HSCROLL, HorizontalScrollBarCommands.SB_LEFT, 0);
+            user32.SendMessage(tree.Handle, (uint)(int)MessageCodes.WM_HSCROLL, HorizontalScrollBarCommands.SB_LEFT, 0);
         }
 
         /// <summary>

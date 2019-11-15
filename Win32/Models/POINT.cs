@@ -1,8 +1,17 @@
-﻿namespace Win32
+﻿using System.Drawing;
+using System.Runtime.InteropServices;
+
+namespace Win32
 {
+    [StructLayout(LayoutKind.Sequential)]
     public struct POINT
     {
-        private int x;
-        private int y;
+        public int x;
+        public int y;
+
+        public static implicit operator Point(POINT point)
+        {
+            return new Point(point.x, point.y);
+        }
     }
 }

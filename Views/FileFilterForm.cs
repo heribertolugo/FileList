@@ -52,6 +52,12 @@ namespace FileList.Views
             filterSelectedHandler(this, args);
         }
 
+        public bool CloseButtonVisible
+        {
+            get { return this.closeButton.Visible; }
+            set { this.closeButton.Visible = value; }
+        }
+
         #endregion
 
         #region Event Handlers

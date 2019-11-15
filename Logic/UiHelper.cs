@@ -40,7 +40,7 @@ namespace FileList.Logic
             UiHelper.OpenLocation(tag.HasValue ? tag.Value.Directory : treeView.SelectedNode.Text);
         }
 
-        public static void Search(string path, FileListControl fileListControl, Action<ConcurrentFileSearchEventArgs> searchFinishedCallback)
+        public static void Search(string path, FileListControl fileListControl, Action<ConcurrentFileSearchEventArgs> searchFinishedCallback, Views.SearchOption filter)
         {
             if (UiHelper.worker == null)
             {
@@ -56,7 +56,7 @@ namespace FileList.Logic
             UiHelper.cancellationToken = new CancellationTokenSource();
             UiHelper._searchFinishedCallback = searchFinishedCallback;
 
-            FileSearchWorkerArgs args = new FileSearchWorkerArgs(path, fileListControl, true, UiHelper.cancellationToken.Token);
+            FileSearchWorkerArgs args = new FileSearchWorkerArgs(path, fileListControl, true, UiHelper.cancellationToken.Token, filter);
 
             UiHelper.worker.RunWorkerAsync(args);
         }
@@ -177,7 +177,7 @@ namespace FileList.Logic
         }
 
         public static bool DisplayPreview(FileData fileData, FilePreview.Previewers previewers, Control control)
-        { //!fileData.Extension.Equals(UiHelper.ZipExtension) && 
+        { 
             bool isZip = Common.Models.ZipExtractor.SevenZipFormat.ZipExtensions.Contains(fileData.Extension);
             if (isZip)
                 return UiHelper.DisplayZipPreview(fileData, previewers, control);
