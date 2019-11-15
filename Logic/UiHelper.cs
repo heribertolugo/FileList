@@ -76,7 +76,7 @@ namespace FileList.Logic
 
         private static void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
         private static void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -90,8 +90,11 @@ namespace FileList.Logic
         private static void Search_Finished(object sender, ConcurrentFileSearchEventArgs e)
         {
             // sender as ConcurrentFileSearch.Dispose()
-            UiHelper.cancellationToken.Dispose();
-            UiHelper._searchFinishedCallback(e);
+            if (UiHelper.cancellationToken != null)
+            {
+                UiHelper.cancellationToken.Dispose();
+                UiHelper._searchFinishedCallback(e);
+            }
         }
 
         public static void DeleteItem(string path, FileListControl fileListControl)

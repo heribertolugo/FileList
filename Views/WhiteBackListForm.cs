@@ -22,7 +22,7 @@ namespace FileList.Views
         {
             get
             {
-                return this.dataGridView1.Rows.Cast<DataGridViewRow>().Select(r => (r.Cells[0].Value?.ToString() ?? string.Empty).Trim()).Distinct();
+                return this.dataGridView1.Rows.Cast<DataGridViewRow>().Where(r => r.Cells[0].Value != null).Select(r => r.Cells[0].Value.ToString().Trim()).Distinct();
             }
             private set
             {

@@ -29,15 +29,15 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
-            this.threadCountUpDown = new System.Windows.Forms.NumericUpDown();
+            this.panel2 = new System.Windows.Forms.Panel();
             this.label2 = new System.Windows.Forms.Label();
+            this.threadCountUpDown = new System.Windows.Forms.NumericUpDown();
             this.closeButton = new System.Windows.Forms.Button();
             this.extensionsButton = new System.Windows.Forms.Button();
             this.propertiesButton = new System.Windows.Forms.Button();
-            this.panel2 = new System.Windows.Forms.Panel();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.threadCountUpDown)).BeginInit();
             this.panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.threadCountUpDown)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
@@ -49,11 +49,32 @@
             this.panel1.Controls.Add(this.extensionsButton);
             this.panel1.Controls.Add(this.propertiesButton);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Location = new System.Drawing.Point(3, 3);
             this.panel1.MinimumSize = new System.Drawing.Size(0, 30);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(610, 30);
+            this.panel1.Size = new System.Drawing.Size(604, 30);
             this.panel1.TabIndex = 2;
+            // 
+            // panel2
+            // 
+            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel2.Controls.Add(this.label2);
+            this.panel2.Controls.Add(this.threadCountUpDown);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel2.Location = new System.Drawing.Point(150, 0);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(159, 30);
+            this.panel2.TabIndex = 7;
+            // 
+            // label2
+            // 
+            this.label2.Dock = System.Windows.Forms.DockStyle.Left;
+            this.label2.Location = new System.Drawing.Point(0, 0);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(46, 28);
+            this.label2.TabIndex = 6;
+            this.label2.Text = "Threads";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // threadCountUpDown
             // 
@@ -77,21 +98,11 @@
             0});
             this.threadCountUpDown.ValueChanged += new System.EventHandler(this.threadCountUpDown_ValueChanged);
             // 
-            // label2
-            // 
-            this.label2.Dock = System.Windows.Forms.DockStyle.Left;
-            this.label2.Location = new System.Drawing.Point(0, 0);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(46, 28);
-            this.label2.TabIndex = 6;
-            this.label2.Text = "Threads";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // closeButton
             // 
             this.closeButton.Dock = System.Windows.Forms.DockStyle.Right;
             this.closeButton.Image = global::FileList.Properties.Resources.closeX_16;
-            this.closeButton.Location = new System.Drawing.Point(578, 0);
+            this.closeButton.Location = new System.Drawing.Point(572, 0);
             this.closeButton.Name = "closeButton";
             this.closeButton.Size = new System.Drawing.Size(32, 30);
             this.closeButton.TabIndex = 2;
@@ -128,17 +139,6 @@
             this.propertiesButton.UseVisualStyleBackColor = false;
             this.propertiesButton.Click += new System.EventHandler(this.propertiesButton_Click);
             // 
-            // panel2
-            // 
-            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel2.Controls.Add(this.label2);
-            this.panel2.Controls.Add(this.threadCountUpDown);
-            this.panel2.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel2.Location = new System.Drawing.Point(150, 0);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(159, 30);
-            this.panel2.TabIndex = 7;
-            // 
             // SearchOptionsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -147,12 +147,13 @@
             this.Controls.Add(this.panel1);
             this.IsMdiContainer = true;
             this.Name = "SearchOptionsForm";
+            this.Padding = new System.Windows.Forms.Padding(3);
             this.Text = "SearchOptionsForm";
             this.Load += new System.EventHandler(this.SearchOptionsForm_Load);
             this.MdiChildActivate += new System.EventHandler(this.SearchOptionsForm_MdiChildActivate);
             this.panel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.threadCountUpDown)).EndInit();
             this.panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.threadCountUpDown)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

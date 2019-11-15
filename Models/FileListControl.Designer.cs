@@ -398,62 +398,62 @@
             this.deleteFileToolStripMenuItem});
             this.filesTreeViewContextMenu.Name = "filesTreeViewContextMenu";
             this.filesTreeViewContextMenu.ShowImageMargin = false;
-            this.filesTreeViewContextMenu.Size = new System.Drawing.Size(156, 176);
+            this.filesTreeViewContextMenu.Size = new System.Drawing.Size(151, 154);
             // 
             // checkUncheckAllToolStripMenuItem
             // 
             this.checkUncheckAllToolStripMenuItem.Name = "checkUncheckAllToolStripMenuItem";
-            this.checkUncheckAllToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.checkUncheckAllToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
             this.checkUncheckAllToolStripMenuItem.Text = "Check/Uncheck All";
             this.checkUncheckAllToolStripMenuItem.Click += new System.EventHandler(this.CheckUncheckAllToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(152, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(147, 6);
             // 
             // expandTreeToolStripMenuItem
             // 
             this.expandTreeToolStripMenuItem.Name = "expandTreeToolStripMenuItem";
-            this.expandTreeToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.expandTreeToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
             this.expandTreeToolStripMenuItem.Text = "Expand All";
             this.expandTreeToolStripMenuItem.Click += new System.EventHandler(this.ExpandTreeToolStripMenuItem_Click);
             // 
             // collapseTreeToolStripMenuItem
             // 
             this.collapseTreeToolStripMenuItem.Name = "collapseTreeToolStripMenuItem";
-            this.collapseTreeToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.collapseTreeToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
             this.collapseTreeToolStripMenuItem.Text = "Collapse All";
             this.collapseTreeToolStripMenuItem.Click += new System.EventHandler(this.CollapseTreeToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(152, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(147, 6);
             // 
             // openFileToolStripMenuItem
             // 
             this.openFileToolStripMenuItem.Name = "openFileToolStripMenuItem";
-            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
             this.openFileToolStripMenuItem.Text = "Open File";
             this.openFileToolStripMenuItem.Click += new System.EventHandler(this.OpenFileToolStripMenuItem_Click);
             // 
             // fileLocationToolStripMenuItem
             // 
             this.fileLocationToolStripMenuItem.Name = "fileLocationToolStripMenuItem";
-            this.fileLocationToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.fileLocationToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
             this.fileLocationToolStripMenuItem.Text = "Open Location";
             this.fileLocationToolStripMenuItem.Click += new System.EventHandler(this.FileLocationToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(152, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(147, 6);
             // 
             // deleteFileToolStripMenuItem
             // 
             this.deleteFileToolStripMenuItem.Name = "deleteFileToolStripMenuItem";
-            this.deleteFileToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.deleteFileToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
             this.deleteFileToolStripMenuItem.Text = "Delete";
             this.deleteFileToolStripMenuItem.Click += new System.EventHandler(this.DeleteFileToolStripMenuItem_Click);
             // 

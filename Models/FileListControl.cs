@@ -582,22 +582,56 @@ namespace FileList.Models
         #region Extensions ListBox ContextMenu
         private void UncheckAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            this.fileTypesCheckedListBox.ItemCheck -= FileTypesCheckedListBox_ItemCheck;
 
+            for (int itemIndex = 0; itemIndex < this.fileTypesCheckedListBox.Items.Count; itemIndex++)
+            {
+                if (itemIndex == this.fileTypesCheckedListBox.Items.Count-1)
+                    this.fileTypesCheckedListBox.ItemCheck += FileTypesCheckedListBox_ItemCheck;
+
+                this.fileTypesCheckedListBox.SetItemChecked(itemIndex, false);
+            }
         }
 
         private void CheckAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            this.fileTypesCheckedListBox.ItemCheck -= FileTypesCheckedListBox_ItemCheck;
 
+            for (int itemIndex = 0; itemIndex < this.fileTypesCheckedListBox.Items.Count; itemIndex++)
+            {
+                if (itemIndex == this.fileTypesCheckedListBox.Items.Count - 1)
+                    this.fileTypesCheckedListBox.ItemCheck += FileTypesCheckedListBox_ItemCheck;
+
+                this.fileTypesCheckedListBox.SetItemChecked(itemIndex, true);
+            }
         }
 
         private void UncheckOthersToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            this.fileTypesCheckedListBox.ItemCheck -= FileTypesCheckedListBox_ItemCheck;
 
+            for (int itemIndex = 0; itemIndex < this.fileTypesCheckedListBox.Items.Count; itemIndex++)
+            {
+                if (itemIndex == this.fileTypesCheckedListBox.Items.Count - 1)
+                    this.fileTypesCheckedListBox.ItemCheck += FileTypesCheckedListBox_ItemCheck;
+
+                if (itemIndex != this.fileTypesCheckedListBox.SelectedIndex)
+                    this.fileTypesCheckedListBox.SetItemChecked(itemIndex, false);
+            }
         }
 
         private void CheckOthersToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            this.fileTypesCheckedListBox.ItemCheck -= FileTypesCheckedListBox_ItemCheck;
 
+            for (int itemIndex = 0; itemIndex < this.fileTypesCheckedListBox.Items.Count; itemIndex++)
+            {
+                if (itemIndex == this.fileTypesCheckedListBox.Items.Count - 1)
+                    this.fileTypesCheckedListBox.ItemCheck += FileTypesCheckedListBox_ItemCheck;
+
+                if (itemIndex != this.fileTypesCheckedListBox.SelectedIndex)
+                    this.fileTypesCheckedListBox.SetItemChecked(itemIndex, true);
+            }
         }
         #endregion
 
