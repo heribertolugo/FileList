@@ -408,7 +408,7 @@ namespace FileList.Models
             EventHandler<FileDataSelectedEventArgs> fileDataSelected = this.OnFileDataSelected;
             if (fileDataSelected == null)
                 return;
-            this.OnFileDataSelected(this, this.GetEventArgs(fileDataSelected));
+            fileDataSelected(this, this.GetEventArgs());
         }
 
         private void FileTypesCheckedListBox_ItemCheck(object sender, ItemCheckEventArgs e)
@@ -442,40 +442,6 @@ namespace FileList.Models
             this.treeView1.SelectedNode = node;
             this.filesTreeViewContextMenu.Items[this.openFileToolStripMenuItem.Name].Enabled = node.Level > 0;
             this.filesTreeViewContextMenu.Show(this.treeView1, e.X, e.Y);
-        }
-
-        private void ExpandTreeToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            this.treeView1.ExpandAll();
-        }
-
-        private void CollapseTreeToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            this.treeView1.CollapseAll();
-        }
-
-        private void OpenFileToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            EventHandler<FileDataSelectedEventArgs> openFileDataClicked = this.OnOpenFileDataClicked;
-            if (openFileDataClicked == null)
-                return;
-            this.OnFileDataSelected(this, this.GetEventArgs(openFileDataClicked));
-        }
-
-        private void FileLocationToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            EventHandler<FileDataSelectedEventArgs> openLocationClicked = this.OnOpenLocationClicked;
-            if (openLocationClicked == null)
-                return;
-            this.OnFileDataSelected(this, this.GetEventArgs(openLocationClicked));
-        }
-
-        private void DeleteFileToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            EventHandler<FileDataSelectedEventArgs> deleteFileDataClicked = this.OnDeleteFileDataClicked;
-            if (deleteFileDataClicked == null)
-                return;
-            this.OnFileDataSelected(this, this.GetEventArgs(deleteFileDataClicked));
         }
 
         private void TreeView1_AfterCheck(object sender, TreeViewEventArgs e)
@@ -568,6 +534,9 @@ namespace FileList.Models
             this.ScrollTreeToTop();
         }
 
+
+        #region TreeView ContextMenu
+
         private void CheckUncheckAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this._allCheck = this.GetCheckedNodes(this.treeView1).Count() <= 1;
@@ -575,6 +544,62 @@ namespace FileList.Models
                 node.Checked = this._allCheck;
         }
 
+        private void ExpandTreeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.treeView1.ExpandAll();
+        }
+
+        private void CollapseTreeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.treeView1.CollapseAll();
+        }
+
+        private void OpenFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            EventHandler<FileDataSelectedEventArgs> openFileDataClicked = this.OnOpenFileDataClicked;
+            if (openFileDataClicked == null)
+                return;
+            openFileDataClicked(this, this.GetEventArgs());
+        }
+
+        private void FileLocationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            EventHandler<FileDataSelectedEventArgs> openLocationClicked = this.OnOpenLocationClicked;
+            if (openLocationClicked == null)
+                return;
+            openLocationClicked(this, this.GetEventArgs());
+        }
+
+        private void DeleteFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            EventHandler<FileDataSelectedEventArgs> deleteFileDataClicked = this.OnDeleteFileDataClicked;
+            if (deleteFileDataClicked == null)
+                return;
+            deleteFileDataClicked(this, this.GetEventArgs());
+        }
+        #endregion
+
+        #region Extensions ListBox ContextMenu
+        private void UncheckAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void CheckAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void UncheckOthersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void CheckOthersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+        #endregion
 
         #endregion
 
@@ -728,7 +753,7 @@ namespace FileList.Models
                 yield return node;
         }
 
-        private FileDataSelectedEventArgs GetEventArgs(EventHandler<FileDataSelectedEventArgs> handler)
+        private FileDataSelectedEventArgs GetEventArgs()
         {
             TreeNode selectedNode = this.treeView1.SelectedNode;
             List<FileData> fileDataList = new List<FileData>();
@@ -1245,6 +1270,7 @@ namespace FileList.Models
             this.SetChildTriggerNodes(parentNode);
         }
         #endregion
+
     }
 
     public class ChildNodeTriggers

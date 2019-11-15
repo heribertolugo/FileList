@@ -105,6 +105,11 @@ namespace FileList.Logic
             fileListControl.RemoveByPath(path);
         }
 
+        public static void DeleteItems(IEnumerable<string> paths, FileListControl fileListControl)
+        {
+            UiHelper.HandleDeleteFilesDialog(paths.ToArray(), fileListControl);
+        }
+
         public static void DeleteSelected(FileListControl fileListControl)
         {
             string[] files = fileListControl.SelectedPath == null ? null : new string[] { fileListControl.SelectedPath };

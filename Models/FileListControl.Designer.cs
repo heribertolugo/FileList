@@ -31,6 +31,13 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.splitContainer1 = new Common.Models.GripSplitContainer();
             this.fileTypesCheckedListBox = new System.Windows.Forms.CheckedListBox();
+            this.extensionsListBoxContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.uncheckAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.checkAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.uncheckOthersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.checkOthersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.notificayionLabel = new System.Windows.Forms.Label();
             this.treeView1 = new FileList.Models.ScrollNotifyTreeView();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -56,12 +63,12 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.deleteFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.notificayionLabel = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.extensionsListBoxContextMenu.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -107,6 +114,7 @@
             // 
             // fileTypesCheckedListBox
             // 
+            this.fileTypesCheckedListBox.ContextMenuStrip = this.extensionsListBoxContextMenu;
             this.fileTypesCheckedListBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.fileTypesCheckedListBox.FormattingEnabled = true;
             this.fileTypesCheckedListBox.Location = new System.Drawing.Point(0, 0);
@@ -115,6 +123,63 @@
             this.fileTypesCheckedListBox.Size = new System.Drawing.Size(120, 372);
             this.fileTypesCheckedListBox.TabIndex = 2;
             this.fileTypesCheckedListBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.FileTypesCheckedListBox_ItemCheck);
+            // 
+            // extensionsListBoxContextMenu
+            // 
+            this.extensionsListBoxContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.uncheckAllToolStripMenuItem,
+            this.checkAllToolStripMenuItem,
+            this.toolStripSeparator4,
+            this.uncheckOthersToolStripMenuItem,
+            this.checkOthersToolStripMenuItem});
+            this.extensionsListBoxContextMenu.Name = "extensionsListBoxContextMenu";
+            this.extensionsListBoxContextMenu.Size = new System.Drawing.Size(159, 98);
+            // 
+            // uncheckAllToolStripMenuItem
+            // 
+            this.uncheckAllToolStripMenuItem.Name = "uncheckAllToolStripMenuItem";
+            this.uncheckAllToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.uncheckAllToolStripMenuItem.Text = "Uncheck All";
+            this.uncheckAllToolStripMenuItem.Click += new System.EventHandler(this.UncheckAllToolStripMenuItem_Click);
+            // 
+            // checkAllToolStripMenuItem
+            // 
+            this.checkAllToolStripMenuItem.Name = "checkAllToolStripMenuItem";
+            this.checkAllToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.checkAllToolStripMenuItem.Text = "Check All";
+            this.checkAllToolStripMenuItem.Click += new System.EventHandler(this.CheckAllToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(155, 6);
+            // 
+            // uncheckOthersToolStripMenuItem
+            // 
+            this.uncheckOthersToolStripMenuItem.Name = "uncheckOthersToolStripMenuItem";
+            this.uncheckOthersToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.uncheckOthersToolStripMenuItem.Text = "Uncheck Others";
+            this.uncheckOthersToolStripMenuItem.Click += new System.EventHandler(this.UncheckOthersToolStripMenuItem_Click);
+            // 
+            // checkOthersToolStripMenuItem
+            // 
+            this.checkOthersToolStripMenuItem.Name = "checkOthersToolStripMenuItem";
+            this.checkOthersToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.checkOthersToolStripMenuItem.Text = "Check Others";
+            this.checkOthersToolStripMenuItem.Click += new System.EventHandler(this.CheckOthersToolStripMenuItem_Click);
+            // 
+            // notificayionLabel
+            // 
+            this.notificayionLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.notificayionLabel.Location = new System.Drawing.Point(35, 155);
+            this.notificayionLabel.Name = "notificayionLabel";
+            this.notificayionLabel.Size = new System.Drawing.Size(469, 48);
+            this.notificayionLabel.TabIndex = 4;
+            this.notificayionLabel.Text = "Notification";
+            this.notificayionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.notificayionLabel.Visible = false;
             // 
             // treeView1
             // 
@@ -333,77 +398,64 @@
             this.deleteFileToolStripMenuItem});
             this.filesTreeViewContextMenu.Name = "filesTreeViewContextMenu";
             this.filesTreeViewContextMenu.ShowImageMargin = false;
-            this.filesTreeViewContextMenu.Size = new System.Drawing.Size(151, 154);
+            this.filesTreeViewContextMenu.Size = new System.Drawing.Size(156, 176);
             // 
             // checkUncheckAllToolStripMenuItem
             // 
             this.checkUncheckAllToolStripMenuItem.Name = "checkUncheckAllToolStripMenuItem";
-            this.checkUncheckAllToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.checkUncheckAllToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
             this.checkUncheckAllToolStripMenuItem.Text = "Check/Uncheck All";
             this.checkUncheckAllToolStripMenuItem.Click += new System.EventHandler(this.CheckUncheckAllToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(147, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(152, 6);
             // 
             // expandTreeToolStripMenuItem
             // 
             this.expandTreeToolStripMenuItem.Name = "expandTreeToolStripMenuItem";
-            this.expandTreeToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.expandTreeToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
             this.expandTreeToolStripMenuItem.Text = "Expand All";
             this.expandTreeToolStripMenuItem.Click += new System.EventHandler(this.ExpandTreeToolStripMenuItem_Click);
             // 
             // collapseTreeToolStripMenuItem
             // 
             this.collapseTreeToolStripMenuItem.Name = "collapseTreeToolStripMenuItem";
-            this.collapseTreeToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.collapseTreeToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
             this.collapseTreeToolStripMenuItem.Text = "Collapse All";
             this.collapseTreeToolStripMenuItem.Click += new System.EventHandler(this.CollapseTreeToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(147, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(152, 6);
             // 
             // openFileToolStripMenuItem
             // 
             this.openFileToolStripMenuItem.Name = "openFileToolStripMenuItem";
-            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
             this.openFileToolStripMenuItem.Text = "Open File";
             this.openFileToolStripMenuItem.Click += new System.EventHandler(this.OpenFileToolStripMenuItem_Click);
             // 
             // fileLocationToolStripMenuItem
             // 
             this.fileLocationToolStripMenuItem.Name = "fileLocationToolStripMenuItem";
-            this.fileLocationToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.fileLocationToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
             this.fileLocationToolStripMenuItem.Text = "Open Location";
             this.fileLocationToolStripMenuItem.Click += new System.EventHandler(this.FileLocationToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(147, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(152, 6);
             // 
             // deleteFileToolStripMenuItem
             // 
             this.deleteFileToolStripMenuItem.Name = "deleteFileToolStripMenuItem";
-            this.deleteFileToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.deleteFileToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
             this.deleteFileToolStripMenuItem.Text = "Delete";
             this.deleteFileToolStripMenuItem.Click += new System.EventHandler(this.DeleteFileToolStripMenuItem_Click);
-            // 
-            // notificayionLabel
-            // 
-            this.notificayionLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.notificayionLabel.Location = new System.Drawing.Point(35, 155);
-            this.notificayionLabel.Name = "notificayionLabel";
-            this.notificayionLabel.Size = new System.Drawing.Size(469, 48);
-            this.notificayionLabel.TabIndex = 4;
-            this.notificayionLabel.Text = "Notification";
-            this.notificayionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.notificayionLabel.Visible = false;
             // 
             // FileListControl
             // 
@@ -417,6 +469,7 @@
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.extensionsListBoxContextMenu.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
@@ -461,5 +514,11 @@
         private System.Windows.Forms.ToolTip toolTip1;
         private Common.Models.GripSplitContainer splitContainer1;
         private System.Windows.Forms.Label notificayionLabel;
+        private System.Windows.Forms.ContextMenuStrip extensionsListBoxContextMenu;
+        private System.Windows.Forms.ToolStripMenuItem uncheckAllToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem checkAllToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripMenuItem uncheckOthersToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem checkOthersToolStripMenuItem;
     }
 }

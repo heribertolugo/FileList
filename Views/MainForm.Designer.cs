@@ -218,6 +218,9 @@ namespace FileList.Views
             this.fileListControl1.TabIndex = 0;
             this.fileListControl1.TreeImageList = null;
             this.fileListControl1.OnFileDataSelected += new System.EventHandler<FileList.Models.FileDataSelectedEventArgs>(this.FileListControl1_OnFileDataSelected);
+            this.fileListControl1.OnOpenFileDataClicked += new System.EventHandler<FileList.Models.FileDataSelectedEventArgs>(this.FileListControl1_OnOpenFileDataClicked);
+            this.fileListControl1.OnOpenLocationClicked += new System.EventHandler<FileList.Models.FileDataSelectedEventArgs>(this.FileListControl1_OnOpenLocationClicked);
+            this.fileListControl1.OnDeleteFileDataClicked += new System.EventHandler<FileList.Models.FileDataSelectedEventArgs>(this.FileListControl1_OnDeleteFileDataClicked);
             // 
             // viewerPanel
             // 

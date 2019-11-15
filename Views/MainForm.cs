@@ -207,7 +207,7 @@ namespace FileList.Views
 
         private void FileListControl1_OnDeleteFileDataClicked(object sender, FileDataSelectedEventArgs e)
         {
-            UiHelper.DeleteItem(this.fileListControl1.SelectedPath, this.fileListControl1);
+            UiHelper.DeleteItems(e.FileData.Select(f => f.Path), this.fileListControl1);
         }
 
         private void browsePanel_EnabledChanged(object sender, EventArgs e)
