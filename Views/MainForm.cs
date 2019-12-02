@@ -255,7 +255,7 @@ namespace FileList.Views
             {
                 Win32.MouseListenerLL.MouseAction += new EventHandler<Win32.MouseListenerEventArgs>(SearchOptionsFormlistener);
                 Win32.MouseListenerLL.Start();
-                this.searchOptionsForm.Show(sender as Control);
+                this.searchOptionsForm.Show(sender as Control, DropFormPosition.BottomLeft);
             }
         }
 

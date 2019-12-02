@@ -19,7 +19,7 @@ namespace Common.Models
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
         }
-        public virtual void Show(Control target)
+        public virtual void Show(Control target, DropFormPosition position = DropFormPosition.BottomRight)
         {
             Rectangle screen = target.RectangleToScreen(target.ClientRectangle);
             Form form = target.FindForm();
@@ -28,7 +28,7 @@ namespace Common.Models
             form.Move += new EventHandler(this.Owner_Move);
             form.Resize -= new EventHandler(this.TargetForm_Resize);
             form.Resize += new EventHandler(this.TargetForm_Resize);
-            this.Location = new Point(screen.X, screen.Bottom);
+            this.Location = this.GetNewPosition(position, target); // new Point(screen.X, screen.Bottom);
             this.TopMost = true;
             this.Show();
         }
@@ -37,6 +37,42 @@ namespace Common.Models
         {
             get { return this._ownerControl; }
             private set { }
+        }
+
+        private Point GetNewPosition(DropFormPosition position, Control target)
+        {
+            Rectangle targetRect = target.RectangleToScreen(target.ClientRectangle);
+
+            switch (position)
+            {
+                case DropFormPosition.BottomRight:
+                    return new Point(targetRect.X, targetRect.Bottom);
+                case DropFormPosition.BottomLeft:
+                    return new Point(targetRect.X - this.Width + target.Width, targetRect.Bottom);
+                case DropFormPosition.BottomMiddle:
+                    return new Point(targetRect.X - (this.Width / 2) + target.Width, targetRect.Bottom);
+                case DropFormPosition.LeftTop:
+                    return new Point(targetRect.X - this.Width, targetRect.Bottom - this.Height);
+                case DropFormPosition.LeftMiddle:
+                    return new Point(targetRect.X - this.Width, targetRect.Top - (this.Height / 2));
+                case DropFormPosition.LeftBottom:
+                    return new Point(targetRect.X - this.Width, targetRect.Top);
+                case DropFormPosition.RightTop:
+                    return new Point(targetRect.X + targetRect.Width, targetRect.Bottom - this.Height);
+                case DropFormPosition.RightMiddle:
+                    return new Point(targetRect.X + targetRect.Width, targetRect.Top - (this.Height / 2));
+                case DropFormPosition.RightBottom:
+                    return new Point(targetRect.X + targetRect.Width, targetRect.Top);
+                case DropFormPosition.TopLeft:
+                    return new Point(targetRect.X - this.Width + target.Width, targetRect.Top - this.Height);
+                case DropFormPosition.TopMiddle:
+                    return new Point(targetRect.X - (this.Width / 2) + target.Width, targetRect.Top - this.Height);
+                case DropFormPosition.TopRight:
+                    return new Point(targetRect.X, targetRect.Top - this.Height);
+                default:
+                    break;
+            }
+            return new Point(targetRect.X, targetRect.Bottom);
         }
 
         private void Owner_Move(object sender, EventArgs e)
@@ -110,5 +146,21 @@ namespace Common.Models
             m.Result = (IntPtr) HitTestMousePositionCodes.HTCAPTION.Value;
         }
         #endregion
+    }
+
+    public enum DropFormPosition
+    {
+        BottomRight,
+        BottomLeft,
+        BottomMiddle,
+        LeftTop,
+        LeftMiddle,
+        LeftBottom,
+        RightTop,
+        RightMiddle,
+        RightBottom,
+        TopLeft,
+        TopMiddle,
+        TopRight
     }
 }
