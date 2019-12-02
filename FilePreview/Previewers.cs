@@ -53,6 +53,11 @@ namespace FilePreview
             return null;
         }
 
+        public IEnumerable<IPreviewFile> GetPreviewrs()
+        {
+            return this._filePreviews;
+        }
+
         private static void GetFilePreviews(ref IList<IPreviewFile> previews)
         {
             previews = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes())

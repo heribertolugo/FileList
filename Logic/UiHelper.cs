@@ -185,12 +185,30 @@ namespace FileList.Logic
         }
 
         public static bool DisplayPreview(FileData fileData, FilePreview.Previewers previewers, Control control)
-        { 
-            bool isZip = Common.Models.ZipExtractor.SevenZipFormat.ZipExtensions.Contains(fileData.Extension);
-            if (isZip)
-                return UiHelper.DisplayZipPreview(fileData, previewers, control);
-            else
-                return UiHelper.DisplayFilePreview(fileData, previewers, control);
+        {
+            //bool isZip = Common.Models.ZipExtractor.SevenZipFormat.ZipExtensions.Contains(fileData.Extension);
+            //if (isZip)
+            //    return UiHelper.DisplayZipPreview(fileData, previewers, control);
+            //else
+            //    return UiHelper.DisplayFilePreview(fileData, previewers, control);
+
+            if ((control.Tag as IPreviewFile) != null)
+                (control.Tag as IPreviewFile).Clear();
+
+            IPreviewFile previewFile = previewers.GetPreviewer(fileData.Extension);
+            FileType fileType = fileData.GetFileType();
+
+            control.Controls.Clear();
+            if (previewFile == null || string.IsNullOrEmpty(fileData.Extension))
+                previewFile = previewers.GetPreviewer(fileType == FileType.Application ? FileType.Unknown : fileType);
+            
+            if (previewFile == null)
+                return false;
+
+            control.Controls.Add(previewFile.Viewer);
+            previewFile.Viewer.Dock = DockStyle.Fill;
+            control.Tag = previewFile;
+            return previewFile.LoadFile(fileData);
         }
 
         private static bool DisplayZipPreview(FileData fileData, FilePreview.Previewers previewers, Control control)

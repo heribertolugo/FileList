@@ -79,6 +79,7 @@
       <DependentUpon>MediaPlayerControl.cs</DependentUpon>
     </Compile>
     <Compile Include="MediaFiles\MediaPreview.cs" />
+    <Compile Include="PdfFiles\PdfPreview.cs" />
     <Compile Include="Previewers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -100,6 +101,10 @@
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{43df2658-688f-4dbb-bc72-26c5e7d418a1}</Project>
       <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PDFView\PDFView.vbproj">
+      <Project>{170d7d1b-61b9-4e8b-9cd3-88350725379f}</Project>
+      <Name>PDFView</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -1241,5 +1246,6 @@
     <None Include="Resources\pauseButton.png" />
     <None Include="Resources\palyButton.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
