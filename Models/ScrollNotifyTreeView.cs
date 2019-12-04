@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 using Win32.Constants;
 using Win32.Libraries;
@@ -11,7 +12,8 @@ namespace FileList.Models
 
         public ScrollNotifyTreeView() : base()
         {
-
+            this.HideSelection = false;
+            this.DrawMode = TreeViewDrawMode.OwnerDrawText;
         }
 
         public bool VerticleScrollVisible()
@@ -71,8 +73,27 @@ namespace FileList.Models
         protected override void CreateHandle()
         {
             base.CreateHandle();
-            // Explorer Theme
+            //// Explorer Theme
             uxtheme.SetWindowTheme(this.Handle, "explorer", null);
+        }
+
+        protected override void OnDrawNode(DrawTreeNodeEventArgs e)
+        {
+            TreeNodeStates treeState = e.State;   
+
+            if (e.Node == e.Node.TreeView.SelectedNode || (e.State & TreeNodeStates.Hot) == TreeNodeStates.Hot)
+            {
+                Font font = e.Node.NodeFont ?? e.Node.TreeView.Font;
+                Rectangle rect = e.Bounds;
+                rect.Offset(0, 1);
+                Brush brush = SystemBrushes.Highlight; // e.Node.TreeView.Focused ? SystemBrushes.Highlight : Brushes.Gray;
+                e.Graphics.FillRectangle(brush, e.Bounds);
+                TextRenderer.DrawText(e.Graphics, e.Node.Text, font, rect, SystemColors.HighlightText, TextFormatFlags.GlyphOverhangPadding);
+            }
+            else
+            {
+                e.DrawDefault = true;
+            }
         }
     }
 

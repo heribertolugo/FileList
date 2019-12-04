@@ -33,7 +33,7 @@ namespace Common.Models
         {
             if (FileData._filePropertyNamesLock == null)
                 FileData._filePropertyNamesLock = new object();
-            
+
             //Extensions.WriteToConsole("requesting filePropertyNames lock @ 36");
             //lock (FileData._filePropertyNamesLock)
             //{
@@ -234,6 +234,9 @@ namespace Common.Models
 
         private void LoadExtendedProperties()
         {
+                if (!System.IO.File.Exists(this.Path) && !System.IO.Directory.Exists(this.Path))
+                    return;
+                    IoHelper.WriteToConsole("loading extnded properties for {0}", this.Path);
             try
             {
                 if (this._shell != null)
@@ -244,6 +247,7 @@ namespace Common.Models
                     for (int iColumn = -1; iColumn < 1000; iColumn++) //(int)short.MaxValue
                     {
                         string detailsOf = folder.GetDetailsOf(null, iColumn);
+                        //IoHelper.WriteToConsole("loading extnded property #{0}", iColumn);
                         if (string.IsNullOrEmpty(detailsOf))
                             continue;
                         string value = folder.GetDetailsOf(name, iColumn);
@@ -260,6 +264,7 @@ namespace Common.Models
             finally
             {
                 this.LoadExtendedPropertiesLight();
+                IoHelper.WriteToConsole("finished loading extnded properties for {0}", this.Path);
             }
         }
 

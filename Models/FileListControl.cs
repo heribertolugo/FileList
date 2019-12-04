@@ -56,6 +56,10 @@ namespace FileList.Models
         /// </summary>
         private TreeNode bottomTrigger;
         /// <summary>
+        /// Keeps track of our selected node for peristing the selection during virtual scrolling
+        /// </summary>
+        private TreeNode lastSelectedNode;
+        /// <summary>
         /// contains all file extensions found in all files found in search
         /// </summary>
         private readonly SortedSet<string> _extensions;
@@ -95,7 +99,7 @@ namespace FileList.Models
             MultiCompareFileData multi = new MultiCompareFileData(this._sortStack); 
             this.SortedNodes = new SortedSet<TreeNode>(multi);
             this.treeView1.TreeViewNodeSorter = (System.Collections.IComparer)multi;
-            this.ChildNodeTriggers = new Dictionary<string, ChildNodeTriggers>();
+            this.ChildNodeTriggers = new Dictionary<string, ChildNodeTriggers>();            
         }
 
         #region Public
@@ -405,6 +409,8 @@ namespace FileList.Models
 
         private void TreeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
+            if (e.Node == this.treeView1.SelectedNode)
+                this.lastSelectedNode = e.Node;
             EventHandler<FileDataSelectedEventArgs> fileDataSelected = this.OnFileDataSelected;
             if (fileDataSelected == null)
                 return;
@@ -1094,9 +1100,6 @@ namespace FileList.Models
         {
             TreeNode parentNode = this.treeView1.TopNode.Parent;
 
-            if (this.treeView1.SelectedNode != null)
-                this.treeView1.SelectedNode = null;
-
             // we have an expanded parent node. need to check child triggers
             if (parentNode != null && this.ChildNodeTriggers.ContainsKey(parentNode.Name))
             {
@@ -1141,16 +1144,20 @@ namespace FileList.Models
                 return;
 
             this.treeView1.BeginUpdate();
+
             for (int node = nodes.Length - 1; node > -1; node--)
             {
                 this.treeView1.Nodes.Insert(0, (TreeNode)nodes[node].Clone());
                 this.treeView1.Nodes[0].Checked = nodes[node].Checked;
                 if (this.treeView1.Nodes.Count > (this.treeView1.VisibleCount * 2))
+                {
+                    if (this.lastSelectedNode!= null && this.treeView1.Nodes[this.treeView1.Nodes.Count - 1].Name == this.lastSelectedNode.Name)
+                        this.treeView1.SelectedNode = null;
                     this.treeView1.Nodes.RemoveAt(this.treeView1.Nodes.Count - 1);
+                }
             }
 
             this.SetTriggerNodes();
-
             this.treeView1.EndUpdate();
             // set our scroll point to 1 item below where we were.  the virtual scroll will change our current position
             // so we need to change it back.
@@ -1158,6 +1165,9 @@ namespace FileList.Models
                 this.treeView1.Nodes[this.treeView1.Nodes.Find(bottomNode.Name, false)[0].Index - 2].EnsureVisible();
             else
                 this.treeView1.Nodes.Find(bottomNode.Name, false)[0].EnsureVisible();
+
+            if (this.lastSelectedNode != null && this.treeView1.Nodes.ContainsKey(this.lastSelectedNode.Name))
+                this.treeView1.SelectedNode = this.treeView1.Nodes[this.lastSelectedNode.Name];
         }
 
         private void FillBottomReserve()
@@ -1178,7 +1188,11 @@ namespace FileList.Models
                 this.treeView1.Nodes.Insert(this.treeView1.Nodes.Count - 1, (TreeNode)nodes[node].Clone());
                 this.treeView1.Nodes[this.treeView1.Nodes.Count - 1].Checked = nodes[node].Checked;
                 if (this.treeView1.Nodes.Count > (this.treeView1.VisibleCount * 2))
+                {
+                    if (this.lastSelectedNode != null && this.treeView1.Nodes[0].Name == this.lastSelectedNode.Name)
+                        this.treeView1.SelectedNode = null;
                     this.treeView1.Nodes.RemoveAt(0);
+                }
             }
 
             this.SetTriggerNodes();
@@ -1189,6 +1203,9 @@ namespace FileList.Models
                 this.treeView1.Nodes[this.treeView1.Nodes.Find(topNode.Name, false)[0].Index + 1].EnsureVisible();
             else
                 this.treeView1.Nodes.Find(topNode.Name, false)[0].EnsureVisible();
+
+            if (this.lastSelectedNode != null && this.treeView1.Nodes.ContainsKey(this.lastSelectedNode.Name))
+                this.treeView1.SelectedNode = this.treeView1.Nodes[this.lastSelectedNode.Name];
         }
 
         private void SetTriggerNodes()
@@ -1223,7 +1240,11 @@ namespace FileList.Models
                 parent.Nodes.Insert(0, nodes[node]);
                 parent.Nodes[0].Checked = nodes[node].Checked;
                 if (parent.Nodes.Count > (this.treeView1.VisibleCount + (parent.Nodes.Count - this.treeView1.VisibleCount)))
+                {
+                    if (this.lastSelectedNode != null && parent.Nodes[parent.Nodes.Count - 1].Name == this.lastSelectedNode.Name)
+                        this.treeView1.SelectedNode = null;
                     parent.Nodes.RemoveAt(parent.Nodes.Count - 1);
+                }
             }
 
             this.SetChildTriggerNodes(parent);
@@ -1234,6 +1255,9 @@ namespace FileList.Models
                 this.treeView1.Nodes[this.treeView1.Nodes.Find(bottomNode.Name, false)[0].Index - 2].EnsureVisible();
             else
                 this.treeView1.Nodes.Find(bottomNode.Name, false)[0].EnsureVisible();
+
+            if (this.lastSelectedNode != null && this.treeView1.Nodes.ContainsKey(this.lastSelectedNode.Name))
+                this.treeView1.SelectedNode = this.treeView1.Nodes[this.lastSelectedNode.Name];
         }
 
         private void FillChildBottomReserve(TreeNode parent)
@@ -1250,12 +1274,17 @@ namespace FileList.Models
                 return;
 
             this.treeView1.BeginUpdate();
+
             for (int node = nodes.Length - 1; node > -1; node--)
             {
                 parent.Nodes.Insert(parent.Nodes.Count - 1, nodes[node]);
                 parent.Nodes[parent.Nodes.Count - 1].Checked = nodes[node].Checked;
                 if (parent.Nodes.Count > (this.treeView1.VisibleCount + (parent.Nodes.Count - this.treeView1.VisibleCount)))
+                {
+                    if (this.lastSelectedNode != null && parent.Nodes[0].Name == this.lastSelectedNode.Name)
+                        this.treeView1.SelectedNode = null;
                     parent.Nodes.RemoveAt(0);
+                }
             }
 
             this.SetChildTriggerNodes(parent);
@@ -1266,6 +1295,9 @@ namespace FileList.Models
                 this.treeView1.Nodes[this.treeView1.Nodes.Find(topNode.Name, false)[0].Index + 1].EnsureVisible();
             else
                 this.treeView1.Nodes.Find(topNode.Name, false)[0].EnsureVisible();
+
+            if (this.lastSelectedNode != null && this.treeView1.Nodes.ContainsKey(this.lastSelectedNode.Name))
+                this.treeView1.SelectedNode = this.treeView1.Nodes[this.lastSelectedNode.Name];
         }
 
         private void SetChildTriggerNodes(TreeNode parent)

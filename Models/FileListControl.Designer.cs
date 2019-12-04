@@ -185,6 +185,7 @@
             // 
             this.treeView1.CheckBoxes = true;
             this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeView1.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawText;
             this.treeView1.HideSelection = false;
             this.treeView1.Location = new System.Drawing.Point(0, 0);
             this.treeView1.Name = "treeView1";
@@ -508,7 +509,6 @@
         private System.Windows.Forms.Label filterSummaryLabel;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         internal System.Windows.Forms.NumericUpDown scoutCountLabel;
-        private System.Windows.Forms.Label countLabel;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ToolTip toolTip1;
@@ -520,5 +520,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripMenuItem uncheckOthersToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem checkOthersToolStripMenuItem;
+        public System.Windows.Forms.Label countLabel;
     }
 }
