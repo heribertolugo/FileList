@@ -39,16 +39,18 @@
             this.currentDirectoryTextBox.Multiline = true;
             this.currentDirectoryTextBox.Name = "currentDirectoryTextBox";
             this.currentDirectoryTextBox.ReadOnly = true;
-            this.currentDirectoryTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.currentDirectoryTextBox.Size = new System.Drawing.Size(711, 32);
+            this.currentDirectoryTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.currentDirectoryTextBox.Size = new System.Drawing.Size(711, 49);
             this.currentDirectoryTextBox.TabIndex = 0;
+            this.currentDirectoryTextBox.WordWrap = false;
             // 
             // listView1
             // 
             this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listView1.Location = new System.Drawing.Point(0, 32);
+            this.listView1.HideSelection = false;
+            this.listView1.Location = new System.Drawing.Point(0, 49);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(711, 519);
+            this.listView1.Size = new System.Drawing.Size(711, 502);
             this.listView1.TabIndex = 1;
             this.listView1.UseCompatibleStateImageBehavior = false;
             // 
