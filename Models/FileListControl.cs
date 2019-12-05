@@ -83,6 +83,7 @@ namespace FileList.Models
         /// keeps trtack of how many files we've found
         /// </summary>
         private int _fileCount = 0;
+        private ToolTip _treeViewToolTip = new ToolTip();
 
         private const int WM_HSCROLL = 276;
         private const int SB_LEFT = 6;
@@ -348,7 +349,7 @@ namespace FileList.Models
 
             TreeNode node = new TreeNode(fileData.Name + fileData.Extension);
             node.Tag = fileData;
-            node.ToolTipText = string.Join(Environment.NewLine, fileData.ExtendedProperties.Select(p => string.Format("{0}: {1}", p.Key, p.Value)).ToArray());
+            //node.ToolTipText = string.Join(Environment.NewLine, fileData.ExtendedProperties.Select(p => string.Format("{0}: {1}", p.Key, p.Value)).ToArray());
             node.ImageKey = fileImageKey;
             node.SelectedImageKey = fileImageKey;
             node.StateImageKey = fileImageKey;
@@ -638,6 +639,51 @@ namespace FileList.Models
                 if (itemIndex != this.fileTypesCheckedListBox.SelectedIndex)
                     this.fileTypesCheckedListBox.SetItemChecked(itemIndex, true);
             }
+        }
+        #endregion
+
+        #region TreeNode ToolTips
+        /// <summary>
+        /// Could not get this to work correctly. see ScrollNotifyTreeView comment in WndProc(ref Message m)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void treeView1_NodeNeedToolTip(object sender, NeedToolTipEventArgs e)
+        {
+            if (e.Node.Tag is FileData)
+            {
+                FileData fileData = (FileData)e.Node.Tag;
+                e.ToolTipText = string.Join(Environment.NewLine, fileData.ExtendedProperties.Select(p => string.Format("{0}: {1}", p.Key, p.Value)).ToArray());
+            }
+        }
+
+        private void treeView1_NodeMouseHover(object sender, TreeNodeMouseHoverEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(e.Node.ToolTipText) && e.Node.Tag is FileData)
+            {
+                FileData fileData = (FileData)e.Node.Tag;
+                System.Drawing.Point treeScreenPoint = RectangleToScreen(e.Node.TreeView.DisplayRectangle).Location;
+
+                this._treeViewToolTip.IsBalloon = true;
+                this._treeViewToolTip.Show(string.Join(Environment.NewLine, fileData.ExtendedProperties.Select(p => string.Format("{0}: {1}", p.Key, p.Value)).ToArray())
+                    , this
+                    , new System.Drawing.Point(MousePosition.X - treeScreenPoint.X + 5, MousePosition.Y - treeScreenPoint.Y + 5));
+            }
+            else
+            {
+                this._treeViewToolTip.Hide(this);
+            }
+        }
+
+        private void treeView1_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (this.treeView1.GetNodeAt(e.Location) == null || !(this.treeView1.GetNodeAt(e.Location).Tag is FileData))
+                this._treeViewToolTip.Hide(this);
+        }
+
+        private void treeView1_MouseLeave(object sender, EventArgs e)
+        {
+            this._treeViewToolTip.Hide(this);
         }
         #endregion
 
@@ -1335,8 +1381,9 @@ namespace FileList.Models
 
             this.SetChildTriggerNodes(parentNode);
         }
-        #endregion
+        #endregion // end virtual scroll
 
+        
     }
 
     public class ChildNodeTriggers

@@ -62,6 +62,7 @@
     <Compile Include="Constants\SysImageListSize.cs" />
     <Compile Include="Constants\WindowHooks.cs" />
     <Compile Include="Constants\WindowStyles.cs" />
+    <Compile Include="Constants\WindowStylesEx.cs" />
     <Compile Include="Libraries\comctl32.cs" />
     <Compile Include="Libraries\dwmapi.cs" />
     <Compile Include="Libraries\Gdi32.cs" />

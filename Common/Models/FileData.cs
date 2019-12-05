@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
+using Win32.Libraries;
 
 namespace Common.Models
 {
@@ -26,6 +28,8 @@ namespace Common.Models
         private DateTime? _dateModified;
         private bool _isDateModifiedSet;
         private IShellDispatch5 _shell;
+        private bool _extendedPropertiesSet;
+        private object _loadExtendedPropertieslock;
 
         private static object _filePropertyNamesLock;
 
@@ -60,7 +64,9 @@ namespace Common.Models
             this._dateModified = null;
             this._isDateModifiedSet = false;
             this._shell = shell; // ?? new ShellClass();
+            this._extendedPropertiesSet = false;
 
+            this._loadExtendedPropertieslock = new object();
             //if (FileData.FilePropertyNames == null || FileData.FilePropertyNames.Count < 1)
             //{
             //    Extensions.WriteToConsole("requesting filePropertyNames lock @ 63");
@@ -73,7 +79,7 @@ namespace Common.Models
             //    }
             //}
 
-            this.LoadExtendedProperties();
+            //this.LoadExtendedProperties();
             //GC.Collect();
         }
 
@@ -149,6 +155,8 @@ namespace Common.Models
         {
             get
             {
+                if (!this._extendedPropertiesSet)
+                    this.LoadExtendedProperties();
                 return this._extendedProperties;
             }
             private set
@@ -171,6 +179,8 @@ namespace Common.Models
         {
             get
             {
+                if (!this._extendedPropertiesSet)
+                    this.LoadExtendedProperties();
                 if (!this._isSizeSet)
                 {
                     this._sizeInKilobytes = this.GetSizeInKiloBytes();
@@ -187,6 +197,8 @@ namespace Common.Models
         {
             get
             {
+                if (!this._extendedPropertiesSet)
+                    this.LoadExtendedProperties();
                 if (!this._isDateCreatedSet)
                     this._dateCreated = this.GetDateFromExtendedProperties("date created") ?? this.GetDateFromExtendedProperties("Creation Time");
                 return this._dateCreated;
@@ -200,6 +212,8 @@ namespace Common.Models
         {
             get
             {
+                if (!this._extendedPropertiesSet)
+                    this.LoadExtendedProperties();
                 if (!this._isDateModifiedSet)
                     this._dateModified = this.GetDateFromExtendedProperties("date modified") ?? this.GetDateFromExtendedProperties("Last Write Time");
                 return this._dateModified;
@@ -232,40 +246,94 @@ namespace Common.Models
             return result;
         }
 
-        private void LoadExtendedProperties()
+        private IShellDispatch5 GetShell()
         {
-                if (!System.IO.File.Exists(this.Path) && !System.IO.Directory.Exists(this.Path))
-                    return;
-                    IoHelper.WriteToConsole("loading extnded properties for {0}", this.Path);
             try
             {
-                if (this._shell != null)
-                {
-                    Folder folder = this._shell.NameSpace(System.IO.Path.GetDirectoryName(this.Path));
-                    FolderItem name = folder.ParseName(System.IO.Path.GetFileName(this.Path));
+                Folder folder = this._shell.NameSpace(System.IO.Path.GetDirectoryName(this.Path));
+                return this._shell;
+            }
+            catch (Exception ex) { }
 
-                    for (int iColumn = -1; iColumn < 1000; iColumn++) //(int)short.MaxValue
+            try
+            {
+                this._shell = ole32.GetIShellDispatch5();
+                Folder folder = this._shell.NameSpace(System.IO.Path.GetDirectoryName(this.Path));
+                return this._shell;
+            }
+            catch (Exception ex) { }
+
+            try
+            {
+                Shell32.ShellClass shell = new Shell32.ShellClass();
+                ole32.GetRegisteredInterfaceMarshalPtr<Shell32.IShellDispatch5>(shell);
+                GC.KeepAlive(shell);
+                this._shell = ole32.GetIShellDispatch5();
+                Folder folder = this._shell.NameSpace(System.IO.Path.GetDirectoryName(this.Path));
+                return this._shell;
+            }
+            catch (Exception ex) { }
+
+            return new ShellClass();
+        }
+
+        private void LoadExtendedProperties()
+        {
+            if (this._extendedPropertiesSet)
+                return;
+
+            Thread thread = new Thread((object f) =>
+            {
+                FileData fileData = (FileData)f;
+                if (fileData._extendedPropertiesSet)
+                    return;
+                lock (fileData._loadExtendedPropertieslock)
+                {
+                    if (fileData._extendedPropertiesSet || fileData._extendedProperties.Count > 0)
+                        return;
+                    fileData._extendedPropertiesSet = true;
+                    
+                    try
                     {
-                        string detailsOf = folder.GetDetailsOf(null, iColumn);
-                        //IoHelper.WriteToConsole("loading extnded property #{0}", iColumn);
-                        if (string.IsNullOrEmpty(detailsOf))
-                            continue;
-                        string value = folder.GetDetailsOf(name, iColumn);
-                        if (!string.IsNullOrEmpty(value))
-                            this._extendedProperties.Add(new KeyValuePair<string, string>(detailsOf, value));
+
+                        if (fileData.GetShell() != null)
+                        {
+                            Folder folder = fileData._shell.NameSpace(System.IO.Path.GetDirectoryName(fileData.Path));
+                            FolderItem name = folder.ParseName(System.IO.Path.GetFileName(fileData.Path));
+
+                            for (int iColumn = -1; iColumn < 1000; iColumn++) //(int)short.MaxValue
+                            {
+                                string detailsOf = folder.GetDetailsOf(null, iColumn);
+                                //IoHelper.WriteToConsole("loading extnded property #{0}", iColumn);
+                                if (string.IsNullOrEmpty(detailsOf))
+                                    continue;
+                                string value = folder.GetDetailsOf(name, iColumn);
+                                if (!string.IsNullOrEmpty(value))
+                                    fileData._extendedProperties.Add(new KeyValuePair<string, string>(detailsOf, value));
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        IoHelper.WriteToConsole("LoadExtendedProperties exception: {0}", ex.Message);
+                        //throw ex;
+                    }
+                    finally
+                    {
+                        fileData.LoadExtendedPropertiesLight();
+                        IoHelper.WriteToConsole("finished loading extnded properties for {0}", fileData.Path);
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                IoHelper.WriteToConsole("LoadExtendedProperties exception: {0}", ex.Message);
-                //throw ex;
-            }
-            finally
-            {
-                this.LoadExtendedPropertiesLight();
-                IoHelper.WriteToConsole("finished loading extnded properties for {0}", this.Path);
-            }
+            });
+
+            if (!System.IO.File.Exists(this.Path) && !System.IO.Directory.Exists(this.Path))
+                return;
+            IoHelper.WriteToConsole("loading extnded properties for {0}", this.Path);
+
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.IsBackground = true;
+            thread.Start(this);
+            thread.Join();
         }
 
         private void LoadExtendedPropertiesLight()

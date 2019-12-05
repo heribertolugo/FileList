@@ -14,9 +14,21 @@ namespace Win32
             try
             {
                 return new System.Drawing.Rectangle(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
-            }catch(Exception ex) { }
+            }
+            catch (Exception ex) { }
 
             return default(System.Drawing.Rectangle);
+        }
+
+        public static implicit operator RECT(System.Drawing.Rectangle rect)
+        {
+            try
+            {
+                return new RECT() { left = rect.Left, top = rect.Top, right = rect.Right, bottom = rect.Bottom };
+            }
+            catch (Exception ex) { }
+
+            return default(RECT);
         }
     }
 }

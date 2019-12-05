@@ -7,6 +7,7 @@ namespace Win32.Constants
     public struct MessageCodes
     {
         public static MessageCodes None = new MessageCodes(0);
+        public static MessageCodes WM_USER = new MessageCodes(0x0400);
         public static MessageCodes WM_NOTIFY = new MessageCodes(0x004E);
         public static MessageCodes WM_INPUTLANGCHANGEREQUEST = new MessageCodes(0x0050);
         public static MessageCodes WM_INPUTLANGCHANGE = new MessageCodes(0x0051);

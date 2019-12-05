@@ -248,7 +248,7 @@ namespace FileList.Views
                     break;
             }
 
-            if (f.DateCreated.HasValue && this._dateCreatedFilter.DateTime1.HasValue)
+            if (this._dateCreatedFilter.DateTime1.HasValue && f.DateCreated.HasValue)
                 switch (this._dateCreatedFilter.FilterType)
                 {
                     case FilterType.Between:
@@ -270,7 +270,7 @@ namespace FileList.Views
                         break;
                 }
 
-            if (f.DateModified.HasValue && this._dateModifiedFilter.DateTime1.HasValue)
+            if (this._dateModifiedFilter.DateTime1.HasValue && f.DateModified.HasValue)
                 switch (this._dateModifiedFilter.FilterType)
                 {
                     case FilterType.Between:

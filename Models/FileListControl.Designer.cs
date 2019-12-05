@@ -62,7 +62,7 @@
             this.fileLocationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.deleteFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.generalToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -193,11 +193,15 @@
             this.treeView1.Size = new System.Drawing.Size(532, 372);
             this.treeView1.TabIndex = 3;
             this.treeView1.Scrolled += new System.EventHandler<FileList.Models.ScrollNotifyTreeViewEventArgs>(this.treeView1_Scrolled);
+            this.treeView1.NeedToolTip += new System.EventHandler<FileList.Models.NeedToolTipEventArgs>(this.treeView1_NodeNeedToolTip);
             this.treeView1.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1_AfterCheck);
             this.treeView1.AfterCollapse += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterCollapse);
             this.treeView1.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeView1_BeforeExpand);
+            this.treeView1.NodeMouseHover += new System.Windows.Forms.TreeNodeMouseHoverEventHandler(this.treeView1_NodeMouseHover);
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1_AfterSelect);
             this.treeView1.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeView1_NodeMouseClick);
+            this.treeView1.MouseLeave += new System.EventHandler(this.treeView1_MouseLeave);
+            this.treeView1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.treeView1_MouseMove);
             // 
             // panel1
             // 
@@ -263,7 +267,7 @@
             this.scoutCountLabel.Size = new System.Drawing.Size(100, 16);
             this.scoutCountLabel.TabIndex = 4;
             this.scoutCountLabel.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.toolTip1.SetToolTip(this.scoutCountLabel, "Number of threads dedicated to searching for files. 1 is recommended.");
+            this.generalToolTip.SetToolTip(this.scoutCountLabel, "Number of threads dedicated to searching for files. 1 is recommended.");
             this.scoutCountLabel.Value = new decimal(new int[] {
             1,
             0,
@@ -299,7 +303,7 @@
             this.label2.Size = new System.Drawing.Size(46, 12);
             this.label2.TabIndex = 1;
             this.label2.Text = "Threads";
-            this.toolTip1.SetToolTip(this.label2, "Number of threads dedicated to searching for files. 1 is recommended.");
+            this.generalToolTip.SetToolTip(this.label2, "Number of threads dedicated to searching for files. 1 is recommended.");
             // 
             // dateModifiedButton
             // 
@@ -511,7 +515,7 @@
         internal System.Windows.Forms.NumericUpDown scoutCountLabel;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.ToolTip generalToolTip;
         private Common.Models.GripSplitContainer splitContainer1;
         private System.Windows.Forms.Label notificayionLabel;
         private System.Windows.Forms.ContextMenuStrip extensionsListBoxContextMenu;

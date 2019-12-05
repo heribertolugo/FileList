@@ -84,15 +84,13 @@ namespace Win32.Libraries
             Guid shellId = Marshal.GenerateGuidForType(typeof(Shell32.IShellDispatch5));
             try
             {
-                    IntPtr ptr = (IntPtr)GCHandle.Alloc(mystream);
+                IntPtr ptr = (IntPtr)GCHandle.Alloc(mystream);
 
                 mystream.Seek(0, 0, ptr);
                 HRESULT o = CoUnmarshalInterface(mystream, ref shellId, out localObject);
             }
             catch (Exception ex)
             {
-                int c = 0;
-                c++;
                 throw;
             }
             return (Shell32.IShellDispatch5)localObject;
