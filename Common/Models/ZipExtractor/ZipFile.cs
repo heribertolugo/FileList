@@ -84,7 +84,7 @@ namespace Common.Models.ZipExtractor
                         this._items[root].Children.Add(newItem);
                     }
 
-                    this.SetProperties(newItem, this.Archive, counter);
+                    //this.SetProperties(newItem, this.Archive, counter);
                     newItem.Parent = this._items[root];
 
                     counter++;
