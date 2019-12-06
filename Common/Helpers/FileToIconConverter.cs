@@ -330,11 +330,11 @@ namespace Common.Helpers
 
         public Icon GetIcon(string fileName, IconSize iconSize)
         {
-            string str = FileToIconConverter.returnKey(fileName, iconSize);
-            string fileName1 = "aaa" + Path.GetExtension(fileName).ToLower();
-            if (!str.StartsWith("."))
-                fileName1 = fileName;
-            return FileToIconConverter.GetFileIcon(fileName1, iconSize);
+            string key = FileToIconConverter.returnKey(fileName, iconSize);
+            string dummyFile = "aaa" + Path.GetExtension(fileName).ToLower();
+            if (!key.StartsWith("."))
+                dummyFile = fileName;
+            return FileToIconConverter.GetFileIcon(dummyFile, iconSize);
         }
 
         public static bool isVistaUp()
@@ -344,31 +344,33 @@ namespace Common.Helpers
 
         private BitmapSource getImage(string fileName, IconSize size)
         {
-            string str1 = FileToIconConverter.returnKey(fileName, size);
-            string str2 = "aaa" + Path.GetExtension(fileName).ToLower();
-            if (!str1.StartsWith("."))
-                str2 = fileName;
+            string key = FileToIconConverter.returnKey(fileName, size);
+            string dummyFile = "aaa" + Path.GetExtension(fileName).ToLower();
+            WriteableBitmap writeableBitmap = null;
+
+            if (!key.StartsWith("."))
+                dummyFile = fileName;
             if (FileToIconConverter.isExecutable(fileName))
             {
-                WriteableBitmap b = new WriteableBitmap(this.addToDic("aaa.exe", size));
-                ThreadPool.QueueUserWorkItem(new WaitCallback(this.PollIconCallback), (object)new FileToIconConverter.thumbnailInfo(b, fileName, size));
-                return (BitmapSource)b;
+                writeableBitmap = new WriteableBitmap(this.addToDic("aaa.exe", size));
+                ThreadPool.QueueUserWorkItem(new WaitCallback(this.PollIconCallback), new FileToIconConverter.thumbnailInfo(writeableBitmap, fileName, size));
+                return writeableBitmap;
             }
             switch (size)
             {
                 case IconSize.ExtraLarge:
                     FileToIconConverter._imgList.ImageListSize = SysImageListSize.extraLargeIcons;
-                    return FileToIconConverter.loadBitmap(FileToIconConverter._imgList.Icon(FileToIconConverter._imgList.IconIndex(str2, FileToIconConverter.isFolder(fileName))).ToBitmap());
+                    return FileToIconConverter.loadBitmap(FileToIconConverter._imgList.Icon(FileToIconConverter._imgList.IconIndex(dummyFile, FileToIconConverter.isFolder(fileName))).ToBitmap());
                 case IconSize.Jumbo:
-                    return FileToIconConverter.loadBitmap(this.loadJumbo(str2));
+                    return FileToIconConverter.loadBitmap(this.loadJumbo(dummyFile));
                 case IconSize.Thumbnail:
                     if (!FileToIconConverter.isImage(fileName))
-                        return this.getImage(str2, IconSize.Jumbo);
-                    WriteableBitmap b1 = new WriteableBitmap(this.addToDic(fileName, IconSize.Jumbo));
-                    ThreadPool.QueueUserWorkItem(new WaitCallback(this.PollThumbnailCallback), (object)new FileToIconConverter.thumbnailInfo(b1, fileName, size));
-                    return (BitmapSource)b1;
+                        return this.getImage(dummyFile, IconSize.Jumbo);
+                    writeableBitmap = new WriteableBitmap(this.addToDic(fileName, IconSize.Jumbo));
+                    ThreadPool.QueueUserWorkItem(new WaitCallback(this.PollThumbnailCallback), new FileToIconConverter.thumbnailInfo(writeableBitmap, fileName, size));
+                    return writeableBitmap;
                 default:
-                    return FileToIconConverter.loadBitmap(FileToIconConverter.GetFileIcon(str2, size).ToBitmap());
+                    return FileToIconConverter.loadBitmap(FileToIconConverter.GetFileIcon(dummyFile, size).ToBitmap());
             }
         }
 
@@ -383,8 +385,8 @@ namespace Common.Helpers
             if (values.Length > 1 && values[1] is double)
                 defaultsize = (int)(float)(double)values[1];
             if (values[0] is string)
-                return (object)this.GetImage(values[0] as string, defaultsize);
-            return (object)this.GetImage(string.Empty, defaultsize);
+                return this.GetImage(values[0] as string, defaultsize);
+            return this.GetImage(string.Empty, defaultsize);
         }
 
         public object[] ConvertBack(

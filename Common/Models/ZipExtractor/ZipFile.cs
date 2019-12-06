@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 
 namespace Common.Models.ZipExtractor
 {
@@ -179,6 +180,7 @@ namespace Common.Models.ZipExtractor
             return default(T);
         }
 
+        [HandleProcessCorruptedStateExceptions]
         private InStreamWrapper OpenStream()
         {
             if (this.ArchiveStream == null)
@@ -189,8 +191,14 @@ namespace Common.Models.ZipExtractor
                     return null;
                 this.ArchiveStream = new InStreamWrapper(File.OpenRead(this._path));
 
-                if (this.Archive.Open(ArchiveStream, ref CheckPos, null) != 0)
+                try
+                {
+                    if (this.Archive.Open(ArchiveStream, ref CheckPos, null) != 0)
+                        return null;
+                }catch(Exception ex)
+                {
                     return null;
+                }
 
                 this.itemCount = Archive.GetNumberOfItems();
             }

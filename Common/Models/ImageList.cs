@@ -95,7 +95,7 @@ namespace Common.Models.ImageList
             IntPtr fileInfo = shell32.SHGetFileInfo(fileName, dwFileAttributes, ref psfi, cbFileInfo, (uint)(fileInfoConstants | (SHGetFileInfo)iconState));
             if (!fileInfo.Equals(IntPtr.Zero))
                 return (int)psfi.iIcon;
-            Debug.Assert(!fileInfo.Equals(IntPtr.Zero), "Failed to get icon index");
+            //Debug.Assert(!fileInfo.Equals(IntPtr.Zero), "Failed to get icon index");
             return 0;
         }
 
