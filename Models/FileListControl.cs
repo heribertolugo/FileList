@@ -1207,6 +1207,7 @@ namespace FileList.Models
             this.treeView1.EndUpdate();
             // set our scroll point to 1 item below where we were.  the virtual scroll will change our current position
             // so we need to change it back.
+            bottomNode = this.treeView1.Nodes[Math.Min(this.treeView1.Nodes.Count - 1, topNode.Index + this.treeView1.VisibleCount)];
             if (!scrollBarWasVisible && this.treeView1.HorizontalScrollVisible())
                 this.treeView1.Nodes[this.treeView1.Nodes.Find(bottomNode.Name, false)[0].Index - 2].EnsureVisible();
             else
@@ -1245,6 +1246,7 @@ namespace FileList.Models
             this.treeView1.EndUpdate();
             // set our scroll point to 1 item below where we were.  the virtual scroll will change our current position
             // so we need to change it back.
+            topNode = this.treeView1.Nodes[Math.Max(0, bottomNode.Index - this.treeView1.VisibleCount)];
             if (!scrollBarWasVisible && this.treeView1.HorizontalScrollVisible()) // our field of view shifted
                 this.treeView1.Nodes[this.treeView1.Nodes.Find(topNode.Name, false)[0].Index + 1].EnsureVisible();
             else
@@ -1273,9 +1275,9 @@ namespace FileList.Models
             Func<FileData, bool> filterPredicate = this.GetFilterPredicate(null);
             int nodeIndex = this._treeKeys.Values.FirstOrDefault(n => n.Name.Equals(parent.Name)).Nodes.Cast<TreeNode>().ToList().IndexOf(topNode);
             TreeNode[] nodes = this._treeKeys[parent.Name].SortChildNodes(new MultiCompareFileData(this._sortStack))
-                .TakeWhile(n => filterPredicate((FileData)n.Tag) && !n.Name.Equals(topNode.Name)).TakeLast(bufferCount).Select(n => (TreeNode)n.Clone()).ToArray();
+                .TakeWhile(n => !n.Name.Equals(topNode.Name)).Where(n => filterPredicate((FileData)n.Tag)).TakeLast(bufferCount).Select(n => (TreeNode)n.Clone()).ToArray();
             bool scrollBarWasVisible = this.treeView1.HorizontalScrollVisible();
-            TreeNode bottomNode = this.treeView1.GetBottomVisibleNode();
+            TreeNode bottomNode = parent.Nodes[parent.Nodes.Count - 1];  
 
             if (nodes == null || nodes.Length == 0)
                 return;
@@ -1285,7 +1287,7 @@ namespace FileList.Models
             {
                 parent.Nodes.Insert(0, nodes[node]);
                 parent.Nodes[0].Checked = nodes[node].Checked;
-                if (parent.Nodes.Count > (this.treeView1.VisibleCount + (parent.Nodes.Count - this.treeView1.VisibleCount)))
+                if (parent.Nodes.Count > (this.treeView1.VisibleCount * 2))
                 {
                     if (this.lastSelectedNode != null && parent.Nodes[parent.Nodes.Count - 1].Name == this.lastSelectedNode.Name)
                         this.treeView1.SelectedNode = null;
@@ -1294,13 +1296,14 @@ namespace FileList.Models
             }
 
             this.SetChildTriggerNodes(parent);
-            this.treeView1.EndUpdate();
+            this.treeView1.EndUpdate(); 
+            bottomNode = parent.Nodes[Math.Min(parent.Nodes.Count - 1, topNode.Index + this.treeView1.VisibleCount)];
             // set our scroll point to 1 item below where we were.  the virtual scroll will change our current position
             // so we need to change it back.
             if (!scrollBarWasVisible && this.treeView1.HorizontalScrollVisible())
-                this.treeView1.Nodes[this.treeView1.Nodes.Find(bottomNode.Name, false)[0].Index - 2].EnsureVisible();
+                parent.Nodes[parent.Nodes.Find(bottomNode.Name, false)[0].Index - 2].EnsureVisible();
             else
-                this.treeView1.Nodes.Find(bottomNode.Name, false)[0].EnsureVisible();
+                parent.Nodes.Find(bottomNode.Name, false)[0].EnsureVisible();
 
             if (this.lastSelectedNode != null && this.treeView1.Nodes.ContainsKey(this.lastSelectedNode.Name))
                 this.treeView1.SelectedNode = this.treeView1.Nodes[this.lastSelectedNode.Name];
@@ -1309,11 +1312,11 @@ namespace FileList.Models
         private void FillChildBottomReserve(TreeNode parent)
         {
             TreeNode topNode = parent.Nodes[0];
-            TreeNode bottomNode = this.treeView1.Nodes[this.treeView1.Nodes.Count - 1];
+            TreeNode bottomNode = parent.Nodes[parent.Nodes.Count - 1];
             int bufferCount = this.treeView1.VisibleCount / 2;
             Func<FileData, bool> filterPredicate = this.GetFilterPredicate(null);
             TreeNode[] nodes = this._treeKeys[parent.Name].SortChildNodes(new MultiCompareFileData(this._sortStack))
-                .SkipWhile(n => filterPredicate((FileData)n.Tag) || !n.Name.Equals(bottomNode.Name)).Skip(1).Take(bufferCount).ToArray();
+                .SkipWhile(n => !n.Name.Equals(bottomNode.Name)).Skip(1).Where(n => filterPredicate((FileData)n.Tag)).Take(bufferCount).Select(n => (TreeNode)n.Clone()).ToArray(); 
             bool scrollBarWasVisible = this.treeView1.HorizontalScrollVisible();
 
             if (nodes == null || nodes.Length == 0)
@@ -1325,7 +1328,7 @@ namespace FileList.Models
             {
                 parent.Nodes.Insert(parent.Nodes.Count - 1, nodes[node]);
                 parent.Nodes[parent.Nodes.Count - 1].Checked = nodes[node].Checked;
-                if (parent.Nodes.Count > (this.treeView1.VisibleCount + (parent.Nodes.Count - this.treeView1.VisibleCount)))
+                if (parent.Nodes.Count > (this.treeView1.VisibleCount * 2))
                 {
                     if (this.lastSelectedNode != null && parent.Nodes[0].Name == this.lastSelectedNode.Name)
                         this.treeView1.SelectedNode = null;
@@ -1335,12 +1338,13 @@ namespace FileList.Models
 
             this.SetChildTriggerNodes(parent);
             this.treeView1.EndUpdate();
+            topNode = parent.Nodes[Math.Max(0, bottomNode.Index - this.treeView1.VisibleCount)];
             // set our scroll point to 1 item below where we were.  the virtual scroll will change our current position
             // so we need to change it back.
             if (!scrollBarWasVisible && this.treeView1.HorizontalScrollVisible()) // our field of view shifted
-                this.treeView1.Nodes[this.treeView1.Nodes.Find(topNode.Name, false)[0].Index + 1].EnsureVisible();
+                parent.Nodes[parent.Nodes.Find(topNode.Name, false)[0].Index + 1].EnsureVisible();
             else
-                this.treeView1.Nodes.Find(topNode.Name, false)[0].EnsureVisible();
+                parent.Nodes.Find(topNode.Name, false)[0].EnsureVisible();
 
             if (this.lastSelectedNode != null && this.treeView1.Nodes.ContainsKey(this.lastSelectedNode.Name))
                 this.treeView1.SelectedNode = this.treeView1.Nodes[this.lastSelectedNode.Name];
@@ -1355,7 +1359,10 @@ namespace FileList.Models
             int bottomTriggerIndex = (int)Math.Floor(baseReserveCount / 2d);
 
             TreeNode top = parent.Nodes[1];
-            TreeNode bottom = parent.Nodes[parent.Nodes.Count - 2];
+            TreeNode bottom = parent.Nodes[parent.Nodes.Count - 1];
+
+            if (this._treeKeys[parent.Name].Name.Equals(bottom.Name))
+                bottom = null;
 
             if (this.ChildNodeTriggers.ContainsKey(parent.Name))
                 this.ChildNodeTriggers[parent.Name] = new ChildNodeTriggers(top, bottom);

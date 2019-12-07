@@ -26,7 +26,7 @@ namespace Common.Extensions
             if (parent is null || parent.Nodes.Count < 2)
                 return parent == null ? Enumerable.Empty<TreeNode>() : parent.Nodes.Cast<TreeNode>();
 
-            TreeNode[] nodes = parent.Nodes.Cast<TreeNode>().OrderBy(n => comparer).ToArray();
+            TreeNode[] nodes = parent.Nodes.Cast<TreeNode>().OrderBy(n => n,comparer).ToArray();
             parent.Nodes.Clear();
             parent.Nodes.AddRange(nodes);
 

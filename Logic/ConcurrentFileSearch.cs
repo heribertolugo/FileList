@@ -39,6 +39,7 @@ namespace FileList.Logic
             this._fileListControl = args.FileListControl;
             this._cancelToken = args.CancellationToken;
             this._validator = args.Filter;
+            this._cancelToken.Register(() => ConcurrentFileSearchMinion.Cancel());
         }
 
         public void Start()
@@ -156,8 +157,8 @@ namespace FileList.Logic
                 return false;
 
             IoHelper.WriteToConsole("{0} directories to process", ConcurrentFileSearch.Directories.Count);
-
-            while ((directory = ConcurrentFileSearch.Directories.Take()) != null)
+            
+            while ((directory = ConcurrentFileSearch.Directories.Take()) != null && !this._cancelToken.IsCancellationRequested)
             {
                 System.Threading.Interlocked.Increment(ref MinionCount);
                 ConcurrentFileSearchMinion searcher = new ConcurrentFileSearchMinion(directory, this.ConcurrentFileSearch_OnFinishedHandler, this._fileListControl, this._validator);
