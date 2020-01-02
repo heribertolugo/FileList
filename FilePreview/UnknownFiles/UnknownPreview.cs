@@ -80,11 +80,11 @@ namespace FilePreview.UnknownFiles
 
                         string p = box.Tag as string;
 
-                        using (StreamReader reader = new StreamReader(p, UnknownPreview.GetFileEncoding(p)))
+                        try
                         {
-                            string intkar = string.Empty;
-                            try
+                            using (StreamReader reader = new StreamReader(p, UnknownPreview.GetFileEncoding(p)))
                             {
+                                string intkar = string.Empty;
                                 while ((intkar = reader.ReadLine()) != null && !token.IsCancellationRequested)
                                 {
                                     token.Token.ThrowIfCancellationRequested();
@@ -94,10 +94,10 @@ namespace FilePreview.UnknownFiles
                                     });
                                 }
                             }
-                            catch (Exception)
-                            {
-                                //box.Invoke((MethodInvoker)delegate{ box.Clear(); }); 
-                            }
+                        }
+                        catch (Exception)
+                        {
+                            //box.Invoke((MethodInvoker)delegate{ box.Clear(); }); 
                         }
                     });
 
@@ -112,12 +112,12 @@ namespace FilePreview.UnknownFiles
                     textBox.Text = (string)null;
                 }
             }
-                return false;
+            return false;
         }
 
         private static System.Text.Encoding GetFileEncoding(string path)
         {
-            return System.Text.Encoding.UTF8;
+            return System.Text.Encoding.Default;// System.Text.Encoding.UTF8;
         }
 
         private bool _disposed = false;

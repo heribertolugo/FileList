@@ -37,8 +37,11 @@
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.uncheckOthersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkOthersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.notificayionLabel = new System.Windows.Forms.Label();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.notificationLabel = new System.Windows.Forms.Label();
             this.treeView1 = new FileList.Models.ScrollNotifyTreeView();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
@@ -69,6 +72,8 @@
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.extensionsListBoxContextMenu.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -106,8 +111,7 @@
             // 
             // splitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.notificayionLabel);
-            this.splitContainer1.Panel2.Controls.Add(this.treeView1);
+            this.splitContainer1.Panel2.Controls.Add(this.tabControl1);
             this.splitContainer1.Size = new System.Drawing.Size(656, 372);
             this.splitContainer1.SplitterDistance = 120;
             this.splitContainer1.TabIndex = 0;
@@ -168,18 +172,41 @@
             this.checkOthersToolStripMenuItem.Text = "Check Others";
             this.checkOthersToolStripMenuItem.Click += new System.EventHandler(this.CheckOthersToolStripMenuItem_Click);
             // 
-            // notificayionLabel
+            // tabControl1
             // 
-            this.notificayionLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl1.Location = new System.Drawing.Point(0, 0);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(532, 372);
+            this.tabControl1.TabIndex = 5;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.notificationLabel);
+            this.tabPage1.Controls.Add(this.treeView1);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(524, 346);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Tree";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // notificationLabel
+            // 
+            this.notificationLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.notificayionLabel.Location = new System.Drawing.Point(35, 155);
-            this.notificayionLabel.Name = "notificayionLabel";
-            this.notificayionLabel.Size = new System.Drawing.Size(469, 48);
-            this.notificayionLabel.TabIndex = 4;
-            this.notificayionLabel.Text = "Notification";
-            this.notificayionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.notificayionLabel.Visible = false;
+            this.notificationLabel.Location = new System.Drawing.Point(25, 34);
+            this.notificationLabel.Name = "notificationLabel";
+            this.notificationLabel.Size = new System.Drawing.Size(478, 285);
+            this.notificationLabel.TabIndex = 4;
+            this.notificationLabel.Text = "Notification";
+            this.notificationLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.notificationLabel.Visible = false;
             // 
             // treeView1
             // 
@@ -187,10 +214,10 @@
             this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView1.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawText;
             this.treeView1.HideSelection = false;
-            this.treeView1.Location = new System.Drawing.Point(0, 0);
+            this.treeView1.Location = new System.Drawing.Point(3, 3);
             this.treeView1.Name = "treeView1";
             this.treeView1.ShowNodeToolTips = true;
-            this.treeView1.Size = new System.Drawing.Size(532, 372);
+            this.treeView1.Size = new System.Drawing.Size(518, 340);
             this.treeView1.TabIndex = 3;
             this.treeView1.Scrolled += new System.EventHandler<FileList.Models.ScrollNotifyTreeViewEventArgs>(this.treeView1_Scrolled);
             this.treeView1.NeedToolTip += new System.EventHandler<FileList.Models.NeedToolTipEventArgs>(this.treeView1_NodeNeedToolTip);
@@ -202,6 +229,16 @@
             this.treeView1.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.TreeView1_NodeMouseClick);
             this.treeView1.MouseLeave += new System.EventHandler(this.treeView1_MouseLeave);
             this.treeView1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.treeView1_MouseMove);
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(524, 346);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Flat";
+            this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // panel1
             // 
@@ -475,6 +512,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.extensionsListBoxContextMenu.ResumeLayout(false);
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
@@ -517,7 +556,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ToolTip generalToolTip;
         private Common.Models.GripSplitContainer splitContainer1;
-        private System.Windows.Forms.Label notificayionLabel;
+        private System.Windows.Forms.Label notificationLabel;
         private System.Windows.Forms.ContextMenuStrip extensionsListBoxContextMenu;
         private System.Windows.Forms.ToolStripMenuItem uncheckAllToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem checkAllToolStripMenuItem;
@@ -525,5 +564,8 @@
         private System.Windows.Forms.ToolStripMenuItem uncheckOthersToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem checkOthersToolStripMenuItem;
         public System.Windows.Forms.Label countLabel;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPage2;
     }
 }

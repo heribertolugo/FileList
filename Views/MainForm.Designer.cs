@@ -210,7 +210,6 @@ namespace FileList.Views
             // fileListControl1
             // 
             this.fileListControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.fileListControl1.FileTypeListSorted = false;
             this.fileListControl1.Location = new System.Drawing.Point(0, 0);
             this.fileListControl1.Name = "fileListControl1";
             this.fileListControl1.SearcherThreads = 1;

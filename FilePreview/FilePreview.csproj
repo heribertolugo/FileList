@@ -33,17 +33,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nVLC.Declarations, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Downloads\nVLC_3.0.0\Sources\nVLC_Demo_WinForms\bin\Debug\nVLC.Declarations.dll</HintPath>
+    <Reference Include="nVLC.Declarations">
+      <HintPath>..\Common\vlc\nVLC.Declarations.dll</HintPath>
     </Reference>
-    <Reference Include="nVLC.Implementation, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Downloads\nVLC_3.0.0\Sources\nVLC_Demo_WinForms\bin\Debug\nVLC.Implementation.dll</HintPath>
+    <Reference Include="nVLC.Implementation">
+      <HintPath>..\Common\vlc\nVLC.Implementation.dll</HintPath>
     </Reference>
-    <Reference Include="nVLC.LibVlcWrapper, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Downloads\nVLC_3.0.0\Sources\nVLC_Demo_WinForms\bin\Debug\nVLC.LibVlcWrapper.dll</HintPath>
+    <Reference Include="nVLC.LibVlcWrapper">
+      <HintPath>..\Common\vlc\nVLC.LibVlcWrapper.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />

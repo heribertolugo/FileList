@@ -29,7 +29,6 @@ namespace FileList.Logic
         private SearchOption _validator;
 
         private static object fileListControlLock = new object();
-        private static object locker = new object();
 
         public ConcurrentFileSearch(string rootPath, FileSearchWorkerArgs args)
         {
@@ -99,7 +98,7 @@ namespace FileList.Logic
                 c.HideNotification();
                 //c.ExpandTree();
                 c.ScrollTreeToTop();
-                c.FileTypeListSorted = true;
+                //c.FileTypeListSorted = true;
                 c.Enabled = true;
             });
         }

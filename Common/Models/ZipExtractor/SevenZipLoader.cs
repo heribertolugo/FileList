@@ -45,9 +45,11 @@ namespace Common.Models.ZipExtractor
         public static SevenZipFormat Mslz = new SevenZipFormat(new string[] { "" }, new Guid("23170f69-40c1-278a-1000-000110D50000"), new byte[] { });
         //public static SevenZipFormat Flv = new SevenZipFormat(new string[]{ "" }, new Guid("23170f69-40c1-278a-1000-000110D60000"), new byte[] {0x46, 0x4C, 0x56});
         public static SevenZipFormat Swf = new SevenZipFormat(new string[] { "swf" }, new Guid("23170f69-40c1-278a-1000-000110D70000"), new byte[] { 0x46, 0x57, 0x53 });
-        public static SevenZipFormat PE = new SevenZipFormat(new string[] { "exe", "dll" }, new Guid("23170f69-40c1-278a-1000-000110DD0000"), new byte[] { });
+        public static SevenZipFormat PE = new SevenZipFormat(new string[] { "exe", "dll", "msi" }, new Guid("23170f69-40c1-278a-1000-000110DD0000"), new byte[] { });
         public static SevenZipFormat Elf = new SevenZipFormat(new string[] { "" }, new Guid("23170f69-40c1-278a-1000-000110DE0000"), new byte[] { });
-        public static SevenZipFormat Msi = new SevenZipFormat(new string[] { "msi" }, new Guid(), new byte[] { });
+        //public static SevenZipFormat Msi = new SevenZipFormat(new string[] { "msi" }, new Guid(), new byte[] { });
+        //public static SevenZipFormat Img = new SevenZipFormat(new string[] { "img" }, new Guid(), new byte[] { });
+        public static SevenZipFormat Vsix = new SevenZipFormat(new string[] { "vsix" }, new Guid("23170f69-40c1-278a-1000-000110010000"), new byte[] { 0x50, 0x4b });
         public static SevenZipFormat Vhd = new SevenZipFormat(new string[] { "vhd" }, new Guid("23170f69-40c1-278a-1000-000110DC0000"), new byte[] { 0x63, 0x6F, 0x6E, 0x65, 0x63, 0x74, 0x69, 0x78 });
         public static SevenZipFormat SquashFS = new SevenZipFormat(new string[] { "" }, new Guid("23170f69-40c1-278a-1000-000110D20000"), new byte[] { });
         public static SevenZipFormat Lzma86 = new SevenZipFormat(new string[] { "" }, new Guid("23170f69-40c1-278a-1000-0001100B0000"), new byte[] { });

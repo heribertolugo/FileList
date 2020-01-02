@@ -333,7 +333,7 @@ namespace Common.Models
             thread.SetApartmentState(ApartmentState.STA);
             thread.IsBackground = true;
             thread.Start(this);
-            thread.Join();
+            //thread.Join();
         }
 
         private void LoadExtendedPropertiesLight()
