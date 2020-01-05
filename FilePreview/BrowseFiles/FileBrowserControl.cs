@@ -116,13 +116,19 @@ namespace FilePreview.BrowseFiles
                         if (args.Token.IsCancellationRequested)
                             return;
                         view.SelectedItems.Clear();
-                        new System.Diagnostics.Process()
+                        try
                         {
-                            StartInfo = {
-                            FileName = "explorer",
-                            Arguments = ("\"" + item.Name + "\"")
+                            new System.Diagnostics.Process()
+                            {
+                                StartInfo = {
+                                    FileName = "explorer",
+                                    Arguments = ("\"" + item.Name + "\"")
+                                }
+                            }.Start();
+                        }catch(System.ComponentModel.Win32Exception win32Ex)
+                        {
+                            MessageBox.Show($"Could not start {item.Name} because:\n{win32Ex.Message}", "Explorer Process Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
-                        }.Start();
                     }
                 });
 

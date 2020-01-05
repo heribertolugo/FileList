@@ -7,21 +7,48 @@ namespace FilePreview
 {
     public class Previewers
     {
-        private IDictionary<string, IPreviewFile> _previewByExtension;
-        private IDictionary<FileType, IPreviewFile> _previewByFileType;
-        private IDictionary<FileType, IPreviewFile> _previewByFileTypeFlag;
-        private IList<IPreviewFile> _filePreviews;
+        private static IDictionary<string, IPreviewFile> _previewByExtension;
+        private static IDictionary<FileType, IPreviewFile> _previewByFileType;
+        private static IDictionary<FileType, IPreviewFile> _previewByFileTypeFlag;
+        private static IList<IPreviewFile> _filePreviews;
+        private static object locker = new object();
+
+        static Previewers()
+        {
+            lock (locker)
+            {
+                if (Previewers._previewByExtension != null)
+                    return;
+                Previewers._previewByExtension = new Dictionary<string, IPreviewFile>();
+                if (Previewers._previewByFileType != null)
+                    return;
+                Previewers._previewByFileType = new Dictionary<FileType, IPreviewFile>();
+                if (Previewers._previewByFileTypeFlag != null)
+                    return;
+                Previewers._previewByFileTypeFlag = new Dictionary<FileType, IPreviewFile>();
+
+                Previewers.GetFilePreviews(ref Previewers._filePreviews);
+                Previewers.SetFilePreviewsByExtension(Previewers._filePreviews, Previewers._previewByExtension);
+                Previewers.SetFilePreviewsByFileType(Previewers._filePreviews, Previewers._previewByFileType);
+                Previewers.SetFilePreviewsByFileTypeFlag(Previewers._filePreviews, Previewers._previewByFileTypeFlag);
+            }
+        }
 
         public Previewers()
         {
-            this._previewByExtension = new Dictionary<string, IPreviewFile>();
-            this._previewByFileType = new Dictionary<FileType, IPreviewFile>();
-            this._previewByFileTypeFlag = new Dictionary<FileType, IPreviewFile>();
+            //this._previewByExtension = new Dictionary<string, IPreviewFile>();
+            //this._previewByFileType = new Dictionary<FileType, IPreviewFile>();
+            //this._previewByFileTypeFlag = new Dictionary<FileType, IPreviewFile>();
 
-            Previewers.GetFilePreviews(ref this._filePreviews);
-            Previewers.SetFilePreviewsByExtension(this._filePreviews, this._previewByExtension);
-            Previewers.SetFilePreviewsByFileType(this._filePreviews, this._previewByFileType);
-            Previewers.SetFilePreviewsByFileTypeFlag(this._filePreviews, this._previewByFileTypeFlag);
+            //Previewers.GetFilePreviews(ref this._filePreviews);
+            //Previewers.SetFilePreviewsByExtension(this._filePreviews, this._previewByExtension);
+            //Previewers.SetFilePreviewsByFileType(this._filePreviews, this._previewByFileType);
+            //Previewers.SetFilePreviewsByFileTypeFlag(this._filePreviews, this._previewByFileTypeFlag);
+        }
+
+        public static void ForceInit()
+        {
+            IPreviewFile previewFile = new Previewers().GetPreviewer(" ");
         }
 
         /// <summary>
@@ -32,8 +59,8 @@ namespace FilePreview
         /// <returns></returns>
         public IPreviewFile GetPreviewer(string fileExtension)
         {
-            if (this._previewByExtension.ContainsKey(fileExtension))
-                return this._previewByExtension[fileExtension];
+            if (Previewers._previewByExtension.ContainsKey(fileExtension))
+                return Previewers._previewByExtension[fileExtension];
             return null;
         }
 
@@ -46,16 +73,16 @@ namespace FilePreview
         /// <returns></returns>
         public IPreviewFile GetPreviewer(FileType fileType, bool byFlag = false)
         {
-            if (byFlag && this._previewByFileTypeFlag.ContainsKey(fileType))
-                return this._previewByFileTypeFlag[fileType];
-            if (!byFlag && this._previewByFileType.ContainsKey(fileType))
-                return this._previewByFileType[fileType];
+            if (byFlag && Previewers._previewByFileTypeFlag.ContainsKey(fileType))
+                return Previewers._previewByFileTypeFlag[fileType];
+            if (!byFlag && Previewers._previewByFileType.ContainsKey(fileType))
+                return Previewers._previewByFileType[fileType];
             return null;
         }
 
         public IEnumerable<IPreviewFile> GetPreviewrs()
         {
-            return this._filePreviews;
+            return Previewers._filePreviews;
         }
 
         private static void GetFilePreviews(ref IList<IPreviewFile> previews)

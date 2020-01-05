@@ -24,6 +24,17 @@ namespace FileList.Logic
         private static CancellationTokenSource cancellationToken;
         private static Action<ConcurrentFileSearchEventArgs> _searchFinishedCallback;
 
+        public static void InitiializeFilePreviewers()
+        {
+            Thread thread = new Thread((object o) =>
+            {
+                FilePreview.Previewers.ForceInit();
+            });
+            //thread.SetApartmentState(ApartmentState.STA);
+            thread.IsBackground = true;
+            thread.Start();
+        }
+
         public static void OpenFileSelectedNode(TreeView treeView)
         {
             if (treeView.SelectedNode == null)
@@ -147,13 +158,20 @@ namespace FileList.Logic
 
         public static void OpenItem(string path)
         {
-            new Process()
+            try
             {
-                StartInfo = {
-                  FileName = "explorer",
-                  Arguments = ("\"" + path + "\"")
-                }
-            }.Start();
+                new System.Diagnostics.Process()
+                {
+                    StartInfo = {
+                                    FileName = "explorer",
+                                    Arguments = ($"\"{path}\"")
+                                }
+                }.Start();
+            }
+            catch (System.ComponentModel.Win32Exception win32Ex)
+            {
+                MessageBox.Show($"Could not start {path} because:\n{win32Ex.Message}", "Explorer Process Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         public static void OpenLocation(string path)
