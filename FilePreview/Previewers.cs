@@ -89,7 +89,8 @@ namespace FilePreview
         {
             previews = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes())
                 .Where(t => typeof(IPreviewFile).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
-                .Select(p => (IPreviewFile)Activator.CreateInstance(p)).ToList();
+                .Select(p => (IPreviewFile)Activator.CreateInstance(p))
+                .ToList();
         }
 
         private static void SetFilePreviewsByExtension(IEnumerable<IPreviewFile> previews, IDictionary<string, IPreviewFile> target)

@@ -667,7 +667,8 @@ namespace FileList.Models
                 System.Drawing.Point treeScreenPoint = RectangleToScreen(e.Node.TreeView.DisplayRectangle).Location;
 
                 this._treeViewToolTip.IsBalloon = true;
-                this._treeViewToolTip.Show(string.Join(Environment.NewLine, fileData.ExtendedProperties.Select(p => string.Format("{0}: {1}", p.Key, p.Value)).ToArray())
+                // expand fileData.ExtendedProperties to list, to prevent possible enumeration changed error
+                this._treeViewToolTip.Show(string.Join(Environment.NewLine, fileData.ExtendedProperties.ToList().Select(p => string.Format("{0}: {1}", p.Key, p.Value)).ToArray())
                     , this
                     , new System.Drawing.Point(MousePosition.X - treeScreenPoint.X + 5, MousePosition.Y - treeScreenPoint.Y + 5));
             }

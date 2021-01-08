@@ -26,13 +26,13 @@ namespace FileList.Logic
 
         public static void InitiializeFilePreviewers()
         {
-            Thread thread = new Thread((object o) =>
-            {
+            //Thread thread = new Thread((object o) =>
+            //{
                 FilePreview.Previewers.ForceInit();
-            });
-            //thread.SetApartmentState(ApartmentState.STA);
-            thread.IsBackground = true;
-            thread.Start();
+            //});
+            ////thread.SetApartmentState(ApartmentState.STA);
+            //thread.IsBackground = true;
+            //thread.Start();
         }
 
         public static void OpenFileSelectedNode(TreeView treeView)
@@ -220,8 +220,12 @@ namespace FileList.Logic
             if (previewFile == null || string.IsNullOrEmpty(fileData.Extension))
                 previewFile = previewers.GetPreviewer(fileType == FileType.Application ? FileType.Unknown : fileType);
             
-            if (previewFile == null)
+            if (previewFile == null && (previewFile = previewers.GetPreviewer(fileType)) == null)
                 return false;
+
+            // for some reason, after not using this for a fewe months, this throws a cross-thread acception
+            // when playing media files. related to vlc plug-in??
+            //control.Invoke((MethodInvoker)(() => control.Controls.Add(previewFile.Viewer)));
 
             control.Controls.Add(previewFile.Viewer);
             previewFile.Viewer.Dock = DockStyle.Fill;
