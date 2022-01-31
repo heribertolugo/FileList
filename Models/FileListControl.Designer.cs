@@ -39,7 +39,6 @@
             this.checkOthersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.notificationLabel = new System.Windows.Forms.Label();
             this.treeView1 = new FileList.Models.ScrollNotifyTreeView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -48,7 +47,7 @@
             this.scoutCountLabel = new System.Windows.Forms.NumericUpDown();
             this.countLabel = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
+            this.threadLabel = new System.Windows.Forms.Label();
             this.dateModifiedButton = new FileList.Models.SortButton();
             this.dateCreatedButton = new FileList.Models.SortButton();
             this.sizeSortButton = new FileList.Models.SortButton();
@@ -66,6 +65,8 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.deleteFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.generalToolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -80,6 +81,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.scoutCountLabel)).BeginInit();
             this.infoPanel.SuspendLayout();
             this.filesTreeViewContextMenu.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -95,7 +97,7 @@
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(662, 428);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(662, 406);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // splitContainer1
@@ -112,7 +114,7 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.tabControl1);
-            this.splitContainer1.Size = new System.Drawing.Size(656, 372);
+            this.splitContainer1.Size = new System.Drawing.Size(656, 350);
             this.splitContainer1.SplitterDistance = 120;
             this.splitContainer1.TabIndex = 0;
             // 
@@ -122,9 +124,9 @@
             this.fileTypesCheckedListBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.fileTypesCheckedListBox.FormattingEnabled = true;
             this.fileTypesCheckedListBox.Location = new System.Drawing.Point(0, 0);
-            this.fileTypesCheckedListBox.MinimumSize = new System.Drawing.Size(120, 372);
+            this.fileTypesCheckedListBox.MinimumSize = new System.Drawing.Size(120, 350);
             this.fileTypesCheckedListBox.Name = "fileTypesCheckedListBox";
-            this.fileTypesCheckedListBox.Size = new System.Drawing.Size(120, 372);
+            this.fileTypesCheckedListBox.Size = new System.Drawing.Size(120, 350);
             this.fileTypesCheckedListBox.TabIndex = 2;
             this.fileTypesCheckedListBox.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.FileTypesCheckedListBox_ItemCheck);
             // 
@@ -180,33 +182,19 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(532, 372);
+            this.tabControl1.Size = new System.Drawing.Size(532, 350);
             this.tabControl1.TabIndex = 5;
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.notificationLabel);
             this.tabPage1.Controls.Add(this.treeView1);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(524, 346);
+            this.tabPage1.Size = new System.Drawing.Size(524, 324);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Tree";
             this.tabPage1.UseVisualStyleBackColor = true;
-            // 
-            // notificationLabel
-            // 
-            this.notificationLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.notificationLabel.Location = new System.Drawing.Point(25, 34);
-            this.notificationLabel.Name = "notificationLabel";
-            this.notificationLabel.Size = new System.Drawing.Size(478, 285);
-            this.notificationLabel.TabIndex = 4;
-            this.notificationLabel.Text = "Notification";
-            this.notificationLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.notificationLabel.Visible = false;
             // 
             // treeView1
             // 
@@ -217,7 +205,7 @@
             this.treeView1.Location = new System.Drawing.Point(3, 3);
             this.treeView1.Name = "treeView1";
             this.treeView1.ShowNodeToolTips = true;
-            this.treeView1.Size = new System.Drawing.Size(518, 340);
+            this.treeView1.Size = new System.Drawing.Size(518, 318);
             this.treeView1.TabIndex = 3;
             this.treeView1.Scrolled += new System.EventHandler<FileList.Models.ScrollNotifyTreeViewEventArgs>(this.treeView1_Scrolled);
             this.treeView1.NeedToolTip += new System.EventHandler<FileList.Models.NeedToolTipEventArgs>(this.treeView1_NodeNeedToolTip);
@@ -235,7 +223,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(524, 346);
+            this.tabPage2.Size = new System.Drawing.Size(524, 324);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Flat";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -278,7 +266,7 @@
             this.tableLayoutPanel2.Controls.Add(this.scoutCountLabel, 0, 1);
             this.tableLayoutPanel2.Controls.Add(this.countLabel, 1, 1);
             this.tableLayoutPanel2.Controls.Add(this.label1, 1, 0);
-            this.tableLayoutPanel2.Controls.Add(this.label2, 0, 0);
+            this.tableLayoutPanel2.Controls.Add(this.threadLabel, 0, 0);
             this.tableLayoutPanel2.Location = new System.Drawing.Point(407, 0);
             this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -331,16 +319,16 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Files";
             // 
-            // label2
+            // threadLabel
             // 
-            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(51, 0);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(46, 12);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "Threads";
-            this.generalToolTip.SetToolTip(this.label2, "Number of threads dedicated to searching for files. 1 is recommended.");
+            this.threadLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.threadLabel.AutoSize = true;
+            this.threadLabel.Location = new System.Drawing.Point(51, 0);
+            this.threadLabel.Name = "threadLabel";
+            this.threadLabel.Size = new System.Drawing.Size(46, 12);
+            this.threadLabel.TabIndex = 1;
+            this.threadLabel.Text = "Threads";
+            this.generalToolTip.SetToolTip(this.threadLabel, "Number of threads dedicated to searching for files. 1 is recommended.");
             // 
             // dateModifiedButton
             // 
@@ -499,11 +487,27 @@
             this.deleteFileToolStripMenuItem.Text = "Delete";
             this.deleteFileToolStripMenuItem.Click += new System.EventHandler(this.DeleteFileToolStripMenuItem_Click);
             // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabel1});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 406);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(662, 22);
+            this.statusStrip1.TabIndex = 2;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel1
+            // 
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(0, 17);
+            // 
             // FileListControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.tableLayoutPanel1);
+            this.Controls.Add(this.statusStrip1);
             this.Name = "FileListControl";
             this.Size = new System.Drawing.Size(662, 428);
             this.tableLayoutPanel1.ResumeLayout(false);
@@ -522,7 +526,10 @@
             this.infoPanel.ResumeLayout(false);
             this.infoPanel.PerformLayout();
             this.filesTreeViewContextMenu.ResumeLayout(false);
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -553,10 +560,9 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         internal System.Windows.Forms.NumericUpDown scoutCountLabel;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label threadLabel;
         private System.Windows.Forms.ToolTip generalToolTip;
         private Common.Models.GripSplitContainer splitContainer1;
-        private System.Windows.Forms.Label notificationLabel;
         private System.Windows.Forms.ContextMenuStrip extensionsListBoxContextMenu;
         private System.Windows.Forms.ToolStripMenuItem uncheckAllToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem checkAllToolStripMenuItem;
@@ -567,5 +573,7 @@
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
     }
 }
