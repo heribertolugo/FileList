@@ -172,7 +172,7 @@ namespace FileList.Models
             }
             set
             {
-                this.scoutCountLabel.Value = value;
+                this.scoutCountLabel.Value = Math.Min(this.scoutCountLabel.Maximum, value);
             }
         }
 
@@ -372,13 +372,13 @@ namespace FileList.Models
 
         public void ShowNotification(string message)
         {
-            this.notificationLabel.Text = message;
-            this.notificationLabel.Visible = true;
+            this.toolStripStatusLabel1.Text = message;
+            //this.statusStrip1.InvokeIfRequired(s => s.Items[nameof(this.toolStripStatusLabel1)].Text = message);
         }
 
         public void HideNotification()
         {
-            this.notificationLabel.Visible = false;
+            this.toolStripStatusLabel1.Text = string.Empty;
         }
 
         #endregion
