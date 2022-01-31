@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Win32.Models;
 
 namespace Win32.Libraries
 {
@@ -24,6 +25,9 @@ namespace Win32.Libraries
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern IntPtr GetModuleHandle(string lpModuleName);
+
+        [DllImport("Kernel32.dll")]
+        public static extern void GetLocalTime([In, Out] SystemTime st);
         #endregion
     }
 }

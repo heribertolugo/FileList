@@ -81,6 +81,7 @@
     <Compile Include="Models\POINT.cs" />
     <Compile Include="Models\RECT.cs" />
     <Compile Include="Models\SHFILEINFO.cs" />
+    <Compile Include="Models\SystemTime.cs" />
     <Compile Include="MouseListenerLL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
