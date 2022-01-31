@@ -240,7 +240,7 @@ namespace FileList.Views
         
         private void ProcessSearchOptionForm()
         {
-            this.fileListControl1.SearcherThreads = this.searchOptionsForm.Threads;
+            this.fileListControl1.scoutCountLabel.Value = this.searchOptionsForm.Threads;
             this.searchOptions = this.searchOptionsForm.SearchOption;
             this.searchOptionsForm.Hide();
         }
