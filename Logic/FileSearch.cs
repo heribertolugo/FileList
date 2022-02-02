@@ -51,7 +51,7 @@ namespace FileList.Logic
             }
             catch (Exception ex)
             {
-                // file would be inaccessable to shellclass, usually because of access permissions
+                // file would be inaccessible to shell class, usually because of access permissions
                 // but sometimes, ShellClass seems to get out of sync.
                 // in which case it will throw "The object invoked has disconnected from its clients" exception
                 // in this scenario, we want to attempt 1 more time to collect extended properties, with a new ShellClass
@@ -74,8 +74,8 @@ namespace FileList.Logic
                 IEnumerable<FileData> files = System.Linq.Enumerable.Empty<FileData>();
                 try
                 {
-                    // some files/folders inacessable to shell class are picked up by .NET IO
-                    // these files are likely link redirects or something. they dont seem to show when you browse explorer  
+                    // some files/folders inaccessible to shell class are picked up by .NET IO
+                    // these files are likely link redirects or something. they don't seem to show when you browse explorer  
                     files = this.RegularSearch(path, searchSubdirectories);
                 }
                 catch (Exception ex2)
@@ -101,7 +101,7 @@ namespace FileList.Logic
 
                 //if (!Extensions.IsSystemObjectAccessable(item.Path))
                 //{
-                //    Console.WriteLine("{0} inaccessable", item.Path);
+                //    Console.WriteLine("{0} inaccessible", item.Path);
                 //    continue;
                 //}
 
@@ -192,10 +192,10 @@ namespace FileList.Logic
                         yield return filez.Current;
                 }
         }
-
+        [STAThread]
         private void AddZipContentsToFileData(string path, FileData fileData)
         {
-            IShellDispatch5 shell = this._shell;
+            IShellDispatch2 shell = this._shell;
             Folder objFolder = null;
 
             try
@@ -204,12 +204,24 @@ namespace FileList.Logic
             }
             catch (Exception ex)
             {
-                throw;
+                //throw; // we dont need to through this. just return. likely it couldnt cast the zip file
             }
 
             if (objFolder == null)
             {
-                return;
+                try
+                {
+                    // not sure why sometimes this will fail, but creating a new instance seems to resolve it
+                    // but we have to reuse it, otherwise we will run out of instances we can create
+                    shell = this._shell = new ShellClass();
+                    objFolder = shell.NameSpace(path);
+                }
+                catch (Exception ex) { }
+
+                if (objFolder == null)
+                {
+                    return;
+                }
             }
 
             foreach (FolderItem2 folderItem2 in objFolder.Items())
