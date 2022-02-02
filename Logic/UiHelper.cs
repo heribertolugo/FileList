@@ -223,7 +223,7 @@ namespace FileList.Logic
             if (previewFile == null && (previewFile = previewers.GetPreviewer(fileType)) == null)
                 return false;
 
-            // for some reason, after not using this for a fewe months, this throws a cross-thread acception
+            // for some reason, after not using this for a few months, this throws a cross-thread exception
             // when playing media files. related to vlc plug-in??
             //control.Invoke((MethodInvoker)(() => control.Controls.Add(previewFile.Viewer)));
 
