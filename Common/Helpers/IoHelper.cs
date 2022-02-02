@@ -125,7 +125,12 @@ namespace Common.Helpers
         public static void WriteToConsole(string format, params object[] values)
         {
             if (OutputIsRequested())
-                Console.WriteLine(format, values);
+            {
+                if (values.Length < 1)
+                    Console.WriteLine(format);
+                else
+                    Console.WriteLine(format, values);
+            }
         }
     }
 }
