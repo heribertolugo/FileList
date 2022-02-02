@@ -51,51 +51,20 @@ namespace FileList.Logic
             GC.KeepAlive(shell);
 
             ConcurrentFileSearch.Directories.Add(this._root);
-            this._fileListControl.InvokeIfRequired(f => f.SearcherThreads = 0);
+            this._fileListControl.InvokeIfRequired(f =>
+            {
+                f.ThreadCounter = 0;
+                InitializeFileListControlImageList(f);
+            });
             this.SummonMinions(this.MaxThreads);
             //thread.Join();
-        }
-        private void AttachFileData(IEnumerable<FileData> files, FileListControl fileListControl, bool commitRequired)
-        {
-            IoHelper.WriteToConsole("requesting fileListControlLock");
-            lock (fileListControlLock)
-            {
-                fileListControl.InvokeIfRequired(c =>
-                {
-                    c.Enabled = false;
-                    //c.Clear();
-
-                    FileToIconConverter iconConverter = new FileToIconConverter();
-                    if (c.TreeImageList == null)
-                        c.TreeImageList = new ImageList();
-                    ImageList treeImageList = c.TreeImageList;
-                    if (!treeImageList.Images.ContainsKey(UiHelper.DirectoryKey))
-                        treeImageList.Images.Add(UiHelper.DirectoryKey, iconConverter.GetImage(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), IconSize.Small).ToBitmap());
-                    if (!treeImageList.Images.ContainsKey(UiHelper.ZipExtension))
-                        treeImageList.Images.Add(UiHelper.ZipExtension, iconConverter.GetImage(UiHelper.ZipExtension, IconSize.Small).ToBitmap());
-                    if (!treeImageList.Images.ContainsKey(UiHelper.NoneFileExtension))
-                        treeImageList.Images.Add(UiHelper.NoneFileExtension, iconConverter.GetImage(UiHelper.NoneFileExtension, IconSize.Small).ToBitmap());
-
-                    foreach (FileData file in files)
-                    {
-                        ImageList.ImageCollection images = treeImageList.Images;
-                        if (!images.ContainsKey(file.Extension))
-                        {
-                            Bitmap icon = iconConverter.GetImage(file.Path, IconSize.Small).ToBitmap();
-                            images.Add(file.Extension, icon);
-                        }
-
-                        c.AddFileData(file);
-                    }
-                });
-            }
-            IoHelper.WriteToConsole("released fileListControlLock");
         }
 
         private void FinalizeFileListControl(FileListControl fileListControl)
         {
             fileListControl.InvokeIfRequired(c =>
             {
+                c.ThreadCounter = 0;
                 c.HideNotification();
                 //c.ExpandTree();
                 c.ScrollTreeToTop();
@@ -104,7 +73,6 @@ namespace FileList.Logic
             });
         }
 
-        private static object SummonMinionLock = new object();
         private void ConcurrentFileSearch_OnFinishedHandler(object sender, ConcurrentFileSearchEventArgs e)
         {
             bool minionsSummoned = false;
@@ -119,8 +87,8 @@ namespace FileList.Logic
             else
                 ConcurrentFileSearchMinion.Cancel();
 
-            int bucketCount = ConcurrentFileSearchMinion.ThreadBucketCount();
-            this._fileListControl.InvokeIfRequired(c => c.SearcherThreads = bucketCount);
+            //int bucketCount = ConcurrentFileSearchMinion.ThreadBucketCount();
+            //this._fileListControl.InvokeIfRequired(c => c.ThreadCounter = bucketCount);
             //minionCount = GetMinionCount();
             IoHelper.WriteToConsole("threads {0} #{1}", minionCount, e.Id);
 
@@ -181,9 +149,8 @@ namespace FileList.Logic
                 //thread.Join(); 
                 bucketCount++;
                 //this._fileListControl.InvokeIfRequired(f => f.SearcherThreads += 1);
-                this._fileListControl.InvokeIfRequired(f => f.SearcherThreads = bucketCount);
+                //this._fileListControl.InvokeIfRequired(f => f.ThreadCounter = bucketCount);
                 summoned = true;
-
                 if (bucketCount >= maxThreads || (bucketCount = GetMinionCount()) >= maxThreads)
                     break;
             }
@@ -200,6 +167,7 @@ namespace FileList.Logic
                 return;
             }
             this.Finished(this, args);
+
         }
 
         private void OnUpdate(ConcurrentFileSearchEventArgs args)
@@ -210,23 +178,41 @@ namespace FileList.Logic
             this.Update(this, args);
         }
 
+        /// <summary>
+        /// Inserts common icons into FileListControl if they do not currently exist.
+        /// </summary>
+        /// <param name="fileListControl"></param>
+        private void InitializeFileListControlImageList(FileListControl fileListControl)
+        {
+            FileToIconConverter iconConverter = new FileToIconConverter();
+            if (fileListControl.TreeImageList == null)
+                fileListControl.TreeImageList = new ImageList();
+            ImageList treeImageList = fileListControl.TreeImageList;
+            if (!treeImageList.Images.ContainsKey(UiHelper.DirectoryKey))
+                treeImageList.Images.Add(UiHelper.DirectoryKey, iconConverter.GetImage(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), IconSize.Small).ToBitmap());
+            if (!treeImageList.Images.ContainsKey(UiHelper.ZipExtension))
+                treeImageList.Images.Add(UiHelper.ZipExtension, iconConverter.GetImage(UiHelper.ZipExtension, IconSize.Small).ToBitmap());
+            if (!treeImageList.Images.ContainsKey(UiHelper.NoneFileExtension))
+                treeImageList.Images.Add(UiHelper.NoneFileExtension, iconConverter.GetImage(UiHelper.NoneFileExtension, IconSize.Small).ToBitmap());
+        }
 
         private struct ConcurrentFileSearchMinion
         {
             internal event EventHandler<ConcurrentFileSearchEventArgs> OnFinishedHandler;
 
-            private static ConcurrentCollection<int> ThreadBucket;
             private FileSearch _fileSearch;
             private static int IdTracker;
             private static object IdLock;
             public readonly int ID;
             private string _root;
             private EventHandler<ConcurrentFileSearchEventArgs> _handler;
-            private List<FileData> _files;
             private static object StaticLock = new object();
             private static volatile int _bucketCount = 0;
-            private static object BucketCountLock = new object();
             private SearchOption _validator;
+            private FileListControl _fileListControl;
+            private static bool _isCancelled;
+            private static object CancelLock;
+            private static object fileListControlLock = new object();
 
             static ConcurrentFileSearchMinion()
             {
@@ -241,12 +227,10 @@ namespace FileList.Logic
                     ConcurrentFileSearchMinion._isCancelled = false;
                 }
             }
-            private FileListControl _fileListControl;
             public ConcurrentFileSearchMinion(string root, EventHandler<ConcurrentFileSearchEventArgs> onFinishedHandler, FileListControl fileListControl, SearchOption validator)
             {
                 System.Threading.Interlocked.Increment(ref _bucketCount);
                 this._root = root;
-                this._files = new List<FileData>();
                 this._fileSearch = null;
                 this._handler = onFinishedHandler;
                 this.ID = 0;
@@ -264,7 +248,7 @@ namespace FileList.Logic
                 if (!ConcurrentFileSearchMinion.IsCancelled())
                 {
                     this.AddDirectories(this._root, ConcurrentFileSearch.Directories);
-                    this.GetFiles(this._root, this._files);
+                    this.GetFiles(this._root);
                 }
 
                 this.RmoveFromThreadBucket();
@@ -282,8 +266,6 @@ namespace FileList.Logic
                 return Interlocked.CompareExchange(ref _bucketCount, 0, 0);
             }
 
-            private static bool _isCancelled;
-            private static object CancelLock;
             public static void Cancel()
             {
                 lock (ConcurrentFileSearchMinion.CancelLock)
@@ -308,7 +290,6 @@ namespace FileList.Logic
                 }
             }
 
-
             private int GetNextId()
             {
                 int id = 0;
@@ -325,74 +306,61 @@ namespace FileList.Logic
                 return id;
             }
 
-            private static object minionLock = new object();
-            private void SummonMinions(string root)
-            {
-                try
-                {
-                    foreach (string directory in IoHelper.AccessableDirectories(root))
-                    {
-                        IoHelper.WriteToConsole("created minion");
-                        ConcurrentFileSearchMinion search = new ConcurrentFileSearchMinion(directory, this._handler, this._fileListControl, default(SearchOption)); // arguments incorrect, only for ability to compile
-                        Thread thread = new Thread((object s) => ((ConcurrentFileSearchMinion)s).Start());
-                        thread.SetApartmentState(ApartmentState.STA);
-                        thread.Start(search);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw;
-                }
-            }
-
             private void AddDirectories(string path, ConcurrentQueue<string> directories)
             {
                 IoHelper.WriteToConsole("thread id #{0} adding dirs in {1}", this.ID, path);
                 directories.AddRange(IoHelper.AccessableDirectories(path));
             }
 
-            private static object uiNotifyLock = new object();
-            private void GetFiles(string root, IList<FileData> files)
+            private void GetFiles(string root)
             {
                 try
                 {
                     this._fileSearch = new FileSearch(root, false, ole32.GetIShellDispatch5());
+                    FileData? fileData = this._fileSearch.GetNext(); // make sure we have files so we don't lock up UI unnecessarily
 
-                    // access thread unsafe ConcurrentFileSearchMinion._isCancelled
-                    // its ok because its not a big deal to get incorrect value right away
-                    // if thread access exception is thrown, it is because value is changing.
-                    // we catch the error, forcing us to quit.
-                    while (this._fileSearch.GetNext() != null && !ConcurrentFileSearchMinion._isCancelled)
-                    {
-                        string message = string.Format("thread id #{0} found file {1}", this.ID, this._fileSearch.Current.Value.Path);
-                        IoHelper.WriteToConsole(message);
+                    if (!fileData.HasValue)
+                        return;
+                    IoHelper.WriteToConsole("requesting fileListControlLock");
 
-                        //if (Monitor.TryEnter(uiNotifyLock, 10))
-                        //{
-                        //    this._fileListControl.InvokeIfRequired(f => f.ShowNotification(message));
-                        //    Monitor.Exit(uiNotifyLock);
-                        //}
-
-                        // check our file filter to see if we want this file
-                        if (this._validator.ValidateFile(this._fileSearch.Current.Value))
+                    //lock (fileListControlLock)
+                    //{
+                        int bucketCount = ConcurrentFileSearchMinion.ThreadBucketCount();
+                        var that = this;
+                        this._fileListControl.InvokeIfRequired(f =>
                         {
-                            //this._fileListControl.InvokeIfRequired(f => f.HideNotification());
-                            this.AttachFileData(this._fileSearch.Current.Value, this._fileListControl);
-                        }
-                        else
-                        {
-                            message = string.Format("skipping filtered file: {0}", this._fileSearch.Current.Value.Path);
-                            IoHelper.WriteToConsole(message);
-
-                            if (Monitor.TryEnter(uiNotifyLock, 10))
+                            f.ThreadCounter = bucketCount;
+                            // access thread unsafe ConcurrentFileSearchMinion._isCancelled
+                            // its ok because its not a big deal to get incorrect value right away
+                            // if thread access exception is thrown, it is because value is changing.
+                            // we catch the error, forcing us to quit.
+                            while (fileData.HasValue && !ConcurrentFileSearchMinion._isCancelled)
                             {
-                                this._fileListControl.InvokeIfRequired(f => f.ShowNotification(message));
-                                Monitor.Exit(uiNotifyLock);
-                            }
-                        }
-                    }
+                                FileData currentFile = that._fileSearch.Current.Value;
+                                string message = string.Format("thread id #{0} found file {1}", that.ID, currentFile.Path);
 
-                    IoHelper.WriteToConsole("this._fileSearch.GetNext() == null");
+                                IoHelper.WriteToConsole(message);
+                                f.ShowNotification(message);
+
+                                // check our file filter to see if we want this file
+                                if (that._validator.ValidateFile(currentFile))
+                                {
+                                    that.AttachFileData(currentFile, f);
+                                }
+                                else
+                                {
+                                    message = string.Format("skipping filtered file: {0}", currentFile.Path);
+                                    IoHelper.WriteToConsole(message);
+
+                                    f.ShowNotification(message);
+                                }
+
+                                fileData = that._fileSearch.GetNext();
+                            }
+                            IoHelper.WriteToConsole("this._fileSearch.GetNext() == null");
+                        });
+                    //}
+                    IoHelper.WriteToConsole("released fileListControlLock");
                 }
                 catch (Exception ex)
                 {
@@ -429,39 +397,24 @@ namespace FileList.Logic
                 }
                 OnFinishedHandler(this, args);
             }
-
+            /// <summary>
+            /// Finds the icon associated with the file and then attaches the icon and file to the FileListControl
+            /// </summary>
+            /// <param name="file"></param>
+            /// <param name="fileListControl"></param>
             private void AttachFileData(FileData file, FileListControl fileListControl)
             {
-                IoHelper.WriteToConsole("requesting fileListControlLock");
+                FileToIconConverter iconConverter = new FileToIconConverter();
+                ImageList treeImageList = fileListControl.TreeImageList;
+                ImageList.ImageCollection images = treeImageList.Images;
 
-                fileListControl.InvokeIfRequired(c =>
+                if (!images.ContainsKey(file.Extension))
                 {
-                    c.Enabled = false;
-                        //c.Clear();
+                    Bitmap icon = iconConverter.GetImage(file.Path, IconSize.Small).ToBitmap();
+                    images.Add(file.Extension, icon);
+                }
 
-                        FileToIconConverter iconConverter = new FileToIconConverter();
-                    if (c.TreeImageList == null)
-                        c.TreeImageList = new ImageList();
-                    ImageList treeImageList = c.TreeImageList;
-                    if (!treeImageList.Images.ContainsKey(UiHelper.DirectoryKey))
-                        treeImageList.Images.Add(UiHelper.DirectoryKey, iconConverter.GetImage(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), IconSize.Small).ToBitmap());
-                    if (!treeImageList.Images.ContainsKey(UiHelper.ZipExtension))
-                        treeImageList.Images.Add(UiHelper.ZipExtension, iconConverter.GetImage(UiHelper.ZipExtension, IconSize.Small).ToBitmap());
-                    if (!treeImageList.Images.ContainsKey(UiHelper.NoneFileExtension))
-                        treeImageList.Images.Add(UiHelper.NoneFileExtension, iconConverter.GetImage(UiHelper.NoneFileExtension, IconSize.Small).ToBitmap());
-
-                    ImageList.ImageCollection images = treeImageList.Images;
-                    if (!images.ContainsKey(file.Extension))
-                    {
-                        Bitmap icon = iconConverter.GetImage(file.Path, IconSize.Small).ToBitmap();
-                        images.Add(file.Extension, icon);
-                    }
-
-                    c.AddFileData(file);
-
-                });
-
-                IoHelper.WriteToConsole("released fileListControlLock");
+                fileListControl.AddFileData(file);
             }
         }
     }
