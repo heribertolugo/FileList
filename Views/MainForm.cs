@@ -5,6 +5,7 @@ using FileList.Models;
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using System.Windows.Forms.Layout;
 
@@ -48,7 +49,8 @@ namespace FileList.Views
 
         private void Search()
         {
-            UiHelper.Search(this.rootPathTextBox.Text, this.fileListControl1, this.ToggleEnabled, this.searchOptions);
+            this.fileListControl1.Tag = DateTime.Now; // store our time when we begin searching
+            UiHelper.Search(this.rootPathTextBox.Text, this.fileListControl1, this.OnSearchFinished, this.searchOptions);
         }
 
         public void Reset()
@@ -65,7 +67,7 @@ namespace FileList.Views
 
             if (!Directory.Exists(this.rootPathTextBox.Text) && !File.Exists(this.rootPathTextBox.Text))
             {
-                MessageBox.Show("Wouldnt it be nice to go to places that dont exist?", UiHelper.ErrorHeader, MessageBoxButtons.OK, MessageBoxIcon.Question);
+                MessageBox.Show("Wouldn't it be nice to go to places that don't exist?", UiHelper.ErrorHeader, MessageBoxButtons.OK, MessageBoxIcon.Question);
                 this.searchButton.Enabled = false;
             }
             else
@@ -79,6 +81,7 @@ namespace FileList.Views
                         this.searchOptionsForm.Hide();
                 }
 
+                this.fileListControl1.HideNotification();
                 this.ToggleEnabled(null);
                 this.Reset();
                 this.Search();
@@ -90,12 +93,46 @@ namespace FileList.Views
             UiHelper.CancelSearch();
         }
 
+        public void OnSearchFinished(ConcurrentFileSearchEventArgs fileSearchEventArgs)
+        {
+            this.fileListControl1.InvokeIfRequired(f =>
+            {
+                try
+                {
+                    Func<TimeSpan, string> friendlyDuration = (TimeSpan t) =>
+                    {
+                        StringBuilder format = new StringBuilder();
+
+                        if (t.Days > 0)
+                            format.Append(@"dd'd '");
+                        if (t.Hours > 0)
+                            format.Append(@"hh'h '");
+                        if (t.Minutes > 0)
+                            format.Append(@"mm'm '");
+                        if (t.Seconds > 0)
+                            format.Append(@"ss's '");
+                        if (t.Milliseconds > 0)
+                            format.Append(@"'.'FFFFFFF");
+                        return t.ToString(@format.ToString());
+                    };
+
+                    DateTime begining = (DateTime)f.Tag;
+                    TimeSpan searchDuration = DateTime.Now.Subtract(begining);
+                    f.ShowNotification($"Found {f.GetNodeCount(false).ToString("n0")} files in {friendlyDuration(searchDuration)}");
+
+                }
+                catch (Exception ex) { throw; }
+            });
+
+            this.ToggleEnabled(fileSearchEventArgs);
+        }
         public void ToggleEnabled(ConcurrentFileSearchEventArgs fileSearchEventArgs)
         {
-            this.InvokeIfRequired(c => { 
+            this.InvokeIfRequired(c =>
+            {
                 Control control = (Control)c;
-                foreach (Control control1 in (ArrangedElementCollection)control.Controls)
-                    control1.Enabled = !control1.Enabled;
+                //foreach (Control control1 in (ArrangedElementCollection)control.Controls)
+                //    control1.Enabled = !control1.Enabled;
 
                 if (this.searchButton.Text.ToUpper().Equals("SEARCH"))
                 {
@@ -131,7 +168,8 @@ namespace FileList.Views
             {
                 this.deleteFileContextMenu.Show(button, new System.Drawing.Point(0, button.Height));
                 button.Tag = true;
-            }else
+            }
+            else
                 button.Tag = false;
         }
 
@@ -147,12 +185,12 @@ namespace FileList.Views
                 MoveFilesForm moveFilesForm = new MoveFilesForm(checkedPaths);
                 this.browsePanel.EnabledChanged -= this.browsePanel_EnabledChanged;
                 this.Enabled = false;
-                moveFilesForm.FormClosed += (FormClosedEventHandler)((s, e2) => 
-                    { 
+                moveFilesForm.FormClosed += (FormClosedEventHandler)((s, e2) =>
+                    {
                         this.Enabled = true;
-                        this.browsePanel.EnabledChanged += this.browsePanel_EnabledChanged; 
-                        (s as Form).Dispose(); 
-                    }); 
+                        this.browsePanel.EnabledChanged += this.browsePanel_EnabledChanged;
+                        (s as Form).Dispose();
+                    });
                 moveFilesForm.Show();
             }
         }
@@ -180,11 +218,12 @@ namespace FileList.Views
             }
             else
             {
-                string[] directories = Directory.Exists(selectedPath) ? Directory.GetDirectories(selectedPath).Select(d => {
+                string[] directories = Directory.Exists(selectedPath) ? Directory.GetDirectories(selectedPath).Select(d =>
+                {
                     //Path.GetDirectoryName(d)
                     int lastDirSeparator = d.TrimEnd('\\').LastIndexOf('\\');
-                    return d.Substring(lastDirSeparator+1);
-                    }).ToArray() : new string[0];
+                    return d.Substring(lastDirSeparator + 1);
+                }).ToArray() : new string[0];
                 FileDataGroup groupFromSelected = this.fileListControl1.GetFileDataGroupFromSelected();
                 this.filePropertiesTextBox.Text = string.Format("Path:{3}{0}Children: {1}{0}{2}{0}{0}Directories:{4}{0}{5}"
                     , Environment.NewLine
@@ -237,10 +276,10 @@ namespace FileList.Views
             this.deleteButton.Tag = false;
             UiHelper.DeleteChecked(this.fileListControl1);
         }
-        
+
         private void ProcessSearchOptionForm()
         {
-            this.fileListControl1.scoutCountLabel.Value = this.searchOptionsForm.Threads;
+            this.fileListControl1.SearcherThreads = this.searchOptionsForm.Threads;
             this.searchOptions = this.searchOptionsForm.SearchOption;
             this.searchOptionsForm.Hide();
         }

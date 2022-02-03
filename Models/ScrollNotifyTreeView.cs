@@ -53,6 +53,7 @@ namespace FileList.Models
             return currentNode;
         }
 
+        #region Overrides
         protected override void DefWndProc(ref Message m)
         {
             MessageCodes msg = m.Msg;
@@ -104,6 +105,51 @@ namespace FileList.Models
         //    base.WndProc(ref m);
         //}
 
+        protected void OnScrolled(Direction direction)
+        {
+            EventHandler<ScrollNotifyTreeViewEventArgs> handler = Scrolled;
+
+            if (handler != null)
+                handler(this, new ScrollNotifyTreeViewEventArgs(direction));
+        }
+
+        protected override void CreateHandle()
+        {
+            base.CreateHandle();
+            //// Explorer Theme
+            uxtheme.SetWindowTheme(this.Handle, "explorer", null);
+        }
+
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            user32.SendMessage(this.Handle,
+                (uint)TreeViewMessages.TVM_SETEXTENDEDSTYLE,
+                (int)TreeViewExtendedStyles.TVS_EX_DOUBLEBUFFER,
+                (IntPtr)TreeViewExtendedStyles.TVS_EX_DOUBLEBUFFER);
+            base.OnHandleCreated(e);
+        }
+
+        protected override void OnDrawNode(DrawTreeNodeEventArgs e)
+        {
+            TreeNodeStates treeState = e.State;   
+
+            if (e.Node == e.Node.TreeView.SelectedNode || (e.State & TreeNodeStates.Hot) == TreeNodeStates.Hot)
+            {
+                Font font = e.Node.NodeFont ?? e.Node.TreeView.Font;
+                Rectangle rect = e.Bounds;
+                rect.Offset(0, 1);
+                Brush brush = SystemBrushes.Highlight; // e.Node.TreeView.Focused ? SystemBrushes.Highlight : Brushes.Gray;
+                e.Graphics.FillRectangle(brush, e.Bounds);
+                TextRenderer.DrawText(e.Graphics, e.Node.Text, font, rect, SystemColors.HighlightText, TextFormatFlags.GlyphOverhangPadding);
+            }
+            else
+            {
+                e.DrawDefault = true;
+            }
+        }
+        #endregion
+
+        #region Win32
         [StructLayout(LayoutKind.Sequential)]
         public struct NMHDR
         {
@@ -145,40 +191,7 @@ namespace FileList.Models
             public uint uFlags;
             public Int64 lParam;
         }
-
-        protected void OnScrolled(Direction direction)
-        {
-            EventHandler<ScrollNotifyTreeViewEventArgs> handler = Scrolled;
-
-            if (handler != null)
-                handler(this, new ScrollNotifyTreeViewEventArgs(direction));
-        }
-
-        protected override void CreateHandle()
-        {
-            base.CreateHandle();
-            //// Explorer Theme
-            uxtheme.SetWindowTheme(this.Handle, "explorer", null);
-        }
-
-        protected override void OnDrawNode(DrawTreeNodeEventArgs e)
-        {
-            TreeNodeStates treeState = e.State;   
-
-            if (e.Node == e.Node.TreeView.SelectedNode || (e.State & TreeNodeStates.Hot) == TreeNodeStates.Hot)
-            {
-                Font font = e.Node.NodeFont ?? e.Node.TreeView.Font;
-                Rectangle rect = e.Bounds;
-                rect.Offset(0, 1);
-                Brush brush = SystemBrushes.Highlight; // e.Node.TreeView.Focused ? SystemBrushes.Highlight : Brushes.Gray;
-                e.Graphics.FillRectangle(brush, e.Bounds);
-                TextRenderer.DrawText(e.Graphics, e.Node.Text, font, rect, SystemColors.HighlightText, TextFormatFlags.GlyphOverhangPadding);
-            }
-            else
-            {
-                e.DrawDefault = true;
-            }
-        }
+        #endregion
     }
 
     public class ScrollNotifyTreeViewEventArgs : EventArgs

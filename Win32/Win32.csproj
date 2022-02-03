@@ -60,6 +60,8 @@
     <Compile Include="Constants\SHGetFileInfo.cs" />
     <Compile Include="Constants\STREAM_SEEK.cs" />
     <Compile Include="Constants\SysImageListSize.cs" />
+    <Compile Include="Constants\TreeViewExtendedStyles.cs" />
+    <Compile Include="Constants\TreeViewMessages.cs" />
     <Compile Include="Constants\WindowHooks.cs" />
     <Compile Include="Constants\WindowStyles.cs" />
     <Compile Include="Constants\WindowStylesEx.cs" />

@@ -59,7 +59,7 @@ namespace Win32.Libraries
           string lpszWindow);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, int wParam, object lParam);
+        public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, int wParam, object lParam); //@TODO: should wParam & lParam be IntPtr ???
 
         [DllImport("user32.dll")]
         public static extern int DestroyIcon(IntPtr hIcon);
