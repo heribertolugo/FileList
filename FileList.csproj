@@ -89,6 +89,7 @@
     <Compile Include="Logic\Mover.cs" />
     <Compile Include="Logic\NotepadHelper.cs" />
     <Compile Include="Logic\UiHelper.cs" />
+    <Compile Include="Models\BatchInConcurrentCollection.cs" />
     <Compile Include="Models\ConcurrentCollection.cs" />
     <Compile Include="Models\ConcurrentQueue.cs" />
     <Compile Include="Models\Direction.cs" />
