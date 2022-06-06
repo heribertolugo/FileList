@@ -42,6 +42,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="win32csNet4">
+      <HintPath>C:\Users\DevOps\source\repos\win32cs\win32csNet4\bin\Release\win32csNet4.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -89,12 +92,6 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Win32\Win32.csproj">
-      <Project>{81a0cdfd-f069-4be5-8f60-277b70c9c57c}</Project>
-      <Name>Win32</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="7z.dll">
