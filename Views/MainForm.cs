@@ -30,8 +30,6 @@ namespace FileList.Views
             this.dialog = new Common.Models.Controls.FolderBrowserDialog(this);
             this.searchOptionsForm = new SearchOptionsForm();
             this.searchOptions = this.searchOptionsForm.SearchOption;// default(SearchOption);
-
-            UiHelper.InitiializeFilePreviewers();
         }
         private void BrowseButton_Click(object sender, EventArgs e)
         {
