@@ -74,10 +74,14 @@ namespace FileList.Logic
 
         public static void CancelSearch()
         {
-            if (UiHelper.worker != null && UiHelper.cancellationToken != null && !UiHelper.cancellationToken.IsCancellationRequested)
-            {
+            bool isTokenDisposed = true;
+            var privateInt = UiHelper.cancellationToken?.GetType().GetProperty("IsDisposed",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            if (privateInt != null)
+                isTokenDisposed = (bool)privateInt.GetValue(UiHelper.cancellationToken, null);
+
+            if (UiHelper.worker != null && UiHelper.cancellationToken != null && !isTokenDisposed && !UiHelper.cancellationToken.IsCancellationRequested)
                 UiHelper.cancellationToken.Cancel();
-            }
         }
 
         private static void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
