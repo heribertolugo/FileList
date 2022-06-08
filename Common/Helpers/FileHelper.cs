@@ -1,6 +1,7 @@
 ﻿using Common.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -32,6 +33,80 @@ namespace Common.Helpers
                 return FileType.Zip;
 
             return FileType.Unknown;
+        }
+
+        public static string GetFileName(string path)
+        {
+            try
+            {
+                return System.IO.Path.GetFileName(path);
+            }
+            catch (PathTooLongException ex)
+            {
+                char pathSeparator = System.IO.Path.DirectorySeparatorChar;
+                int dirSeperatorIndex = path.LastIndexOf(pathSeparator);
+
+                return path.Remove(0, dirSeperatorIndex).Trim(new char[] { ' ', pathSeparator });
+            }
+        }
+
+        public static string GetFileExtension(string path)
+        {
+            try
+            {
+                return System.IO.Path.GetExtension(path);
+            }catch(PathTooLongException ex)
+            {
+                string fileName = FileHelper.GetFileName(path);
+
+                return fileName.Remove(0, fileName.LastIndexOf('.'));
+            }
+        }
+
+        public static string GetFileNameWithoutExtension(string path)
+        {
+            try
+            {
+                return System.IO.Path.GetFileNameWithoutExtension(FileHelper.GetFileName(path));
+            }catch(PathTooLongException ex)
+            {
+                string fileName = FileHelper.GetFileName(path);
+                int extensionIndex = fileName.LastIndexOf('.');
+
+                return fileName.Substring(0, extensionIndex);
+            }
+        }
+
+        public static string GetDirectoryName(string path)
+        {
+            try
+            {
+                return System.IO.Path.GetDirectoryName(path);
+            }catch(PathTooLongException ex)
+            {
+                return path.Replace(FileHelper.GetFileName(path), "");
+            }
+        }
+
+        public static string GetCurrentDirectoryName(string path)
+        {
+            char pathSeparator = System.IO.Path.DirectorySeparatorChar;
+
+            return FileHelper.GetFileName(path.Replace(FileHelper.GetFileName(path), "").Trim(new char[] { ' ', pathSeparator })) + pathSeparator;
+        }
+
+        public static bool PathHasExtension(string path)
+        {
+            try
+            {
+                return System.IO.Path.HasExtension(path);
+            }catch(PathTooLongException ex)
+            {
+                string fileName = FileHelper.GetFileName(path);
+                string extension = fileName.Remove(0, fileName.LastIndexOf('.'));
+
+                return !string.IsNullOrWhiteSpace(extension.Trim(new char[] { '.' }));
+            }
         }
     }
 }
