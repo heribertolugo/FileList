@@ -1,4 +1,5 @@
-﻿using Common.Models;
+﻿using Common.Helpers;
+using Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -49,7 +50,7 @@ namespace FilePreview.TextFiles
                 else
                 {
                     viewer.Clear();
-                    viewer.LoadFile(path, System.IO.Path.GetExtension(path).ToLower().Equals(Common.Models.Constants.ZipExtension) ? RichTextBoxStreamType.RichText : RichTextBoxStreamType.PlainText);
+                    viewer.LoadFile(path, FileHelper.GetFileExtension(path).ToLower().Equals(Common.Models.Constants.ZipExtension) ? RichTextBoxStreamType.RichText : RichTextBoxStreamType.PlainText);
                 }
                 success = true;
             }

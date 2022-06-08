@@ -101,7 +101,7 @@ namespace Common.Models
                 if (string.IsNullOrEmpty(this.Path) || this.Path.Trim() == string.Empty)
                     return string.Empty;
                 if (this._name == null)
-                    this._name = System.IO.Path.GetFileNameWithoutExtension(this.Path);
+                    this._name = FileHelper.GetFileNameWithoutExtension(this.Path);
                 return this._name;
             }
             private set
@@ -116,7 +116,7 @@ namespace Common.Models
                 if (string.IsNullOrEmpty(this.Path) || this.Path.Trim() == string.Empty)
                     return string.Empty;
                 if (this._extension == null)
-                    this._extension = System.IO.Path.GetExtension(this.Path);
+                    this._extension = FileHelper.GetFileExtension(this.Path);
                 return this._extension.ToLowerInvariant();
             }
             private set
@@ -131,7 +131,7 @@ namespace Common.Models
                 if (string.IsNullOrEmpty(this.Path) || this.Path.Trim() == string.Empty)
                     return string.Empty;
                 if (this._diectory == null)
-                    this._diectory = System.IO.Path.GetDirectoryName(this.Path) + "\\";
+                    this._diectory = FileHelper.GetDirectoryName(this.Path) + "\\";
                 return this._diectory;
             }
             private set
@@ -250,7 +250,7 @@ namespace Common.Models
         {
             try
             {
-                Folder folder = this._shell.NameSpace(System.IO.Path.GetDirectoryName(this.Path));
+                Folder folder = this._shell.NameSpace(FileHelper.GetDirectoryName(this.Path));
                 return this._shell;
             }
             catch (Exception ex) { }
@@ -258,7 +258,7 @@ namespace Common.Models
             try
             {
                 this._shell = ole32.GetIShellDispatch5();
-                Folder folder = this._shell.NameSpace(System.IO.Path.GetDirectoryName(this.Path));
+                Folder folder = this._shell.NameSpace(FileHelper.GetDirectoryName(this.Path));
                 return this._shell;
             }
             catch (Exception ex) { }
@@ -269,7 +269,7 @@ namespace Common.Models
                 ole32.GetRegisteredInterfaceMarshalPtr<Shell32.IShellDispatch5>(shell);
                 GC.KeepAlive(shell);
                 this._shell = ole32.GetIShellDispatch5();
-                Folder folder = this._shell.NameSpace(System.IO.Path.GetDirectoryName(this.Path));
+                Folder folder = this._shell.NameSpace(FileHelper.GetDirectoryName(this.Path));
                 return this._shell;
             }
             catch (Exception ex) { }
@@ -298,8 +298,8 @@ namespace Common.Models
 
                         if (fileData.GetShell() != null)
                         {
-                            Folder folder = fileData._shell.NameSpace(System.IO.Path.GetDirectoryName(fileData.Path));
-                            FolderItem name = folder.ParseName(System.IO.Path.GetFileName(fileData.Path));
+                            Folder folder = fileData._shell.NameSpace(FileHelper.GetDirectoryName(fileData.Path));
+                            FolderItem name = folder.ParseName(FileHelper.GetFileName(fileData.Path));
 
                             for (int iColumn = -1; iColumn < 1000; iColumn++) //(int)short.MaxValue
                             {

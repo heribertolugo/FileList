@@ -79,7 +79,7 @@ namespace FilePreview.BrowseFiles
                                     if (args.Token.IsCancellationRequested)
                                         break;
                                     string key = FileBrowserControl.AddImage(file, v.LargeImageList, v.LargeImageList.ImageSize);
-                                    FileBrowserControl.AddItem(v, System.IO.Path.GetFileName(file), key);
+                                    FileBrowserControl.AddItem(v, FileHelper.GetFileName(file), key);
                                     this._itemGroups[this._itemGroupIndex].Items.Add(v.Items[file]);
                                 }
                                 catch (Exception ex) { }
@@ -184,8 +184,8 @@ namespace FilePreview.BrowseFiles
                         {
                             args.Token.ThrowIfCancellationRequested();
                             string key = FileBrowserControl.AddImage(zipContent.Path, v.LargeImageList, v.LargeImageList.ImageSize);
-                            string fileName = System.IO.Path.GetFileName(zipContent.Path);
-                            string itemName = string.IsNullOrWhiteSpace(fileName) ? System.IO.Path.GetDirectoryName(zipContent.Path) : fileName;
+                            string fileName = FileHelper.GetFileName(zipContent.Path);
+                            string itemName = string.IsNullOrWhiteSpace(fileName) ? FileHelper.GetDirectoryName(zipContent.Path) : fileName;
                             FileBrowserControl.AddItem(v, itemName, key);
                             this._itemGroups[this._itemGroupIndex].Items.Add(v.Items[zipContent.Path]);
                         }
@@ -225,7 +225,7 @@ namespace FilePreview.BrowseFiles
                     {
                         args.Token.ThrowIfCancellationRequested();
                         string key = FileBrowserControl.AddImage(file, args.View.LargeImageList, args.View.LargeImageList.ImageSize);
-                        FileBrowserControl.AddItem(args.View, System.IO.Path.GetFileName(file), key);
+                        FileBrowserControl.AddItem(args.View, FileHelper.GetFileName(file), key);
                         this._itemGroups[this._itemGroupIndex].Items.Add(args.View.Items[file]);
                     }
                     catch (Exception) { }
@@ -281,7 +281,7 @@ namespace FilePreview.BrowseFiles
 
         private static string GetKey(string fileName)
         {
-            return !Path.GetFileName(fileName).Equals(string.Empty) || !fileName.EndsWith(Constants.DirectoryKey) ? Path.GetExtension(fileName) : Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + Constants.DirectoryKey;
+            return !FileHelper.GetFileName(fileName).Equals(string.Empty) || !fileName.EndsWith(Constants.DirectoryKey) ? FileHelper.GetFileExtension(fileName) : Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + Constants.DirectoryKey;
         }
 
         private class FileBrowserControlItem

@@ -13,7 +13,7 @@ namespace Common.Helpers
         public static FileType GetFileTypeFromPath(string path)
         {
             string mimeType = Constants.ApplicationUnknown;
-            string extension = System.IO.Path.GetExtension(path).ToLower();
+            string extension = FileHelper.GetFileExtension(path).ToLower();
             if (extension.Equals(string.Empty) && System.IO.Directory.Exists(path))
                 return FileType.Folder;
 
