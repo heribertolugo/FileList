@@ -297,7 +297,7 @@ namespace Common.Helpers
         private Bitmap LoadJumbo(string lookup)
         {
             FileToIconConverter._imgList.ImageListSize = FileToIconConverter.IsVistaUp() ? SysImageListSize.jumbo : SysImageListSize.extraLargeIcons;
-            Icon icon = FileToIconConverter._imgList.Icon(FileToIconConverter._imgList.IconIndex(lookup, FileToIconConverter.isFolder(lookup)));
+            Icon icon = FileToIconConverter._imgList.Icon(FileToIconConverter._imgList.IconIndex(lookup, FileToIconConverter.IsFolder(lookup)));
             Bitmap imgToResize = icon.ToBitmap();
             icon.Dispose();
             Color color = Color.FromArgb(0, 0, 0, 0);
@@ -392,7 +392,7 @@ namespace Common.Helpers
             {
                 case IconSize.ExtraLarge:
                     FileToIconConverter._imgList.ImageListSize = SysImageListSize.extraLargeIcons;
-                    return FileToIconConverter.LoadBitmap(FileToIconConverter._imgList.Icon(FileToIconConverter._imgList.IconIndex(dummyFile, FileToIconConverter.isFolder(fileName))).ToBitmap());
+                    return FileToIconConverter.LoadBitmap(FileToIconConverter._imgList.Icon(FileToIconConverter._imgList.IconIndex(dummyFile, FileToIconConverter.IsFolder(fileName))).ToBitmap());
                 case IconSize.Jumbo:
                     return FileToIconConverter.LoadBitmap(this.LoadJumbo(dummyFile));
                 case IconSize.Thumbnail:
