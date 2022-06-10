@@ -79,7 +79,7 @@ namespace FilePreview.BrowseFiles
                                     if (args.Token.IsCancellationRequested)
                                         break;
                                     string key = FileBrowserControl.AddImage(file, v.LargeImageList, v.LargeImageList.ImageSize);
-                                    FileBrowserControl.AddItem(v, FileHelper.GetFileName(file), key);
+                                    FileBrowserControl.AddItem(v, file, key, FileHelper.GetFileName(file));
                                     this._itemGroups[this._itemGroupIndex].Items.Add(v.Items[file]);
                                 }
                                 catch (Exception ex) { }
@@ -91,8 +91,9 @@ namespace FilePreview.BrowseFiles
                                 {
                                     if (args.Token.IsCancellationRequested)
                                         break;
-                                    string key = FileBrowserControl.AddImage(Constants.DirectoryKey, v.LargeImageList, v.LargeImageList.ImageSize);
-                                    FileBrowserControl.AddItem(v, Constants.DirectoryKey, key);
+                                    string currentDirectory = FileHelper.GetCurrentDirectoryName(directory);
+                                    string key = FileBrowserControl.AddImage(directory + Constants.DirectoryKey, v.LargeImageList, v.LargeImageList.ImageSize);
+                                    FileBrowserControl.AddItem(v, directory + Constants.DirectoryKey, key, currentDirectory);
                                     this._itemGroups[this._itemGroupIndex].Items.Add(v.Items[directory + Constants.DirectoryKey]);
                                 }
                                 catch (Exception ex) { }
@@ -225,7 +226,7 @@ namespace FilePreview.BrowseFiles
                     {
                         args.Token.ThrowIfCancellationRequested();
                         string key = FileBrowserControl.AddImage(file, args.View.LargeImageList, args.View.LargeImageList.ImageSize);
-                        FileBrowserControl.AddItem(args.View, FileHelper.GetFileName(file), key);
+                        FileBrowserControl.AddItem(args.View, file, key, FileHelper.GetFileName(file));
                         this._itemGroups[this._itemGroupIndex].Items.Add(args.View.Items[file]);
                     }
                     catch (Exception) { }
@@ -235,8 +236,9 @@ namespace FilePreview.BrowseFiles
                     try
                     {
                         args.Token.ThrowIfCancellationRequested();
-                        string key = FileBrowserControl.AddImage(Constants.DirectoryKey, args.View.LargeImageList, args.View.LargeImageList.ImageSize);
-                        FileBrowserControl.AddItem(args.View, Constants.DirectoryKey, key);
+                        string currentDirectory = FileHelper.GetCurrentDirectoryName(directory);
+                        string key = FileBrowserControl.AddImage(directory + Constants.DirectoryKey, args.View.LargeImageList, args.View.LargeImageList.ImageSize);
+                        FileBrowserControl.AddItem(args.View, directory + Constants.DirectoryKey, key, currentDirectory);
                         this._itemGroups[this._itemGroupIndex].Items.Add(args.View.Items[directory + Constants.DirectoryKey]);
                     }
                     catch (Exception) { }
@@ -272,10 +274,12 @@ namespace FilePreview.BrowseFiles
             return key;
         }
 
-        private static void AddItem(ListView listView, string fileName, string imageKey)
+        private static void AddItem(ListView listView, string fileName, string imageKey, string text = null)
         {
             ListViewItem listViewItem = new ListViewItem(fileName, imageKey.Equals(string.Empty) ? Constants.NoneFileExtension : imageKey);
             listViewItem.Name = fileName;
+            if (text != null)
+                listViewItem.Text = text;
             listView.Items.Add(listViewItem);
         }
 
