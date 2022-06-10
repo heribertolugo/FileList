@@ -396,7 +396,7 @@ namespace FileList.Logic
                 }
                 catch (Exception ex)
                 {
-                    string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+                    string dir = FileHelper.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
                     lock (errFileLock)
                     {
                         System.IO.File.WriteAllText(System.IO.Path.Combine(dir, "err.txt"), ex.Message);

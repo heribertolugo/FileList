@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common.Helpers;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -185,8 +186,8 @@ namespace Common.Models.ZipExtractor
         {
             if (this.ArchiveStream == null)
             {
-                this.sevenZipFormat = new SevenZipLoader(System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), sevenZipDll));
-                this.Archive = sevenZipFormat.CreateInArchive(this.GetFormatFromExtension(System.IO.Path.GetExtension(this._path)).Guid);
+                this.sevenZipFormat = new SevenZipLoader(System.IO.Path.Combine(FileHelper.GetDirectoryName(Assembly.GetExecutingAssembly().Location), sevenZipDll));
+                this.Archive = sevenZipFormat.CreateInArchive(this.GetFormatFromExtension(FileHelper.GetFileExtension(this._path)).Guid);
                 if (Archive == null)
                     return null;
                 this.ArchiveStream = new InStreamWrapper(File.OpenRead(this._path));

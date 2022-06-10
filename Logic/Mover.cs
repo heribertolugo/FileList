@@ -1,4 +1,5 @@
 ﻿using Common.Extensions;
+using Common.Helpers;
 using FileList.Models;
 using System;
 using System.Collections.Generic;
@@ -61,7 +62,7 @@ namespace FileList.Logic
                 {
                     if (!File.Exists(item))
                         throw new Exception(string.Format("The file requested does not exist: {0}", item));
-                    string destination = Path.Combine(this._destination, Path.GetFileName(item));
+                    string destination = Path.Combine(this._destination, FileHelper.GetFileName(item));
                     File.Copy(item, destination, this._overwrite);
                     this._moveProgress.InvokeIfRequired(p => p.PushMessage(string.Format("File copied: {0}", item)));
                     if (!this.ValidateCopy(item, destination))
@@ -71,11 +72,11 @@ namespace FileList.Logic
                         File.Delete(item);
                         if (File.Exists(item))
                             throw new Exception(string.Format("Could not delete file: {0}", item));
-                        string directoryName = Path.GetDirectoryName(item);
+                        string directoryName = FileHelper.GetDirectoryName(item);
                         if (Directory.GetFiles(directoryName).Length < 1)
                             Directory.Delete(directoryName);
                     }
-                    this._moveProgress.InvokeIfRequired(p => p.AddItem(item, string.Format("{0} successfully {2} to {1}", Path.GetFileName(item), destination, this.OperationText)));
+                    this._moveProgress.InvokeIfRequired(p => p.AddItem(item, string.Format("{0} successfully {2} to {1}", FileHelper.GetFileName(item), destination, this.OperationText)));
                 }
                 catch (Exception ex)
                 {
@@ -108,11 +109,11 @@ namespace FileList.Logic
                         File.Delete(item);
                         if (File.Exists(item))
                             throw new Exception(string.Format("Could not delete file: {0}", item));
-                        string directoryName = Path.GetDirectoryName(item);
+                        string directoryName = FileHelper.GetDirectoryName(item);
                         if (Directory.GetFiles(directoryName).Length < 1)
                             Directory.Delete(directoryName);
                     }
-                    this._moveProgress.InvokeIfRequired(p => p.AddItem(item, string.Format("{0} successfully {2} to {1}", Path.GetFileName(item), destination, this.OperationText)));
+                    this._moveProgress.InvokeIfRequired(p => p.AddItem(item, string.Format("{0} successfully {2} to {1}", FileHelper.GetFileName(item), destination, this.OperationText)));
                 }
                 catch (Exception ex)
                 {
@@ -138,7 +139,7 @@ namespace FileList.Logic
         private string CreateDestination(string source, string destination, ProgressInfoControl moveProgress)
         {
             string path = Path.Combine(destination, source.Replace(":", ""));
-            string directoryName = Path.GetDirectoryName(path);
+            string directoryName = FileHelper.GetDirectoryName(path);
 
             if (!Directory.Exists(directoryName))
             {

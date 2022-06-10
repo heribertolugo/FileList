@@ -82,7 +82,7 @@ namespace Common.Models.ImageList
             SHGetFileInfo fileInfoConstants = SHGetFileInfo.SHGFI_SYSICONINDEX;
             if (this.size == SysImageListSize.smallIcons)
                 fileInfoConstants |= SHGetFileInfo.SHGFI_SMALLICON;
-            uint dwFileAttributes;
+            FileAttribute dwFileAttributes;
             if (!forceLoadFromDisk)
             {
                 fileInfoConstants |= SHGetFileInfo.SHGFI_USEFILEATTRIBUTES;
@@ -92,7 +92,7 @@ namespace Common.Models.ImageList
                 dwFileAttributes = 0;
             SHFILEINFO psfi = new SHFILEINFO();
             uint cbFileInfo = (uint)Marshal.SizeOf(psfi.GetType());
-            IntPtr fileInfo = shell32.SHGetFileInfo(fileName, dwFileAttributes, ref psfi, cbFileInfo, (uint)(fileInfoConstants | (SHGetFileInfo)iconState));
+            IntPtr fileInfo = shell32.SHGetFileInfo(fileName, dwFileAttributes, ref psfi, cbFileInfo, (fileInfoConstants | (SHGetFileInfo)iconState));
             if (!fileInfo.Equals(IntPtr.Zero))
                 return (int)psfi.iIcon;
             //Debug.Assert(!fileInfo.Equals(IntPtr.Zero), "Failed to get icon index");
@@ -226,7 +226,7 @@ namespace Common.Models.ImageList
                     fileInfoConstants |= SHGetFileInfo.SHGFI_SMALLICON;
                 SHFILEINFO psfi = new SHFILEINFO();
                 uint cbFileInfo = (uint)Marshal.SizeOf(psfi.GetType());
-                this.hIml = shell32.SHGetFileInfo(".txt", FileAttribute.FILE_ATTRIBUTE_NORMAL, ref psfi, cbFileInfo, (uint)fileInfoConstants);
+                this.hIml = shell32.SHGetFileInfo(".txt", FileAttribute.FILE_ATTRIBUTE_NORMAL, ref psfi, cbFileInfo, fileInfoConstants);
                 Debug.Assert(this.hIml != IntPtr.Zero, "Failed to create Image List");
             }
         }

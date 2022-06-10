@@ -11,6 +11,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Linq;
 using FileList.Views;
+using Common.Helpers;
 
 namespace FileList.Logic
 {
@@ -74,10 +75,14 @@ namespace FileList.Logic
 
         public static void CancelSearch()
         {
-            if (UiHelper.worker != null && UiHelper.cancellationToken != null && !UiHelper.cancellationToken.IsCancellationRequested)
-            {
+            bool isTokenDisposed = true;
+            var privateInt = UiHelper.cancellationToken?.GetType().GetProperty("IsDisposed",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            if (privateInt != null)
+                isTokenDisposed = (bool)privateInt.GetValue(UiHelper.cancellationToken, null);
+
+            if (UiHelper.worker != null && UiHelper.cancellationToken != null && !isTokenDisposed && !UiHelper.cancellationToken.IsCancellationRequested)
                 UiHelper.cancellationToken.Cancel();
-            }
         }
 
         private static void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -177,7 +182,7 @@ namespace FileList.Logic
         public static void OpenLocation(string path)
         {
             if (File.Exists(path))
-                UiHelper.OpenItem(path.Replace(Path.GetFileName(path), string.Empty));
+                UiHelper.OpenItem(path.Replace(FileHelper.GetFileName(path), string.Empty));
             else
                 UiHelper.OpenItem(path);
         }
@@ -269,7 +274,7 @@ namespace FileList.Logic
         public static FileType GetFileType(string fileName)
         {
             string str = "application/unknown";
-            string lower = Path.GetExtension(fileName).ToLower();
+            string lower = FileHelper.GetFileExtension(fileName).ToLower();
             if (lower.Equals(string.Empty) && Directory.Exists(fileName))
             {
                 str = string.Empty;

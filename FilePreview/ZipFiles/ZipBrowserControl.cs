@@ -218,7 +218,7 @@ namespace FilePreview.BrowseFiles
                 key = ZipBrowserControl.GetKey(path);
                 // because we are in zip file, we cant pass the folder inside the zip to get image
                 // so we pass appdata folder to get a folder image. some files dont have extension, so pass .none as extension
-                bitmap1 = fileToIconConverter.GetImage(string.IsNullOrWhiteSpace(System.IO.Path.GetFileName(path)) ? Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) : (path.Contains(".") ? path : ".none"), IconSize.ExtraLarge).ToBitmap(); 
+                bitmap1 = fileToIconConverter.GetImage(string.IsNullOrWhiteSpace(FileHelper.GetFileName(path)) ? Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) : (path.Contains(".") ? path : ".none"), IconSize.ExtraLarge).ToBitmap(); 
 
                 if (!imageList.Images.ContainsKey(key))
                     imageList.Images.Add(key, bitmap1);
@@ -237,7 +237,7 @@ namespace FilePreview.BrowseFiles
 
         private static string GetKey(string fileName)
         {
-            return !Path.GetFileName(fileName).Equals(string.Empty) || !fileName.EndsWith(Constants.DirectoryKey) ? Path.GetExtension(fileName) : Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + Constants.DirectoryKey;
+            return !FileHelper.GetFileName(fileName).Equals(string.Empty) || !fileName.EndsWith(Constants.DirectoryKey) ? FileHelper.GetFileExtension(fileName) : Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + Constants.DirectoryKey;
         }
 
         private class FileBrowserControlItem

@@ -10,6 +10,7 @@ using Win32.Constants;
 using Win32.Libraries;
 using Common.Extensions;
 using Common.Models;
+using Common.Helpers;
 
 namespace FileList.Models
 {
@@ -188,9 +189,9 @@ namespace FileList.Models
 
             if (treeNode == null)
             {
-                parentName = System.IO.Path.GetDirectoryName(path);
-                TreeNode parentNode = this.treeView1.Nodes[System.IO.Path.GetDirectoryName(path)];
-                childName = System.IO.Path.GetFileName(path);
+                parentName = FileHelper.GetDirectoryName(path);
+                TreeNode parentNode = this.treeView1.Nodes[FileHelper.GetDirectoryName(path)];
+                childName = FileHelper.GetFileName(path);
 
                 if (parentNode.Nodes.ContainsKey(childName))
                 {
@@ -233,8 +234,8 @@ namespace FileList.Models
             {
                 if ((n.Tag as FileData?).HasValue)
                     return true;
-                if (Path.HasExtension(n.Text))
-                    return Path.GetExtension(n.Text).ToLowerInvariant().Equals(UiHelper.ZipExtension);
+                if (FileHelper.PathHasExtension(n.Text))
+                    return FileHelper.GetFileExtension(n.Text).ToLowerInvariant().Equals(UiHelper.ZipExtension);
                 return false;
             }).Select(n =>
             {
@@ -457,7 +458,7 @@ namespace FileList.Models
         {
             (sender as TreeView).AfterCheck -= new TreeViewEventHandler(this.TreeView1_AfterCheck);
             string nodePath = FileListControl.GetNodePath(e.Node);
-            if (nodePath.ToLowerInvariant().Contains(UiHelper.ZipExtension) && !Path.GetExtension(nodePath).ToLowerInvariant().Equals(UiHelper.ZipExtension) && e.Node.Checked)
+            if (nodePath.ToLowerInvariant().Contains(UiHelper.ZipExtension) && !FileHelper.GetFileExtension(nodePath).ToLowerInvariant().Equals(UiHelper.ZipExtension) && e.Node.Checked)
             {
                 MessageBox.Show("Extracting zip files is not supported yet.\nSelect the actual zip to copy or move it", "", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                 e.Node.Checked = false;
@@ -470,7 +471,7 @@ namespace FileList.Models
             }
             else
             {
-                if (Path.GetExtension(nodePath).Equals(UiHelper.ZipExtension))
+                if (FileHelper.GetFileExtension(nodePath).Equals(UiHelper.ZipExtension))
                 {
                     (sender as TreeView).AfterCheck += new TreeViewEventHandler(this.TreeView1_AfterCheck);
                     return;
@@ -701,7 +702,7 @@ namespace FileList.Models
         /// <param name="tree"></param>
         private static void ScrollTreeLeft(TreeView tree)
         {
-            user32.SendMessage(tree.Handle, (uint)(int)MessageCodes.WM_HSCROLL, HorizontalScrollBarCommands.SB_LEFT, 0);
+            user32.SendMessage(tree.Handle, (uint)(int)MessageCodes.WM_HSCROLL, HorizontalScrollBarCommands.SB_LEFT, new IntPtr(0)); 
         }
 
         /// <summary>
@@ -1007,7 +1008,7 @@ namespace FileList.Models
         private bool ShouldNodeVisible(TreeNode node, IsParentNode isParent, ItemCheckEventArgs itemCheckEventArgs = null)
         {
             Func<FileData, bool> filterPredicate = this.GetFilterPredicate(itemCheckEventArgs);
-            string parentNodeName = System.IO.Path.GetDirectoryName(node.Name);
+            string parentNodeName = FileHelper.GetDirectoryName(node.Name);
             int maxNodes = this.treeView1.VisibleCount * 2;
 
             switch (isParent)
