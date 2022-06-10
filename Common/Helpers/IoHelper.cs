@@ -56,14 +56,14 @@ namespace Common.Helpers
         {
             try
             {
-                if (System.IO.Directory.Exists(path))
+                if (FileHelper.DirectoryExists(path))
                 {
                     //System.IO.DirectoryInfo dirInfo = new System.IO.DirectoryInfo(path);
                     //System.Security.AccessControl.DirectorySecurity dirAC = dirInfo.GetAccessControl(System.Security.AccessControl.AccessControlSections.All);
                     System.IO.Directory.GetDirectories(path);
                     System.IO.Directory.GetFiles(path);
                 }
-                else if (System.IO.File.Exists(path))
+                else if (FileHelper.FileExists(path))
                 {
                     //System.IO.FileInfo fileInfo = new System.IO.FileInfo(path);
                     //System.Security.AccessControl.FileSecurity fileAC = fileInfo.GetAccessControl(System.Security.AccessControl.AccessControlSections.All);
