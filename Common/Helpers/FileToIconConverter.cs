@@ -98,11 +98,11 @@ namespace Common.Helpers
         internal static Icon GetFileIcon(string fileName, IconSize size)
         {
             SHFILEINFO psfi = new SHFILEINFO();
-            uint num = ShellIconFlags.SHGFI_SYSICONINDEX; 
+            SHGetFileInfo num = SHGetFileInfo.SHGFI_SYSICONINDEX; 
             if (fileName.IndexOf(":") == -1)
-                num |= ShellIconFlags.SHGFI_USEFILEATTRIBUTES; 
-            uint uFlags = size != IconSize.Small ? num | ShellIconFlags.SHGFI_ICON : (uint)((int)num | ShellIconFlags.SHGFI_ICON | ShellIconFlags.SHGFI_SMALLICON);
-            shell32.SHGetFileInfo(fileName, ShellIconFlags.SHGFI_LARGEICON, ref psfi, (uint)Marshal.SizeOf(psfi), uFlags);
+                num |= SHGetFileInfo.SHGFI_USEFILEATTRIBUTES;
+            SHGetFileInfo uFlags = (SHGetFileInfo)(size != IconSize.Small ? num | SHGetFileInfo.SHGFI_ICON : (num | SHGetFileInfo.SHGFI_ICON | SHGetFileInfo.SHGFI_SMALLICON));
+            shell32.SHGetFileInfo(fileName, (FileAttribute)SHGetFileInfo.SHGFI_LARGEICON, ref psfi, (uint)Marshal.SizeOf(psfi), uFlags);
             return Icon.FromHandle(psfi.hIcon);
         }
 
