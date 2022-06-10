@@ -37,75 +37,142 @@ namespace Common.Helpers
 
         public static string GetFileName(string path)
         {
-            try
-            {
-                return System.IO.Path.GetFileName(path);
-            }
-            catch (PathTooLongException ex)
-            {
+            //try
+            //{
+                //return System.IO.Path.GetFileName(path); // because System.IO.Path.GetDirectoryName cannot be trusted, i lost faith is built in methods
+            //}
+            //catch (PathTooLongException ex)
+            //{
+                if (DirectoryExists(path))
+                    return string.Empty;
+
                 char pathSeparator = System.IO.Path.DirectorySeparatorChar;
                 int dirSeperatorIndex = path.LastIndexOf(pathSeparator);
 
-                return path.Remove(0, dirSeperatorIndex).Trim(new char[] { ' ', pathSeparator });
-            }
+                if (dirSeperatorIndex < 0)
+                    return path;
+
+                return path.Remove(0, dirSeperatorIndex).Trim(new char[] { pathSeparator });
+            //}
         }
 
         public static string GetFileExtension(string path)
         {
-            try
-            {
-                return System.IO.Path.GetExtension(path);
-            }catch(PathTooLongException ex)
-            {
-                string fileName = FileHelper.GetFileName(path);
+        //    try
+        //    {
+        //        return System.IO.Path.GetExtension(path); // because System.IO.Path.GetDirectoryName cannot be trusted, i lost faith is built in methods
+        //    }
+        //    catch(PathTooLongException ex)
+        //    {
+                if (DirectoryExists(path))
+                    return string.Empty;
 
+                string fileName = GetFileName(path);
+
+                if (string.IsNullOrWhiteSpace(fileName))
+                    return string.Empty;
+                int extensionIndex = fileName.LastIndexOf('.');
+                if (extensionIndex < 0)
+                    return string.Empty;
                 return fileName.Remove(0, fileName.LastIndexOf('.'));
-            }
+            //}
         }
 
         public static string GetFileNameWithoutExtension(string path)
         {
-            try
-            {
-                return System.IO.Path.GetFileNameWithoutExtension(FileHelper.GetFileName(path));
-            }catch(PathTooLongException ex)
-            {
-                string fileName = FileHelper.GetFileName(path);
-                int extensionIndex = fileName.LastIndexOf('.');
+            //try
+            //{
+            //    return System.IO.Path.GetFileNameWithoutExtension(FileHelper.GetFileName(path)); // because System.IO.Path.GetDirectoryName cannot be trusted, i lost faith is built in methods
+            //}
+            //catch(PathTooLongException ex)
+            //{
+                if (DirectoryExists(path))
+                    return string.Empty;
 
-                return fileName.Substring(0, extensionIndex);
-            }
+            string fileName = FileHelper.GetFileName(path);
+            if (string.IsNullOrWhiteSpace(fileName))
+                return string.Empty;
+            string extension = GetFileExtension(fileName);
+
+            if (string.IsNullOrWhiteSpace(extension))
+                return fileName;
+
+            return fileName.Substring(0, fileName.LastIndexOf(extension));
+            //}
         }
 
         public static string GetDirectoryName(string path)
         {
-            try
-            {
-                return System.IO.Path.GetDirectoryName(path);
-            }catch(PathTooLongException ex)
-            {
-                return path.Replace(FileHelper.GetFileName(path), "");
-            }
+            //try
+            //{
+            //    return System.IO.Path.GetDirectoryName(path); // unfortunately this gives wrong directory if path does not end with /
+            //}catch(PathTooLongException ex)
+            //{
+                char pathSeparator = System.IO.Path.DirectorySeparatorChar;
+
+                if (path.EndsWith(pathSeparator.ToString()))
+                    return path.TrimEnd(new char[] { pathSeparator });
+
+                string directoryName = FileExists(path) ? path.Replace(GetFileName(path), "") : path;// GetFileName(path);
+                if (directoryName.EndsWith(pathSeparator.ToString()))
+                    directoryName = directoryName.TrimEnd(new char[] { pathSeparator });
+
+
+                return directoryName;
+            //}
         }
 
         public static string GetCurrentDirectoryName(string path)
         {
             char pathSeparator = System.IO.Path.DirectorySeparatorChar;
 
-            return FileHelper.GetFileName(path.Replace(FileHelper.GetFileName(path), "").Trim(new char[] { ' ', pathSeparator })) + pathSeparator;
+            string directories = GetDirectoryName(path);
+
+            if (string.IsNullOrWhiteSpace(directories))
+                return string.Empty;
+
+            return directories.Substring(directories.LastIndexOf(pathSeparator)).Trim(new char[] { pathSeparator });
         }
 
         public static bool PathHasExtension(string path)
         {
-            try
-            {
-                return System.IO.Path.HasExtension(path);
-            }catch(PathTooLongException ex)
-            {
-                string fileName = FileHelper.GetFileName(path);
-                string extension = fileName.Remove(0, fileName.LastIndexOf('.'));
+            //try
+            //{
+            //    return System.IO.Path.HasExtension(path);  // because System.IO.Path.GetDirectoryName cannot be trusted, i lost faith is built in methods
+            //}
+            //catch(PathTooLongException ex)
+            //{
+                if (DirectoryExists(path))
+                    return false;
 
-                return !string.IsNullOrWhiteSpace(extension.Trim(new char[] { '.' }));
+                return path.IndexOf('.', path.LastIndexOf(System.IO.Path.DirectorySeparatorChar)) > -1;
+            //}
+        }
+
+        //https://stackoverflow.com/a/27111931/6368401
+        public static bool DirectoryExists(string path)
+        {
+            uint attributes = Win32.Libraries.kernal32.GetFileAttributes(path.StartsWith(@"\\?\") ? path : @"\\?\" + path);
+            if (attributes != (uint)Win32.Constants.FileAttribute.INVALID_FILE_ATTRIBUTES)
+            {
+                return ((FileAttributes)attributes).HasFlag(FileAttributes.Directory);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public static bool FileExists(string path)
+        {
+            uint attributes = Win32.Libraries.kernal32.GetFileAttributes(path.StartsWith(@"\\?\") ? path : @"\\?\" + path);
+            if (attributes != (uint)Win32.Constants.FileAttribute.INVALID_FILE_ATTRIBUTES)
+            {
+                return !((FileAttributes)attributes).HasFlag(FileAttributes.Directory);
+            }
+            else
+            {
+                return false;
             }
         }
     }
