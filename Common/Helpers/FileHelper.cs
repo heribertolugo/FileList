@@ -153,7 +153,7 @@ namespace Common.Helpers
         public static bool DirectoryExists(string path)
         {
             uint attributes = Win32.Libraries.kernal32.GetFileAttributes(path.StartsWith(@"\\?\") ? path : @"\\?\" + path);
-            if (attributes != (uint)Win32.Constants.FileAttribute.INVALID_FILE_ATTRIBUTES)
+            if (attributes != (uint)Win32.Constants.FileAttribute.INVALID_FILE_ATTRIBUTES) //TODO: if(INVALID_FILE_ATTRIBUTES == GetFileAttributes("C:\\MyFile.txt") && GetLastError()==ERROR_FILE_NOT_FOUND)
             {
                 return ((FileAttributes)attributes).HasFlag(FileAttributes.Directory);
             }
